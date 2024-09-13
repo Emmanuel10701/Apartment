@@ -70,8 +70,8 @@ export default function HomePage() {
           >
             {loading ? (
               <div className="flex items-center justify-center space-x-2">
-                <CircularProgress size={24} className="text-white" />
-                <span>Sending...</span>
+              <CircularProgress color="inherit" size={24} />
+              <span>Sending...</span>
               </div>
             ) : (
               'Send Email'
