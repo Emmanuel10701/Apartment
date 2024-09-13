@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { CiMenuBurger } from "react-icons/ci"; 
-import { FaHome, FaList, FaInfoCircle, FaPhone, FaTachometerAlt } from 'react-icons/fa';
-import Image from 'next/image';
-import Link from 'next/link';
+import { CiMenuBurger } from "react-icons/ci";
+import { FaTimes, FaHome, FaList, FaInfoCircle, FaPhone, FaTachometerAlt, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { usePathname, useRouter } from 'next/navigation';
 
 export interface LinkItem {
@@ -23,24 +21,45 @@ const LINKS: LinkItem[] = [
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [isDashboardDropdownOpen, setIsDashboardDropdownOpen] = useState<boolean>(false);
+  const [isListingsDropdownOpen, setIsListingsDropdownOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dashboardDropdownRef = useRef<HTMLDivElement>(null);
+  const listingsDropdownRef = useRef<HTMLDivElement>(null);
   const path = usePathname();
+  const router = useRouter();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
-  useEffect(() => {
-    const savedProfileImage = localStorage.getItem('profileImage');
-    if (savedProfileImage) setProfileImage(savedProfileImage);
-  }, []);
+  const toggleDashboardDropdown = () => {
+    setIsDashboardDropdownOpen(!isDashboardDropdownOpen);
+  };
+
+  const toggleListingsDropdown = () => {
+    setIsListingsDropdownOpen(!isListingsDropdownOpen);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
+      }
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+      if (dashboardDropdownRef.current && !dashboardDropdownRef.current.contains(event.target as Node)) {
+        setIsDashboardDropdownOpen(false);
+      }
+      if (listingsDropdownRef.current && !listingsDropdownRef.current.contains(event.target as Node)) {
+        setIsListingsDropdownOpen(false);
       }
     };
 
@@ -51,170 +70,217 @@ const Navbar: React.FC = () => {
   }, []);
 
   return (
-    <nav className="relative flex w-full items-center justify-between bg-zinc-50 py-2 shadow-dark-mild dark:bg-neutral-700 lg:flex-wrap lg:justify-start lg:py-4">
-      <div className="flex w-full flex-wrap items-center justify-between px-3">
-        <button
-          className="block border-0 bg-transparent px-2 text-black/50 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:outline-none focus:ring-0 dark:text-neutral-200 lg:hidden"
-          type="button"
-          onClick={toggleMenu}
-          aria-controls="navbarSupportedContent1"
-          aria-expanded={isMenuOpen}
-          aria-label="Toggle navigation"
-        >
-          <CiMenuBurger className="w-7 stroke-black/50 dark:stroke-neutral-200" />
-        </button>
+    <div className="bg-slate-100 shadow-md min-h-screen">
+      <nav className="flex w-full items-center fixed top-0 right-0 justify-between bg-zinc-50 py-2 shadow-dark-mild dark:bg-neutral-700 lg:py-4">
+        <div className="flex w-full items-center justify-between px-3">
+          {/* Hamburger Menu Button */}
+          <button
+            className="block lg:hidden border-0 bg-transparent px-3 text-black/50 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:outline-none focus:ring-0 dark:text-neutral-200"
+            type="button"
+            onClick={toggleMenu}
+            aria-controls="sidebarMenu"
+            aria-expanded={isMenuOpen}
+            aria-label="Toggle navigation"
+          >
+            <CiMenuBurger className="w-12 h-12 stroke-black/50 dark:stroke-neutral-200" />
+          </button>
 
-        <div
-          className={`!visible ${isMenuOpen ? 'flex' : 'hidden'} flex-grow basis-[100%] items-center lg:!flex lg:basis-auto`}
-          id="navbarSupportedContent1"
-          ref={menuRef}
-        >
-          <div className="mb-4 me-5 ms-2 mt-3 flex items-center text-neutral-900 hover:text-neutral-900 focus:text-neutral-900 dark:text-neutral-200 dark:hover:text-neutral-400 dark:focus:text-neutral-400 lg:mb-0 lg:mt-0">
-            <Image
-              src="https://tecdn.b-cdn.net/img/logo/te-transparent-noshadows.webp"
-              height={15}
-              width={100}
-              alt="Logo"
-              loading="lazy"
-            />
-          </div>
-          <ul className="list-style-none me-auto flex flex-col ps-0 lg:flex-row">
-            {LINKS.map((link) => (
-              <li key={link.href} className="mb-4 lg:mb-0 lg:pe-2">
-                <Link href={link.href}>
-                  <div
-                    className={`text-black/60 transition duration-200 hover:text-black/80 hover:ease-in-out focus:text-black/80 active:text-black/80 motion-reduce:transition-none dark:text-white/60 dark:hover:text-white/80 dark:focus:text-white/80 dark:active:text-white/80 lg:px-2 ${link.href === path ? 'text-blue-500 font-bold' : ''}`}
-                  >
-                    {link.icon}
-                    {link.name}
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="relative flex items-center">
-          <div className="me-4 text-neutral-600 dark:text-white">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-5"
+          {/* Centered Hamburger Menu */}
+          <div className="flex-1 text-start">
+            <button
+              className="border-0 bg-transparent px-2 text-black/50 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:outline-none focus:ring-0 dark:text-neutral-200"
+              type="button"
+              onClick={toggleMenu}
+              aria-controls="sidebarMenu"
+              aria-expanded={isMenuOpen}
+              aria-label="Toggle navigation"
             >
-              <path
-                d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"
-              />
-            </svg>
+              <CiMenuBurger className="w-10 stroke-black/50 dark:stroke-neutral-200" />
+            </button>
           </div>
 
-          <div className="relative">
-            <div
-              className="me-4 flex items-center text-neutral-600 dark:text-white"
-              id="dropdownMenuButton1"
-              role="button"
-              aria-expanded="false"
+          {/* Sidebar Menu */}
+          <div
+            className={`fixed top-0 left-0 w-64 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+            ref={menuRef}
+            id="sidebarMenu"
+          >
+            <button
+              className="absolute top-4 right-4 text-black"
+              onClick={toggleMenu}
+              aria-label="Close menu"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="absolute -mt-4 ms-2.5 rounded-full bg-danger px-[0.35em] py-[0.15em] text-[0.6rem] font-bold leading-none text-white">1</span>
+              <FaTimes className="w-6 h-6" />
+            </button>
+            <div className="flex flex-col items-start p-4 mt-10">
+              <ul className="flex flex-col space-y-8"> {/* Increased space between links */}
+                {LINKS.map((link) => {
+                  if (link.name === 'Dashboard') {
+                    return (
+                      <li key={link.href} className="flex flex-col">
+                        <button
+                          className={`flex items-center w-full text-black transition duration-300 hover:text-gray-700 cursor-pointer ${link.href === path ? 'text-blue-500 font-bold' : ''}`}
+                          onClick={toggleDashboardDropdown}
+                        >
+                          <span className="flex-1 flex items-center">
+                            {link.icon}
+                            <span className="ml-2">{link.name}</span>
+                          </span>
+                          {isDashboardDropdownOpen ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+                        </button>
+                        <div
+                          className={`pl-8 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg ${isDashboardDropdownOpen ? 'block' : 'hidden'}`}
+                          ref={dashboardDropdownRef}
+                        >
+                          <ul className="list-style-none space-y-2"> {/* Increased space between dropdown items */}
+                            <li>
+                              <span
+                                className="block px-4 py-2 text-purple-500 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => router.push('/dashboard/overview')}
+                              >
+                                Overview
+                              </span>
+                            </li>
+                            <li>
+                              <span
+                                className="block px-4 py-2 text-purple-500 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => router.push('/dashboard/settings')}
+                              >
+                                Settings
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                    );
+                  }
+
+                  if (link.name === 'Listings') {
+                    return (
+                      <li key={link.href} className="flex flex-col">
+                        <button
+                          className={`flex items-center w-full text-black transition duration-300 hover:text-gray-700 cursor-pointer ${link.href === path ? 'text-blue-500 font-bold' : ''}`}
+                          onClick={toggleListingsDropdown}
+                        >
+                          <span className="flex-1 flex items-center">
+                            {link.icon}
+                            <span className="ml-2">{link.name}</span>
+                          </span>
+                          {isListingsDropdownOpen ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+                        </button>
+                        <div
+                          className={`pl-8 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg ${isListingsDropdownOpen ? 'block' : 'hidden'}`}
+                          ref={listingsDropdownRef}
+                        >
+                          <ul className="list-style-none space-y-2"> {/* Increased space between dropdown items */}
+                            <li>
+                              <span
+                                className="block px-4 py-2 text-purple-500 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => router.push('/listings/sell')}
+                              >
+                                Sell Listings
+                              </span>
+                            </li>
+                            <li>
+                              <span
+                                className="block px-4 py-2 text-purple-500 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => router.push('/listings/rent')}
+                              >
+                                Rent Listings
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                    );
+                  }
+
+                  return (
+                    <li key={link.href} className="flex items-center">
+                      <span
+                        className={`text-black transition duration-300 hover:text-gray-700 cursor-pointer flex items-center ${link.href === path ? 'text-blue-500 font-bold' : ''}`}
+                        onClick={() => router.push(link.href)}
+                      >
+                        <span className="flex-1 flex items-center">
+                          {link.icon}
+                          <span className="ml-2">{link.name}</span>
+                        </span>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-            <ul
-              className="absolute z-[1000] float-left m-0 hidden min-w-max list-none overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-left text-base shadow-lg dark:bg-surface-dark"
-              aria-labelledby="dropdownMenuButton1"
-            >
-              <li>
-                <Link href="#">
-                  <div
-                    className="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25"
-                  >
-                    Action
-                  </div>
-                </Link>
-              </li>
-              <li>
-                <Link href="#">
-                  <div
-                    className="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25"
-                  >
-                    Another action
-                  </div>
-                </Link>
-              </li>
-              <li>
-                <Link href="#">
-                  <div
-                    className="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25"
-                  >
-                    Something else here
-                  </div>
-                </Link>
-              </li>
-            </ul>
           </div>
 
-          <div className="relative">
-            <a
-              className="flex items-center whitespace-nowrap transition duration-150 ease-in-out"
-              id="dropdownMenuButton2"
-              role="button"
-              aria-expanded="false"
+          {/* Button Group */}
+          <div className="hidden lg:flex lg:items-center lg:ml-auto lg:space-x-4">
+            <span
+              className="px-6 py-3 border border-transparent text-purple-500 font-semibold rounded-lg hover:border-purple-500 hover:bg-purple-50 transition cursor-pointer"
+              onClick={() => router.push('/signin')}
             >
-              <Image
-                src={profileImage || 'https://tecdn.b-cdn.net/img/new/avatars/2.jpg'}
-                className="rounded-full"
-                height={25}
-                width={25}
-                alt="User avatar"
-                loading="lazy"
-              />
-            </a>
-            <ul
-              className="absolute z-[1000] float-left m-0 hidden min-w-max list-none overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-left text-base shadow-lg dark:bg-surface-dark"
-              aria-labelledby="dropdownMenuButton2"
+              Sign In
+            </span>
+            <span
+              className="px-6 py-3 border border-transparent text-purple-500 font-semibold rounded-lg hover:border-purple-500 hover:bg-purple-50 transition cursor-pointer"
+              onClick={() => router.push('/signup')}
             >
-              <li>
-                <Link href="#">
-                  <div
-                    className="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25"
+              Sign Up
+            </span>
+            <span
+              className="relative px-6 py-3 border border-transparent text-purple-500 font-semibold rounded-lg hover:border-purple-500 hover:bg-purple-50 transition cursor-pointer"
+              onClick={() => router.push('/add-property')}
+            >
+              Add Property
+            </span>
+          </div>
+
+          {/* Dropdown for Small Screens */}
+          <div className="lg:hidden">
+            <button
+              className="px-6 py-3 text-purple-500 font-semibold outline-1 border-purple-500 rounded-full hover:bg-purple-50 transition"
+              onClick={toggleDropdown}
+              aria-controls="dropdownMenu"
+              aria-expanded={isDropdownOpen}
+            >
+              Actions
+            </button>
+            <div
+              className={`absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg ${isDropdownOpen ? 'block' : 'hidden'}`}
+              ref={dropdownRef}
+              id="dropdownMenu"
+            >
+              <ul className="list-style-none space-y-2"> {/* Increased space between dropdown items */}
+                <li>
+                  <span
+                    className="block px-4 py-2 text-purple-500 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => router.push('/signin')}
                   >
-                    Action
-                  </div>
-                </Link>
-              </li>
-              <li>
-                <Link href="#">
-                  <div
-                    className="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25"
+                    Sign In
+                  </span>
+                </li>
+                <li>
+                  <span
+                    className="block px-4 py-2 text-purple-500 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => router.push('/signup')}
                   >
-                    Another action
-                  </div>
-                </Link>
-              </li>
-              <li>
-                <Link href="#">
-                  <div
-                    className="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25"
+                    Sign Up
+                  </span>
+                </li>
+                <li>
+                  <span
+                    className="block px-4 py-2 text-purple-500 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => router.push('/add-property')}
                   >
-                    Something else here
-                  </div>
-                </Link>
-              </li>
-            </ul>
+                    Add Property
+                  </span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 };
 
