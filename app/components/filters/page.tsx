@@ -1,3 +1,5 @@
+"use client"; // Add this directive for client-side rendering in Next.js
+
 import React, { useState, useEffect } from 'react';
 import { FaBed, FaHome, FaBuilding, FaCar } from 'react-icons/fa'; // Updated icons
 
@@ -24,6 +26,29 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, on
     if (searches) {
       setSavedSearches(JSON.parse(searches));
     }
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const priceFilter = document.getElementById('price-filter');
+      const savedSearchesButton = document.getElementById('saved-searches-button');
+
+      if (
+        priceFilter &&
+        !priceFilter.contains(target) &&
+        savedSearchesButton &&
+        !savedSearchesButton.contains(target)
+      ) {
+        setShowPriceFilter(false);
+        setShowSavedSearches(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,7 +120,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, on
         {/* Filters Container */}
         <div className="flex flex-col sm:flex-row gap-4">
           {/* Price Filter */}
-          <div className="relative w-full sm:w-48">
+          <div id="price-filter" className="relative w-full sm:w-48">
             <button
               onClick={handlePriceFilterClick}
               className="w-full px-4 py-2 border rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -138,11 +163,11 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, on
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
             >
               <option value="">Rental Type</option>
-              <option value="studio">Studio <FaHome className="inline-block ml-2 text-green-600" /></option>
-              <option value="one-bedroom">1 Bedroom <FaBed className="inline-block ml-2 text-blue-600" /></option>
-              <option value="two-bedrooms">2 Bedrooms <FaBuilding className="inline-block ml-2 text-orange-600" /></option>
-              <option value="three-bedrooms">3 Bedrooms <FaCar className="inline-block ml-2 text-indigo-600" /></option>
-              <option value="four-bedrooms">4+ Bedrooms <FaCar className="inline-block ml-2 text-slate-600" /></option>
+              <option value="studio" className="text-green-600">Studio <FaHome className="inline-block ml-2" /></option>
+              <option value="one-bedroom" className="text-blue-600">1 Bedroom <FaBed className="inline-block ml-2" /></option>
+              <option value="two-bedrooms" className="text-orange-600">2 Bedrooms <FaBuilding className="inline-block ml-2" /></option>
+              <option value="three-bedrooms" className="text-indigo-600">3 Bedrooms <FaCar className="inline-block ml-2" /></option>
+              <option value="four-bedrooms" className="text-slate-600">4+ Bedrooms <FaCar className="inline-block ml-2" /></option>
             </select>
           </div>
         </div>
@@ -164,11 +189,12 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, on
             Sort {sortOrder === 'ascending' ? '▲' : '▼'}
           </button>
           <button
+            id="saved-searches-button"
             type="button"
             onClick={handleShowSavedSearches}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+            className="px-4 py-2 border border-green-500 text-green-500 rounded-lg hover:bg-green-100"
           >
-            Show Saved Searches
+            Saved Searches
           </button>
         </div>
       </div>
@@ -185,7 +211,9 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, on
                     key={index}
                     className={`p-2 mb-2 border rounded-lg cursor-pointer hover:bg-transparent hover:border-blue-500 ${index % 2 === 0 ? 'bg-slate-100' : 'bg-indigo-100'}`}
                   >
-                    {search}
+                    <a href={`#search-${index}`} className="text-blue-500" target="_blank" rel="noopener noreferrer">
+                      {search}
+                    </a>
                   </li>
                 ))
               ) : (
@@ -194,7 +222,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, on
             </ul>
             <button
               onClick={handleModalClose}
-              className="mt-4 px-4 py-2 items-center flex justify-center bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
+              className="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
             >
               Close
             </button>
