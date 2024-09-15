@@ -1,0 +1,17 @@
+{
+    "title": "Stylish Downtown Studio",
+    "logo": "https://via.placeholder.com/48x48?text=Logo",
+    "location": "San Francisco, CA",
+    "images": [
+      "https://via.placeholder.com/600x400?text=Image+1",
+      "https://via.placeholder.com/600x400?text=Image+2",
+      "https://via.placeholder.com/600x400?text=Image+3"
+    ],
+    "priceRange": "$1,800 - $2,200/month",
+    "studioType": "Studio Apartment",
+    "description": "This chic studio apartment offers modern amenities, a spacious layout, and stunning views of downtown San Francisco. Perfect for urban living with easy access to public transportation.",
+    "contactNumber": "+1 (415) 555-1234",
+    "email": "info@stylishstudio.com"
+  }
+
+  
