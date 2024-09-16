@@ -1,45 +1,58 @@
 "use client";
-import React from 'react';
-import { FaUser, FaEnvelope, FaLock, FaGithub, FaMicrosoft, FaGoogle } from 'react-icons/fa'; // Icons for User, Email, Lock, GitHub, Microsoft, and Google
+import React, { useState } from 'react';
+import { FaUser, FaEnvelope, FaLock, FaGithub, FaMicrosoft, FaGoogle } from 'react-icons/fa';
 import Link from 'next/link';
+import CircularProgress from '@mui/material/CircularProgress';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const RegisterPage: React.FC = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+
   const handleSocialLogin = (provider: string) => {
     console.log(`Sign in with ${provider}`);
   };
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLoading(true);
+
+    // Simulate an API call
+    setTimeout(() => {
+      setLoading(false);
+      toast.success('Registration successful!');
+    }, 2000);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
+      <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg relative">
         <h2 className="text-4xl font-bold text-center mb-6 text-gray-800">Register</h2>
 
         {/* Social Login Buttons */}
         <div className="space-y-4 mb-6">
           <button
-            className="w-full py-3 bg-gray-900 text-white font-bold rounded-lg flex items-center justify-center hover:bg-gray-800 transition-colors"
+            className="w-full py-3 text-gray-900 font-bold rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
             onClick={() => handleSocialLogin('GitHub')}
           >
-            <FaGithub className="mr-2 text-2xl text-white" />
-            Sign in with GitHub
+            <FaGithub className="mr-2 text-2xl" />
           </button>
           <button
-            className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg flex items-center justify-center hover:bg-blue-700 transition-colors"
+            className="w-full py-3 text-blue-600 font-bold rounded-lg flex items-center justify-center hover:bg-blue-100 transition-colors"
             onClick={() => handleSocialLogin('Microsoft')}
           >
-            <FaMicrosoft className="mr-2 text-2xl text-white" />
-            Sign in with Microsoft
+            <FaMicrosoft className="mr-2 text-2xl" />
           </button>
           <button
-            className="w-full py-3 bg-red-600 text-white font-bold rounded-lg flex items-center justify-center hover:bg-red-700 transition-colors"
+            className="w-full py-3 text-red-600 font-bold rounded-lg flex items-center justify-center hover:bg-red-100 transition-colors"
             onClick={() => handleSocialLogin('Google')}
           >
-            <FaGoogle className="mr-2 text-2xl text-white" />
-            Sign in with Google
+            <FaGoogle className="mr-2 text-2xl" />
           </button>
         </div>
 
         {/* Registration Form */}
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="relative">
             <input
               type="text"
@@ -69,17 +82,19 @@ const RegisterPage: React.FC = () => {
           </div>
           <button
             type="submit"
-            className="w-full py-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors"
+            className="w-full py-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center"
           >
-            Sign Up
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign Up'}
           </button>
         </form>
 
         <div className="text-center mt-4">
           <Link href="/login">
-            <a className="text-blue-500 hover:underline">Already have an account? Log in</a>
+            <span className="text-blue-500 hover:underline">Already have an account? Log in</span>
           </Link>
         </div>
+
+        <ToastContainer />
       </div>
     </div>
   );
