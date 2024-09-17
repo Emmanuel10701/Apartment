@@ -28,7 +28,7 @@ const RegisterPage: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-gray-100 p-4">
       <div className="flex flex-col items-center justify-center flex-1">
         <div className="w-full max-w-2xl p-12 bg-white shadow-lg rounded-lg mb-8">
-          <h2 className="text-4xl font-bold text-center mb-6 text-gray-800">Register</h2>
+          <h2 className="text-4xl font-extrabold text-center mb-6 text-slate-600 ">🔏 Register</h2>
 
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -68,8 +68,8 @@ const RegisterPage: React.FC = () => {
             >
               {loading ? (
                 <>
-                  <CircularProgress size={24} className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-                  <span className="invisible">Signing Up...</span>
+                  <CircularProgress size={24} className="absolute left-1/2 top-1/2 text-white transform -translate-x-1/2 -translate-y-1/2" />
+                  <span className="invisible text-white">Signing Up...</span>
                 </>
               ) : (
                 "Sign Up"
@@ -103,17 +103,19 @@ const RegisterPage: React.FC = () => {
                 </div>
               </div>
             </div>
+            
+        <div className="text-center mt-4">
+        Already have an account?
+          <Link href="/login">
+            <span className="text-blue-500 hover:underline"> Log in</span>
+          </Link>
+        </div>
           </form>
 
           {/* Toast Notifications */}
           <ToastContainer />
         </div>
 
-        <div className="text-center mt-4">
-          <Link href="/login">
-            <span className="text-blue-500 hover:underline">Already have an account? Log in</span>
-          </Link>
-        </div>
       </div>
     </div>
   );

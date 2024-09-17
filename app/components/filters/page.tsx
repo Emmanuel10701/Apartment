@@ -106,7 +106,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, on
   };
 
   return (
-    <div className="bg-white shadow-md py-4 px-6 fixed top-0 left-0 w-full z-50">
+    <div className="bg-white shadow-md py-4 px-6 w-full z-50">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Search Bar */}
         <input

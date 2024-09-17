@@ -75,29 +75,15 @@ const Navbar: React.FC = () => {
         <div className="flex w-full items-center justify-between px-3">
           {/* Hamburger Menu Button */}
           <button
-            className="block lg:hidden border-0 bg-transparent px-3 text-black/50 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:outline-none focus:ring-0 dark:text-neutral-200"
+            className="block border-0 bg-transparent px-3 text-black/50 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:ring-0 dark:text-neutral-200"
             type="button"
             onClick={toggleMenu}
             aria-controls="sidebarMenu"
             aria-expanded={isMenuOpen}
             aria-label="Toggle navigation"
           >
-            <CiMenuBurger className="w-12 h-12 stroke-black/50 dark:stroke-neutral-200" />
+            <CiMenuBurger className="w-10 h-10 bg-slate-200 hover:bg-slate-300 p-1 font-extrabold stroke-black/100 focus:outline-2 dark:stroke-neutral-700" />
           </button>
-
-          {/* Centered Hamburger Menu */}
-          <div className="flex-1 text-start">
-            <button
-              className="border-0 bg-transparent px-2 text-black/50 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:outline-none focus:ring-0 dark:text-neutral-200"
-              type="button"
-              onClick={toggleMenu}
-              aria-controls="sidebarMenu"
-              aria-expanded={isMenuOpen}
-              aria-label="Toggle navigation"
-            >
-              <CiMenuBurger className="w-10 stroke-black/50 dark:stroke-neutral-200" />
-            </button>
-          </div>
 
           {/* Sidebar Menu */}
           <div
@@ -113,7 +99,7 @@ const Navbar: React.FC = () => {
               <FaTimes className="w-6 h-6" />
             </button>
             <div className="flex flex-col items-start p-4 mt-10">
-              <ul className="flex flex-col space-y-8"> {/* Increased space between links */}
+              <ul className="flex flex-col space-y-6"> {/* Adjusted spacing */}
                 {LINKS.map((link) => {
                   if (link.name === 'Dashboard') {
                     return (
@@ -132,7 +118,7 @@ const Navbar: React.FC = () => {
                           className={`pl-8 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg ${isDashboardDropdownOpen ? 'block' : 'hidden'}`}
                           ref={dashboardDropdownRef}
                         >
-                          <ul className="list-style-none space-y-2"> {/* Increased space between dropdown items */}
+                          <ul className="list-style-none space-y-2"> {/* Adjusted spacing */}
                             <li>
                               <span
                                 className="block px-4 py-2 text-purple-500 hover:bg-gray-100 cursor-pointer"
@@ -172,7 +158,7 @@ const Navbar: React.FC = () => {
                           className={`pl-8 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg ${isListingsDropdownOpen ? 'block' : 'hidden'}`}
                           ref={listingsDropdownRef}
                         >
-                          <ul className="list-style-none space-y-2"> {/* Increased space between dropdown items */}
+                          <ul className="list-style-none space-y-2"> {/* Adjusted spacing */}
                             <li>
                               <span
                                 className="block px-4 py-2 text-purple-500 hover:bg-gray-100 cursor-pointer"
@@ -217,13 +203,13 @@ const Navbar: React.FC = () => {
           <div className="hidden lg:flex lg:items-center lg:ml-auto lg:space-x-4">
             <span
               className="px-6 py-3 border border-transparent text-purple-500 font-semibold rounded-lg hover:border-purple-500 hover:bg-purple-50 transition cursor-pointer"
-              onClick={() => router.push('/signin')}
+              onClick={() => router.push('/login')}
             >
               Sign In
             </span>
             <span
               className="px-6 py-3 border border-transparent text-purple-500 font-semibold rounded-lg hover:border-purple-500 hover:bg-purple-50 transition cursor-pointer"
-              onClick={() => router.push('/signup')}
+              onClick={() => router.push('/register')}
             >
               Sign Up
             </span>
@@ -250,11 +236,11 @@ const Navbar: React.FC = () => {
               ref={dropdownRef}
               id="dropdownMenu"
             >
-              <ul className="list-style-none space-y-2"> {/* Increased space between dropdown items */}
+              <ul className="list-style-none space-y-2"> {/* Adjusted spacing */}
                 <li>
                   <span
                     className="block px-4 py-2 text-purple-500 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => router.push('/signin')}
+                    onClick={() => router.push('/login')}
                   >
                     Sign In
                   </span>
@@ -262,7 +248,7 @@ const Navbar: React.FC = () => {
                 <li>
                   <span
                     className="block px-4 py-2 text-purple-500 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => router.push('/signup')}
+                    onClick={() => router.push('/register')}
                   >
                     Sign Up
                   </span>

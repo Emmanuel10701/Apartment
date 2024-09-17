@@ -21,14 +21,18 @@ const LoginPage: React.FC = () => {
     setTimeout(() => {
       setLoading(false);
       toast.success('Login successful!');
-    }, 2000);
+    }, 1000);
   };
+
+
+
+
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 p-4">
       <div className="flex flex-col items-center justify-center flex-1">
         <div className="w-full max-w-2xl p-12 bg-white shadow-lg rounded-lg mb-8">
-          <h2 className="text-4xl font-bold text-center mb-6 text-gray-800">Login</h2>
+          <h2 className="text-4xl font-extrabold text-center mb-6 text-slate-600">🔒 Login</h2>
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -52,6 +56,11 @@ const LoginPage: React.FC = () => {
               />
               <FaLock className="absolute left-3 top-3 text-gray-500 text-xl" />
             </div>
+            <div className="text-end mt-4">
+          <Link href="/forgot-password">
+            <span className="text-blue-500 hover:underline">Forgot Password?</span>
+          </Link>
+        </div>
             <button
               type="submit"
               className="w-full py-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors relative"
@@ -93,17 +102,21 @@ const LoginPage: React.FC = () => {
                 </div>
               </div>
             </div>
+           
+
+        <div className="text-center mt-4">
+        Don't have an account?
+          <Link href="/register">
+            <span className="text-blue-500 hover:underline"> Register</span>
+          </Link>
+        </div>
           </form>
 
           {/* Toast Notifications */}
           <ToastContainer />
         </div>
 
-        <div className="text-center mt-4">
-          <Link href="/forgot-password">
-            <span className="text-blue-500 hover:underline">Forgot Password?</span>
-          </Link>
-        </div>
+       
       </div>
     </div>
   );
