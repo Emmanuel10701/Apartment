@@ -1,12 +1,12 @@
+"use client"
 import React from 'react';
-
 const Footer: React.FC = () => {
   const handleLinkClick = (url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
-    <footer className="bg-gray-800 text-white p-4 fixed bottom-0 w-full">
+    <footer className="bg-gray-800 text-white p-4  w-full">
       <div className="container mx-auto text-center mb-4">
         <p className="text-lg font-semibold mb-4">Contact Us</p>
         <p className="mb-4">123 Apartment St, Suite 101<br />City, State, 12345</p>
