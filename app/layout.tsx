@@ -1,32 +1,21 @@
-import React from 'react';
-import { Inter } from 'next/font/google';
-import Navbar from './components/Navbar/page'; // Adjust the import path as needed
-import Footer from './components/Footer/page'; // Adjust the import path as needed
-import SessionWrapper from './components/sessionwrapper/page'; // Import the new SessionWrapper
-import './globals.css';
-import type { Metadata } from 'next';
+// src/components/Map.tsx
+import { MapContainer, Marker, TileLayer, Tooltip } from "react-leaflet"
+import "leaflet/dist/leaflet.css"
+import "leaflet-defaulticon-compatibility"
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
 
-const inter = Inter({ subsets: ['latin'] });
+export default function MyMap(props: any) {
+  const { position, zoom } = props
 
-export const metadata: Metadata = {
-  title: 'Apartment Rental',
-  description: 'Find your perfect apartment with ApartmentRental.',
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode; // Specify the type for children
-}) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>
-        <SessionWrapper>
-          <Navbar />
-          <main className="flex-grow">{children}</main>
-          <Footer />
-        </SessionWrapper>
-      </body>
-    </html>
-  );
+  return <MapContainer center={position} zoom={zoom} scrollWheelZoom={false}>
+    <TileLayer
+      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    />
+    <Marker position={position}>
+      <Popup>
+        A pretty CSS3 popup. <br /> Easily customizable.
+      </Popup>
+    </Marker>
+  </MapContainer>
 }
