@@ -1,61 +1,47 @@
-// app/api/register/route.ts
-
+import bcrypt from 'bcryptjs'; // Ensure consistency with your previous setup
+import prisma from '../../libs/prisma';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
-import { hash } from 'bcryptjs';
 
-const prisma = new PrismaClient();
-
-// Define the schema for validation
-const userSchema = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters long').max(30, 'Username must be less than 30 characters'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters long'),
-});
+interface RegisterRequestBody {
+  name: string;
+  email: string;
+  password: string;
+}
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    // Validate input data
-    const parsedData = userSchema.parse(body);
+    const body: RegisterRequestBody = await request.json();
+
+    const { name, email, password } = body;
+
+    if (!name || !email || !password) {
+      return new NextResponse('Missing Fields', { status: 400 });
+    }
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: {
-        email: parsedData.email,
-      },
+      where: { email },
     });
 
     if (existingUser) {
-      return NextResponse.json({ message: 'Email already registered.' }, { status: 400 });
+      return new NextResponse('Email already exists', { status: 400 });
     }
 
     // Hash the password
-    const hashedPassword = await hash(parsedData.password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user in the database
-    const newUser = await prisma.user.create({
+    // Create new user
+    const user = await prisma.user.create({
       data: {
-        username: parsedData.username,
-        email: parsedData.email,
-        password: hashedPassword,
+        name,
+        email,
+        hashedPassword, // Ensure this matches the Prisma schema
       },
     });
 
-    return NextResponse.json({ message: 'Registration successful!', user: newUser }, { status: 200 });
+    return NextResponse.json(user, { status: 201 });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      // Handle validation errors
-      const validationErrors = error.errors.reduce((acc, curr) => {
-        acc[curr.path[0]] = curr.message;
-        return acc;
-      }, {} as Record<string, string>);
-
-      return NextResponse.json({ errors: validationErrors }, { status: 400 });
-    }
-
-    // Handle other errors
-    return NextResponse.json({ message: 'Registration failed. Please try again.' }, { status: 500 });
+    console.error(error);
+    return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

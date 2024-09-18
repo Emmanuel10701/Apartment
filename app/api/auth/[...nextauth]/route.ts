@@ -1,74 +1,58 @@
-import NextAuth from 'next-auth';
-import GitHubProvider from 'next-auth/providers/github';
-import GoogleProvider from 'next-auth/providers/google';
-import MicrosoftProvider from 'next-auth/providers/microsoft';
-import CredentialsProvider from 'next-auth/providers/credentials';
+import NextAuth from 'next-auth/next';
+import prisma from '../../../libs/prisma'; // Adjust the path if necessary
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs'; // For password hashing
-
-const prisma = new PrismaClient();
+import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
+import GithubProvider from 'next-auth/providers/github';
+import bcrypt from 'bcryptjs';
+import { User } from '@prisma/client'; // Import the User type from Prisma
 
 export const authOptions = {
+  adapter: PrismaAdapter(prisma),
   providers: [
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    GithubProvider({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    MicrosoftProvider({
-      clientId: process.env.MICROSOFT_CLIENT_ID!,
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_ID!,
+      clientSecret: process.env.GOOGLE_SECRET!,
     }),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'text' },
+        email: { label: 'Email', type: 'text', placeholder: 'jsmith@example.com' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email and password are required');
+          throw new Error('Please enter an email and password');
         }
 
-        // Validate user credentials
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
-        if (!user) {
-          throw new Error('No user found with this email');
+        if (!user || !user.hashedPassword) {
+          throw new Error('No user found');
         }
 
-        const isValidPassword = await bcrypt.compare(credentials.password, user.password);
-        
-        if (!isValidPassword) {
+        const passwordMatch = await bcrypt.compare(credentials.password, user.hashedPassword);
+
+        if (!passwordMatch) {
           throw new Error('Incorrect password');
         }
 
-        return user;
+        return user as User;
       },
     }),
   ],
-  adapter: PrismaAdapter(prisma),
-  pages: {
-    signIn: '/login',
-    error: '/error', // Custom error page
-  },
+  secret: process.env.SECRET!,
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt' as const, // Use 'as const' to specify the exact string literal type
   },
-  callbacks: {
-    async session({ session, user }) {
-      if (user) {
-        session.user = user;
-      }
-      return session;
-    },
-  },
+  debug: process.env.NODE_ENV === 'development',
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

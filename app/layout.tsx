@@ -2,9 +2,9 @@ import React from 'react';
 import { Inter } from 'next/font/google';
 import Navbar from './components/Navbar/page'; // Adjust the import path as needed
 import Footer from './components/Footer/page'; // Adjust the import path as needed
+import SessionWrapper from './components/sessionwrapper/page'; // Import the new SessionWrapper
 import './globals.css';
-import Filters from "@/app/components/filters/page";
-import type { Metadata } from 'next'; // Import Metadata type
+import type { Metadata } from 'next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -15,15 +15,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode; // Specify the type for children
+}) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Navbar />
-        <main className="flex-grow">{children}</main>
-        <Footer />
+        <SessionWrapper>
+          <Navbar />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </SessionWrapper>
       </body>
     </html>
   );

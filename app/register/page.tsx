@@ -1,6 +1,6 @@
-"use client";
+'use client'
 import React, { useState } from 'react';
-import { FaUser, FaEnvelope, FaLock, FaGithub, FaMicrosoft, FaGoogle } from 'react-icons/fa'; // Icons for User, Email, Lock, GitHub, Microsoft, and Google
+import { FaUser, FaEnvelope, FaLock, FaGithub, FaMicrosoft, FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa'; 
 import Link from 'next/link';
 import { CircularProgress } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
@@ -11,6 +11,7 @@ const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const handleSocialLogin = (provider: string) => {
     console.log(`Sign in with ${provider}`);
@@ -33,12 +34,10 @@ const RegisterPage: React.FC = () => {
 
       if (response.ok) {
         toast.success(result.message);
-        // Reset form fields
         setUsername('');
         setEmail('');
         setPassword('');
       } else {
-        // Display errors using toast
         if (result.errors) {
           Object.keys(result.errors).forEach((key) => {
             toast.error(result.errors[key]);
@@ -60,7 +59,6 @@ const RegisterPage: React.FC = () => {
         <div className="w-full max-w-xl p-12 bg-white shadow-lg rounded-lg mb-8">
           <h2 className="text-4xl font-extrabold text-center mb-6 text-slate-600">🔏 Register</h2>
 
-          {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">
               <input
@@ -88,7 +86,7 @@ const RegisterPage: React.FC = () => {
             </div>
             <div className="relative">
               <input
-                type="password"
+                type={passwordVisible ? 'text' : 'password'}
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -97,22 +95,34 @@ const RegisterPage: React.FC = () => {
                 required
               />
               <FaLock className="absolute left-3 top-3 text-gray-500 text-xl" />
+              <div
+                className="absolute right-3 top-3 text-gray-500 text-xl cursor-pointer"
+                onClick={() => setPasswordVisible(!passwordVisible)}
+              >
+                {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+              </div>
             </div>
             <button
               type="submit"
-              className="w-full py-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors relative"
+              className={`w-full py-4 text-white font-bold rounded-lg transition-colors bg-blue-500 relative ${loading ? 'border-2 border-indigo-800' : ''} ${loading ? 'bg-blue-500' : 'hover:bg-blue-600'}`}
             >
-              {loading ? (
-                <>
-                  <CircularProgress size={24} className="absolute left-1/2 top-1/2 text-white transform -translate-x-1/2 -translate-y-1/2" />
-                  <span className="invisible text-white">Signing Up...</span>
-                </>
-              ) : (
-                "Sign Up"
-              )}
+           {loading ? (
+              <>
+                <div className="flex items-center justify-center space-x-2">
+                  <span className="text-white">Processing...</span>
+                  <CircularProgress
+                    size={24}
+                    color="inherit" // Inherit the color from the surrounding text or use white
+                    style={{ color: "white" }} // Explicitly set the spinner to white
+                  />
+                </div>
+              </>
+            ) : (
+              "Sign Up"
+            )}
+
             </button>
 
-            {/* Social Login Icons with Labels */}
             <div className="mt-8 text-center">
               <p className="text-lg font-semibold mb-4">Or sign up with</p>
               <div className="flex justify-center space-x-8">
@@ -148,7 +158,6 @@ const RegisterPage: React.FC = () => {
             </div>
           </form>
 
-          {/* Toast Notifications */}
           <ToastContainer />
         </div>
       </div>
