@@ -27,7 +27,7 @@ const RegisterPage: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 p-4">
       <div className="flex flex-col items-center justify-center flex-1">
-        <div className="w-full max-w-2xl p-12 bg-white shadow-lg rounded-lg mb-8">
+        <div className="w-full max-w-xl p-12 bg-white shadow-lg rounded-lg mb-8">
           <h2 className="text-4xl font-extrabold text-center mb-6 text-slate-600 ">🔏 Register</h2>
 
           {/* Registration Form */}
@@ -83,21 +83,21 @@ const RegisterPage: React.FC = () => {
                 <div className="flex flex-col items-center">
                   <FaGithub
                     onClick={() => handleSocialLogin('GitHub')}
-                    className="text-gray-800 text-4xl cursor-pointer hover:text-gray-600"
+                    className="text-gray-800 text-2xl cursor-pointer hover:text-gray-600"
                   />
                   <span className="text-gray-600 mt-2">GitHub</span>
                 </div>
                 <div className="flex flex-col items-center">
                   <FaMicrosoft
                     onClick={() => handleSocialLogin('Microsoft')}
-                    className="text-blue-600 text-4xl cursor-pointer hover:text-blue-400"
+                    className="text-blue-600 text-2xl cursor-pointer hover:text-blue-400"
                   />
                   <span className="text-blue-600 mt-2">Microsoft</span>
                 </div>
                 <div className="flex flex-col items-center">
                   <FaGoogle
                     onClick={() => handleSocialLogin('Google')}
-                    className="text-red-600 text-4xl cursor-pointer hover:text-red-400"
+                    className="text-red-600 text-2xl cursor-pointer hover:text-red-400"
                   />
                   <span className="text-red-600 mt-2">Google</span>
                 </div>
