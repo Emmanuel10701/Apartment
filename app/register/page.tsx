@@ -7,28 +7,58 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const RegisterPage: React.FC = () => {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSocialLogin = (provider: string) => {
     console.log(`Sign in with ${provider}`);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success(result.message);
+        // Reset form fields
+        setUsername('');
+        setEmail('');
+        setPassword('');
+      } else {
+        // Display errors using toast
+        if (result.errors) {
+          Object.keys(result.errors).forEach((key) => {
+            toast.error(result.errors[key]);
+          });
+        } else {
+          toast.error(result.message);
+        }
+      }
+    } catch (error) {
+      toast.error('Registration failed. Please try again.');
+    } finally {
       setLoading(false);
-      toast.success('Registration successful!');
-    }, 2000);
+    }
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 p-4">
       <div className="flex flex-col items-center justify-center flex-1">
         <div className="w-full max-w-xl p-12 bg-white shadow-lg rounded-lg mb-8">
-          <h2 className="text-4xl font-extrabold text-center mb-6 text-slate-600 ">🔏 Register</h2>
+          <h2 className="text-4xl font-extrabold text-center mb-6 text-slate-600">🔏 Register</h2>
 
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -36,6 +66,8 @@ const RegisterPage: React.FC = () => {
               <input
                 type="text"
                 id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full p-4 border border-gray-300 rounded-lg pl-12 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
                 placeholder="Username"
                 required
@@ -46,6 +78,8 @@ const RegisterPage: React.FC = () => {
               <input
                 type="email"
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full p-4 border border-gray-300 rounded-lg pl-12 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
                 placeholder="Email Address"
                 required
@@ -56,6 +90,8 @@ const RegisterPage: React.FC = () => {
               <input
                 type="password"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-4 border border-gray-300 rounded-lg pl-12 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
                 placeholder="Password"
                 required
@@ -104,18 +140,17 @@ const RegisterPage: React.FC = () => {
               </div>
             </div>
             
-        <div className="text-center mt-4">
-        Already have an account?
-          <Link href="/login">
-            <span className="text-blue-500 hover:underline"> Log in</span>
-          </Link>
-        </div>
+            <div className="text-center mt-4">
+              Already have an account?
+              <Link href="/login">
+                <span className="text-blue-500 hover:underline"> Log in</span>
+              </Link>
+            </div>
           </form>
 
           {/* Toast Notifications */}
           <ToastContainer />
         </div>
-
       </div>
     </div>
   );
