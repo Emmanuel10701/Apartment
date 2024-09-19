@@ -13,7 +13,14 @@ interface SearchNavbarProps {
   onPropertyTypeChange: (type: string) => void;
 }
 
-const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, onRentalTypeChange, onSortChange, onStarRatingChange, onPropertyTypeChange }) => {
+const SearchNavbar: React.FC<SearchNavbarProps> = ({
+  onSearch,
+  onPriceFilter,
+  onRentalTypeChange,
+  onSortChange,
+  onStarRatingChange,
+  onPropertyTypeChange,
+}) => {
   const [search, setSearch] = useState<string>('');
   const [minRent, setMinRent] = useState<number | ''>('');
   const [maxRent, setMaxRent] = useState<number | ''>('');
@@ -92,7 +99,8 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, on
     onSortChange(newOrder);
   };
 
-  const handleStarRatingChange = (rating: number) => {
+  const handleStarRatingChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const rating = parseInt(event.target.value, 10);
     setStarRating(rating);
     onStarRatingChange(rating);
   };
@@ -103,15 +111,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, on
     onPropertyTypeChange(newType);
   };
 
-  const handleSaveSearch = () => {
-    // Save search to local storage
-    if (search.trim()) {
-      const updatedSearches = [search, ...savedSearches];
-      setSavedSearches(updatedSearches);
-      localStorage.setItem('savedSearches', JSON.stringify(updatedSearches));
-      setSearch('');
-    }
-  };
 
   const handleShowSavedSearches = () => {
     setShowSavedSearches(prev => !prev);
@@ -189,25 +188,18 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, on
 
           {/* Star Rating Filter */}
           <div className="relative w-full sm:w-48">
-            <button
-              onClick={() => handleStarRatingChange(starRating)}
-              className="w-full px-4 py-2 border rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <select
+              value={starRating}
+              onChange={handleStarRatingChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
             >
-              <div className="flex items-center">
-                {[5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1].map((rating) => (
-                  <div
-                    key={rating}
-                    className="flex items-center"
-                    onClick={() => handleStarRatingChange(rating)}
-                  >
-                    {[...Array(Math.floor(rating))].map((_, i) => (
-                      <FaStar key={i} className="text-yellow-500" />
-                    ))}
-                    {rating % 1 !== 0 && <FaStarHalf className="text-yellow-500" />}
-                  </div>
-                ))}
-              </div>
-            </button>
+              <option value="0">Select Star Rating</option>
+              <option value="1">1 Star</option>
+              <option value="2">2 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="5">5 Stars</option>
+            </select>
           </div>
 
           {/* Property Type Filter */}
@@ -234,13 +226,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch, onPriceFilter, on
           </button>
         </div>
         
-        {/* Save Search Button */}
-        <button
-          onClick={handleSaveSearch}
-          className="w-full sm:w-48 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          Save Search
-        </button>
 
         {/* Saved Searches Button */}
         <button

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 
 interface ApartmentProps {
@@ -24,7 +25,7 @@ const Apartment: React.FC<ApartmentProps> = ({
   email,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isActive, setIsActive] = useState<string | null>(null); // State for active button
+  const [isActive, setIsActive] = useState<string | null>(null);
 
   const handleNextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -36,13 +37,22 @@ const Apartment: React.FC<ApartmentProps> = ({
 
   const handleButtonClick = (type: string) => {
     setIsActive(type);
-    setTimeout(() => setIsActive(null), 200); // Reset active state after animation
+    setTimeout(() => setIsActive(null), 200);
+  };
+
+  const handleImageClick = (index: number) => {
+    setCurrentImageIndex(index);
   };
 
   return (
-    <div className="apartment-card border border-gray-200 rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105">
+    <div className="apartment-card border border-gray-200 rounded-lg shadow-md overflow-hidden transition-transform transform ">
       <div className="relative">
-        <img src={images[currentImageIndex]} alt={name} className="w-full h-48 object-cover" />
+        <img
+          src={images[currentImageIndex]}
+          alt={name}
+          className="w-full h-48 object-cover cursor-pointer"
+          onClick={() => handleImageClick(currentImageIndex)}
+        />
         <button
           onClick={() => { handlePrevImage(); handleButtonClick('prev'); }}
           className={`absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full ${isActive === 'prev' ? 'bg-gray-200 ring-2 ring-blue-500' : 'bg-white'} shadow-md transition duration-300`}
@@ -94,7 +104,7 @@ const Apartment: React.FC<ApartmentProps> = ({
 
 export default Apartment;
 
-// Example apartments with Pexels image URLs
+// Example apartments with clickable image URLs
 const apartments = [
   {
     id: 1,
@@ -104,9 +114,9 @@ const apartments = [
     starRating: 4,
     propertyType: "Apartment",
     images: [
-      "https://images.pexels.com/photos/1234567/pexels-photo-1234567.jpeg",
-      "https://images.pexels.com/photos/1234568/pexels-photo-1234568.jpeg",
-      "https://images.pexels.com/photos/1234569/pexels-photo-1234569.jpeg",
+      "https://images.pexels.com/photos/2080588/pexels-photo-2080588.jpeg", // New image
+      "https://images.pexels.com/photos/1860780/pexels-photo-1860780.jpeg", // New image
+      "https://images.pexels.com/photos/4502083/pexels-photo-4502083.jpeg", // New image
     ],
     phoneNumber: "1234567890",
     email: "luxury@apartment.com",
@@ -119,9 +129,9 @@ const apartments = [
     starRating: 5,
     propertyType: "Studio",
     images: [
-      "https://images.pexels.com/photos/7654321/pexels-photo-7654321.jpeg",
-      "https://images.pexels.com/photos/7654322/pexels-photo-7654322.jpeg",
-      "https://images.pexels.com/photos/7654323/pexels-photo-7654323.jpeg",
+      "https://images.pexels.com/photos/4518355/pexels-photo-4518355.jpeg", // New image
+      "https://images.pexels.com/photos/4518347/pexels-photo-4518347.jpeg", // New image
+      "https://images.pexels.com/photos/4502029/pexels-photo-4502029.jpeg", // New image
     ],
     phoneNumber: "0987654321",
     email: "cozy@studio.com",
