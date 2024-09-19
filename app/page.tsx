@@ -1,166 +1,257 @@
-"use client";
+'use client';
+import { useJsApiLoader, GoogleMap, Marker, Autocomplete, DirectionsRenderer } from '@react-google-maps/api';
+import { useRef, useState } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
+import Button from '@mui/material/Button';
 
-import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
-import Map from "./components/map/page"; // Adjust the path as needed
+// Center of the map
+const center = { lat: 48.8584, lng: 2.2945 };
 
-const apartments = [
-  {
-    id: 1,
-    name: "Luxury Apartment",
-    address: "123 Luxury St, Chicago, IL 60601",
-    minPrice: 2000,
-    maxPrice: 2500,
-    rentalType: "Monthly",
-    lat: 41.8801,
-    lng: -87.6308,
-    image: "https://via.placeholder.com/150",
-    description: "A luxurious apartment with modern amenities and a great view.",
-  },
-  // Add more apartments as needed
-];
+// Component for displaying the map and directions
+const MapComponent: React.FC = () => {
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+    libraries: ['places', 'drawing'],
+  });
 
-const SearchNavbar: React.FC<{
-  onSearch: (search: string) => void;
-  onPriceFilter: (min: number, max: number) => void;
-  onRentalTypeChange: (type: string) => void;
-  onSortChange: (order: string) => void;
-}> = ({ onSearch, onPriceFilter, onRentalTypeChange, onSortChange }) => {
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [directionsResponse, setDirectionsResponse] = useState<google.maps.DirectionsResult | null>(null);
+  const [distance, setDistance] = useState<string>('N/A');
+  const [duration, setDuration] = useState<string>('N/A');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [currentLocation, setCurrentLocation] = useState<google.maps.LatLng | null>(null);
+  const [drawingManager, setDrawingManager] = useState<google.maps.drawing.DrawingManager | null>(null);
+
+  const originRef = useRef<HTMLInputElement>(null);
+  const destinationRef = useRef<HTMLInputElement>(null);
+
+  if (loadError) {
+    return <div className="p-4 text-red-500">Failed to load Google Maps. Please check the console for more details.</div>;
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="p-4 flex justify-center items-center">
+        <CircularProgress />
+      </div>
+    );
+  }
+
+  const calculateRoute = async () => {
+    if (originRef.current && destinationRef.current) {
+      const origin = originRef.current.value;
+      const destination = destinationRef.current.value;
+
+      if (!origin || !destination) {
+        return;
+      }
+
+      setLoading(true);
+      const directionsService = new google.maps.DirectionsService();
+
+      try {
+        const results = await directionsService.route({
+          origin,
+          destination,
+          travelMode: google.maps.TravelMode.DRIVING,
+        });
+
+        const route = results.routes[0];
+        if (route) {
+          const leg = route.legs[0];
+          if (leg) {
+            setDirectionsResponse(results);
+            setDistance(leg.distance?.text || 'N/A');
+            setDuration(leg.duration?.text || 'N/A');
+          }
+        }
+      } catch (error) {
+        console.error('Error calculating route:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const clearRoute = () => {
+    setDirectionsResponse(null);
+    setDistance('N/A');
+    setDuration('N/A');
+    if (originRef.current) originRef.current.value = '';
+    if (destinationRef.current) destinationRef.current.value = '';
+    // Clear drawings
+    if (drawingManager) {
+      drawingManager.setMap(null);
+      setDrawingManager(null);
+    }
+  };
+
+  const centerMap = () => {
+    if (map) {
+      map.panTo(center);
+      map.setZoom(15);
+    }
+  };
+
+  const handleLocationClick = () => {
+    if (navigator.geolocation) {
+      setLoading(true); // Start loading when fetching the current location
+      navigator.geolocation.getCurrentPosition((position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        setCurrentLocation(new google.maps.LatLng(lat, lng));
+        map?.panTo({ lat, lng });
+        setLoading(false); // Stop loading after location is found
+      }, () => {
+        // Handle geolocation error
+        setLoading(false); // Stop loading on error
+      });
+    }
+  };
+
+  const toggleDrawing = () => {
+    if (drawingManager) {
+      drawingManager.setMap(null);
+      setDrawingManager(null);
+    } else {
+      const newDrawingManager = new google.maps.drawing.DrawingManager({
+        drawingMode: google.maps.drawing.OverlayType.MARKER,
+        drawingControl: true,
+        drawingControlOptions: {
+          position: google.maps.ControlPosition.TOP_CENTER,
+          drawingModes: [
+            google.maps.drawing.OverlayType.MARKER,
+            google.maps.drawing.OverlayType.CIRCLE,
+            google.maps.drawing.OverlayType.POLYGON,
+            google.maps.drawing.OverlayType.POLYLINE,
+            google.maps.drawing.OverlayType.RECTANGLE,
+          ],
+        },
+        markerOptions: {
+          icon: {
+            url: '/your-icon-url.png', // Customize your marker icon
+            scaledSize: new google.maps.Size(30, 30),
+          },
+        },
+        circleOptions: {
+          fillColor: '#FF0000',
+          fillOpacity: 0.5,
+          strokeWeight: 2,
+          clickable: false,
+          editable: true,
+          zIndex: 1,
+        },
+        polygonOptions: {
+          fillColor: '#00FF00',
+          fillOpacity: 0.5,
+          strokeWeight: 2,
+          clickable: false,
+          editable: true,
+          zIndex: 1,
+        },
+        polylineOptions: {
+          strokeColor: '#0000FF',
+          strokeWeight: 2,
+        },
+        rectangleOptions: {
+          fillColor: '#FFFF00',
+          fillOpacity: 0.5,
+          strokeWeight: 2,
+          clickable: false,
+          editable: true,
+          zIndex: 1,
+        },
+      });
+      newDrawingManager.setMap(map);
+      setDrawingManager(newDrawingManager);
+    }
+  };
+
+  const setMapType = (type: google.maps.MapTypeId) => {
+    if (map) {
+      map.setMapTypeId(type);
+    }
+  };
+
   return (
-    <div className="bg-gray-800 text-white p-4">
-      <input
-        type="text"
-        placeholder="Search"
-        className="p-2 bg-gray-900 rounded"
-        onChange={(e) => onSearch(e.target.value)}
-      />
-      <div className="my-4">
-        <label>
-          Min Price:
-          <input
-            type="number"
-            onChange={(e) => onPriceFilter(Number(e.target.value), Number(e.target.max))}
-            className="ml-2"
-          />
-        </label>
-        <label>
-          Max Price:
-          <input
-            type="number"
-            onChange={(e) => onPriceFilter(Number(e.target.min), Number(e.target.value))}
-            className="ml-2"
-          />
-        </label>
-      </div>
-      <div className="my-4">
-        <button onClick={() => onRentalTypeChange("Monthly")} className="mr-2">Monthly</button>
-        <button onClick={() => onRentalTypeChange("Yearly")} className="mr-2">Yearly</button>
-        <button onClick={() => onRentalTypeChange("All")} className="mr-2">All</button>
-      </div>
-      <div className="my-4">
-        <button onClick={() => onSortChange("ascending")} className="mr-2">Sort by Price Ascending</button>
-        <button onClick={() => onSortChange("descending")} className="mr-2">Sort by Price Descending</button>
-      </div>
-    </div>
-  );
-};
-
-const LeafletMapPage: React.FC = () => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [filteredApartments, setFilteredApartments] = useState(apartments);
-
-  const toggleDrawer = () => setDrawerOpen(!drawerOpen);
-
-  const handleSearch = (search: string) => {
-    const filtered = apartments.filter((apartment) =>
-      apartment.name.toLowerCase().includes(search.toLowerCase())
-    );
-    setFilteredApartments(filtered);
-  };
-
-  const handlePriceFilter = (min: number, max: number) => {
-    const filtered = apartments.filter(
-      (apartment) => apartment.minPrice >= min && apartment.maxPrice <= max
-    );
-    setFilteredApartments(filtered);
-  };
-
-  const handleRentalTypeChange = (type: string) => {
-    const filtered = apartments.filter(
-      (apartment) => apartment.rentalType === type || type === "All"
-    );
-    setFilteredApartments(filtered);
-  };
-
-  const handleSortChange = (order: string) => {
-    const sorted = [...filteredApartments].sort((a, b) =>
-      order === "ascending" ? a.minPrice - b.minPrice : b.minPrice - a.minPrice
-    );
-    setFilteredApartments(sorted);
-  };
-
-  return (
-    <div className="relative h-screen flex flex-col mt-20 lg:flex-row">
-      <SearchNavbar
-        onSearch={handleSearch}
-        onPriceFilter={handlePriceFilter}
-        onRentalTypeChange={handleRentalTypeChange}
-        onSortChange={handleSortChange}
-      />
-
-      <button
-        onClick={toggleDrawer}
-        className="lg:hidden fixed top-4 left-4 z-10 p-2 bg-gray-800 text-white rounded-full"
-        aria-label={drawerOpen ? "Close menu" : "Open menu"}
-      >
-        <FontAwesomeIcon icon={drawerOpen ? faTimes : faBars} />
-      </button>
-
-      <div
-        className={`fixed inset-0 lg:hidden z-20 bg-gray-800 text-white p-4 transition-transform transform ${drawerOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-      >
-        <button
-          onClick={toggleDrawer}
-          className="absolute top-4 right-4 text-white"
-          aria-label="Close menu"
+    <div className="relative h-screen w-screen">
+      <div className="absolute inset-0">
+        <GoogleMap
+          center={center}
+          zoom={15}
+          mapContainerStyle={{ width: '100%', height: '100%' }}
+          options={{
+            zoomControl: true,
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: false,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+          }}
+          onLoad={(map) => {
+            setMap(map);
+          }}
         >
-          <FontAwesomeIcon icon={faTimes} />
-        </button>
-        <h2 className="text-2xl font-bold mb-4">Map Controls</h2>
-        <button
-          onClick={() => { }}
-          className="block w-full mb-2 bg-blue-500 text-white p-2 rounded"
-        >
-          Roadmap
-        </button>
-        <button
-          onClick={() => { }}
-          className="block w-full mb-2 bg-blue-500 text-white p-2 rounded"
-        >
-          Satellite
-        </button>
-        <button
-          onClick={() => { }}
-          className="block w-full mb-2 bg-blue-500 text-white p-2 rounded"
-        >
-          Terrain
-        </button>
+          <Marker position={center} />
+          {currentLocation && <Marker position={currentLocation.toJSON()} icon={{ url: '/current-location-icon.png' }} />}
+          {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
+        </GoogleMap>
       </div>
-
-      <div className="relative flex-grow">
-        <div className="relative flex">
-          <Map />
-          <input
-            type="text"
-            placeholder="Search places"
-            className="absolute top-4 left-4 bg-white text-black p-2 rounded"
-          />
+      <div className="absolute top-4 left-4 p-4 bg-white shadow-lg rounded-lg z-10">
+        <div className="flex gap-2 mb-4">
+          <div className="flex-grow">
+            <Autocomplete>
+              <input
+                type="text"
+                placeholder="Origin"
+                ref={originRef}
+                className="p-2 border border-gray-300 rounded"
+              />
+            </Autocomplete>
+          </div>
+          <div className="flex-grow">
+            <Autocomplete>
+              <input
+                type="text"
+                placeholder="Destination"
+                ref={destinationRef}
+                className="p-2 border border-gray-300 rounded"
+              />
+            </Autocomplete>
+          </div>
+          <Button variant="contained" color="primary" onClick={calculateRoute} disabled={loading}>
+            Calculate Route
+          </Button>
+          <Button variant="contained" color="secondary" onClick={clearRoute}>
+            Clear
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleLocationClick}>
+            Current Location
+          </Button>
+          <Button variant="contained" color="info" onClick={toggleDrawing}>
+            {drawingManager ? 'Disable Drawing' : 'Enable Drawing'}
+          </Button>
+          <Button variant="contained" color="info" onClick={() => setMapType(google.maps.MapTypeId.TERRAIN)}>
+            Terrain
+          </Button>
+          <Button variant="contained" color="info" onClick={() => setMapType(google.maps.MapTypeId.SATELLITE)}>
+            Satellite
+          </Button>
+        </div>
+        <div className="flex gap-4">
+          <span>Distance: {distance}</span>
+          <span>Duration: {duration}</span>
+          <Button variant="contained" color="primary" onClick={centerMap}>
+            Center Map
+          </Button>
         </div>
       </div>
+      {loading && (
+        <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50 z-20">
+          <CircularProgress />
+        </div>
+      )}
     </div>
   );
 };
 
-export default LeafletMapPage;
+export default MapComponent;

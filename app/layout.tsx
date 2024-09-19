@@ -1,21 +1,24 @@
-// src/components/Map.tsx
-import { MapContainer, Marker, TileLayer, Tooltip } from "react-leaflet"
-import "leaflet/dist/leaflet.css"
-import "leaflet-defaulticon-compatibility"
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
+// app/layout.tsx
+import { Inter } from 'next/font/google';
+import Navbar from './components/Navbar/page'; // Adjust the path as needed
+import Footer from './components/Footer/page'; // Adjust the path as needed
+import './globals.css'; // Adjust the path as needed
 
-export default function MyMap(props: any) {
-  const { position, zoom } = props
+const inter = Inter({ subsets: ['latin'] });
 
-  return <MapContainer center={position} zoom={zoom} scrollWheelZoom={false}>
-    <TileLayer
-      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-    />
-    <Marker position={position}>
-      <Popup>
-        A pretty CSS3 popup. <br /> Easily customizable.
-      </Popup>
-    </Marker>
-  </MapContainer>
+export const metadata = {
+  title: 'Portfolio',
+  description: 'My portfolio website',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <Navbar />
+        <main>{children}</main>
+        <Footer />
+      </body>
+    </html>
+  );
 }
