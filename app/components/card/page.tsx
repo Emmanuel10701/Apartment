@@ -1,103 +1,129 @@
-// ImageCard.tsx
-import React from 'react';
-import Slider from 'react-slick';
-import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
+import React, { useState } from 'react';
 
-interface ImageCardProps {
-  title: string;
-  logo: string;
-  location: string;
+interface ApartmentProps {
+  id: number;
+  name: string;
+  minPrice: number;
+  rentalType: string;
+  starRating: number;
+  propertyType: string;
   images: string[];
-  priceRange: string;
-  studioType: string;
-  description: string;
-  contactNumber: string;
+  phoneNumber: string;
   email: string;
 }
 
-const ImageCard: React.FC<ImageCardProps> = ({
-  title,
-  logo,
-  location,
+const Apartment: React.FC<ApartmentProps> = ({
+  id,
+  name,
+  minPrice,
+  rentalType,
+  starRating,
+  propertyType,
   images,
-  priceRange,
-  studioType,
-  description,
-  contactNumber,
+  phoneNumber,
   email,
 }) => {
-  // Slick slider settings
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isActive, setIsActive] = useState<string | null>(null); // State for active button
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
 
-  // Function to handle email button click
-  const handleEmailClick = () => {
-    window.location.href = `mailto:${email}`;
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+  };
+
+  const handleButtonClick = (type: string) => {
+    setIsActive(type);
+    setTimeout(() => setIsActive(null), 200); // Reset active state after animation
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-      {/* Header with title, logo, and location */}
-      <div className="flex items-center p-4 bg-gray-100">
-        <img src={logo} alt="Logo" className="w-12 h-12 mr-4" />
-        <div className="flex-1">
-          <h2 className="text-xl font-semibold">{title}</h2>
-          <div className="flex items-center text-gray-600 mt-1">
-            <FaMapMarkerAlt className="mr-2" />
-            <span>{location}</span>
-          </div>
-        </div>
+    <div className="apartment-card border border-gray-200 rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105">
+      <div className="relative">
+        <img src={images[currentImageIndex]} alt={name} className="w-full h-48 object-cover" />
+        <button
+          onClick={() => { handlePrevImage(); handleButtonClick('prev'); }}
+          className={`absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full ${isActive === 'prev' ? 'bg-gray-200 ring-2 ring-blue-500' : 'bg-white'} shadow-md transition duration-300`}
+        >
+          &#10094; {/* Left arrow */}
+        </button>
+        <button
+          onClick={() => { handleNextImage(); handleButtonClick('next'); }}
+          className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full ${isActive === 'next' ? 'bg-gray-200 ring-2 ring-blue-500' : 'bg-white'} shadow-md transition duration-300`}
+        >
+          &#10095; {/* Right arrow */}
+        </button>
       </div>
-
-      {/* Carousel for images */}
       <div className="p-4">
-        <Slider {...settings}>
-          {images.map((image, index) => (
-            <div key={index}>
-              <img src={image} alt={`Image ${index + 1}`} className="w-full h-64 object-cover" />
-            </div>
+        <h3 className="text-xl font-semibold text-gray-800">{name}</h3>
+        <p className="text-gray-600">ID: {id}</p>
+        <p className="text-gray-800 font-medium">Min Price: ${minPrice}</p>
+        <p className="text-gray-800">Rental Type: {rentalType}</p>
+        <p className="text-gray-800">Property Type: {propertyType}</p>
+        <div className="flex items-center mt-2">
+          {Array.from({ length: 5 }, (_, index) => (
+            <span key={index}>
+              {index < starRating ? (
+                <span className="text-yellow-500">★</span>
+              ) : (
+                <span className="text-gray-300">★</span>
+              )}
+            </span>
           ))}
-        </Slider>
-      </div>
-
-      {/* Details Section */}
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <span className="font-bold text-lg">{priceRange}</span>
-            <div className="text-gray-600">{studioType}</div>
-          </div>
         </div>
-
-        <p className="text-gray-700 mb-4">{description}</p>
-
-        <div className="flex flex-row items-center justify-between mb-4">
-          <div className="flex items-center">
-            <FaPhoneAlt className="mr-2 text-gray-600" />
-            <span>{contactNumber}</span>
-          </div>
-          <div className="flex items-center">
-            <FaEnvelope className="mr-2 text-gray-600" />
-            <span>{email}</span>
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            onClick={handleEmailClick}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
+        <div className="flex gap-4 mt-4">
+          <a
+            href={`tel:${phoneNumber}`}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-300"
           >
-            Email Us
-          </button>
+            Call
+          </a>
+          <a
+            href={`mailto:${email}`}
+            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-300"
+          >
+            Email
+          </a>
         </div>
       </div>
     </div>
   );
 };
 
-export default ImageCard;
+export default Apartment;
+
+// Example apartments with Pexels image URLs
+const apartments = [
+  {
+    id: 1,
+    name: "Luxury Apartment",
+    minPrice: 1500,
+    rentalType: "Monthly",
+    starRating: 4,
+    propertyType: "Apartment",
+    images: [
+      "https://images.pexels.com/photos/1234567/pexels-photo-1234567.jpeg",
+      "https://images.pexels.com/photos/1234568/pexels-photo-1234568.jpeg",
+      "https://images.pexels.com/photos/1234569/pexels-photo-1234569.jpeg",
+    ],
+    phoneNumber: "1234567890",
+    email: "luxury@apartment.com",
+  },
+  {
+    id: 2,
+    name: "Cozy Studio",
+    minPrice: 800,
+    rentalType: "Monthly",
+    starRating: 5,
+    propertyType: "Studio",
+    images: [
+      "https://images.pexels.com/photos/7654321/pexels-photo-7654321.jpeg",
+      "https://images.pexels.com/photos/7654322/pexels-photo-7654322.jpeg",
+      "https://images.pexels.com/photos/7654323/pexels-photo-7654323.jpeg",
+    ],
+    phoneNumber: "0987654321",
+    email: "cozy@studio.com",
+  },
+];

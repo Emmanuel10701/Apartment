@@ -2,7 +2,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-      domains: ['tecdn.b-cdn.net'],
+      domains: ['https://images.pexels.com'],
     },
   };
   

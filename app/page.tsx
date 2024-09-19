@@ -1,29 +1,105 @@
-'use client';
-import { useJsApiLoader, GoogleMap, Marker, Autocomplete, DirectionsRenderer } from '@react-google-maps/api';
+"use client";
+import { useJsApiLoader, GoogleMap, Marker, Autocomplete } from '@react-google-maps/api';
 import { useRef, useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
+import Footer from "./components/Footer/page"
+import Filter from "./components/filters/page"
+import { FaMap, FaSatellite, FaMountain } from 'react-icons/fa';
+import Apartment from './components/card/page'; // Make sure to adjust this path
 
-// Center of the map
 const center = { lat: 48.8584, lng: 2.2945 };
 
-// Component for displaying the map and directions
+const apartments = [
+  {
+    id: 1,
+    name: "Luxury Apartment",
+    minPrice: 1500,
+    rentalType: "Monthly",
+    starRating: 4,
+    propertyType: "Apartment",
+    images: [
+      "https://images.pexels.com/photos/1234567/pexels-photo-1234567.jpeg",
+      "https://images.pexels.com/photos/1234568/pexels-photo-1234568.jpeg",
+      "https://images.pexels.com/photos/1234569/pexels-photo-1234569.jpeg",
+    ],
+    phoneNumber: "1234567890",
+    email: "luxury@apartment.com",
+  },
+  {
+    id: 2,
+    name: "Cozy Studio",
+    minPrice: 800,
+    rentalType: "Monthly",
+    starRating: 5,
+    propertyType: "Studio",
+    images: [
+      "https://images.pexels.com/photos/7654321/pexels-photo-7654321.jpeg",
+      "https://images.pexels.com/photos/7654322/pexels-photo-7654322.jpeg",
+      "https://images.pexels.com/photos/7654323/pexels-photo-7654323.jpeg",
+    ],
+    phoneNumber: "0987654321",
+    email: "cozy@studio.com",
+  },
+  {
+    id: 2,
+    name: "Cozy Studio",
+    minPrice: 800,
+    rentalType: "Monthly",
+    starRating: 5,
+    propertyType: "Studio",
+    images: [
+      "https://images.pexels.com/photos/7654321/pexels-photo-7654321.jpeg",
+      "https://images.pexels.com/photos/7654322/pexels-photo-7654322.jpeg",
+      "https://images.pexels.com/photos/7654323/pexels-photo-7654323.jpeg",
+    ],
+    phoneNumber: "0987654321",
+    email: "cozy@studio.com",
+  },
+  {
+    id: 2,
+    name: "Cozy Studio",
+    minPrice: 800,
+    rentalType: "Monthly",
+    starRating: 5,
+    propertyType: "Studio",
+    images: [
+      "https://images.pexels.com/photos/7654321/pexels-photo-7654321.jpeg",
+      "https://images.pexels.com/photos/7654322/pexels-photo-7654322.jpeg",
+      "https://images.pexels.com/photos/7654323/pexels-photo-7654323.jpeg",
+    ],
+    phoneNumber: "0987654321",
+    email: "cozy@studio.com",
+  },
+  {
+    id: 3,
+    name: "Cozy Studio",
+    minPrice: 800,
+    rentalType: "Monthly",
+    starRating: 5,
+    propertyType: "Studio",
+    images: [
+      "https://images.pexels.com/photos/7654321/pexels-photo-7654321.jpeg",
+      "https://images.pexels.com/photos/7654322/pexels-photo-7654322.jpeg",
+      "https://images.pexels.com/photos/7654323/pexels-photo-7654323.jpeg",
+    ],
+    phoneNumber: "0987654321",
+    email: "cozy@studio.com",
+  },
+];
+
 const MapComponent: React.FC = () => {
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
-    libraries: ['places', 'drawing'],
+    libraries: ['places'],
   });
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [directionsResponse, setDirectionsResponse] = useState<google.maps.DirectionsResult | null>(null);
-  const [distance, setDistance] = useState<string>('N/A');
-  const [duration, setDuration] = useState<string>('N/A');
   const [loading, setLoading] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<google.maps.LatLng | null>(null);
-  const [drawingManager, setDrawingManager] = useState<google.maps.drawing.DrawingManager | null>(null);
-
+  const [searchValue, setSearchValue] = useState<string>('');
   const originRef = useRef<HTMLInputElement>(null);
-  const destinationRef = useRef<HTMLInputElement>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   if (loadError) {
     return <div className="p-4 text-red-500">Failed to load Google Maps. Please check the console for more details.</div>;
@@ -37,134 +113,42 @@ const MapComponent: React.FC = () => {
     );
   }
 
-  const calculateRoute = async () => {
-    if (originRef.current && destinationRef.current) {
-      const origin = originRef.current.value;
-      const destination = destinationRef.current.value;
-
-      if (!origin || !destination) {
-        return;
-      }
-
-      setLoading(true);
-      const directionsService = new google.maps.DirectionsService();
-
-      try {
-        const results = await directionsService.route({
-          origin,
-          destination,
-          travelMode: google.maps.TravelMode.DRIVING,
-        });
-
-        const route = results.routes[0];
-        if (route) {
-          const leg = route.legs[0];
-          if (leg) {
-            setDirectionsResponse(results);
-            setDistance(leg.distance?.text || 'N/A');
-            setDuration(leg.duration?.text || 'N/A');
-          }
-        }
-      } catch (error) {
-        console.error('Error calculating route:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  const clearRoute = () => {
-    setDirectionsResponse(null);
-    setDistance('N/A');
-    setDuration('N/A');
-    if (originRef.current) originRef.current.value = '';
-    if (destinationRef.current) destinationRef.current.value = '';
-    // Clear drawings
-    if (drawingManager) {
-      drawingManager.setMap(null);
-      setDrawingManager(null);
-    }
-  };
-
-  const centerMap = () => {
-    if (map) {
-      map.panTo(center);
-      map.setZoom(15);
-    }
-  };
-
   const handleLocationClick = () => {
     if (navigator.geolocation) {
-      setLoading(true); // Start loading when fetching the current location
+      setLoading(true);
       navigator.geolocation.getCurrentPosition((position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         setCurrentLocation(new google.maps.LatLng(lat, lng));
         map?.panTo({ lat, lng });
-        setLoading(false); // Stop loading after location is found
+        setLoading(false);
       }, () => {
-        // Handle geolocation error
-        setLoading(false); // Stop loading on error
+        setLoading(false);
       });
     }
   };
 
-  const toggleDrawing = () => {
-    if (drawingManager) {
-      drawingManager.setMap(null);
-      setDrawingManager(null);
-    } else {
-      const newDrawingManager = new google.maps.drawing.DrawingManager({
-        drawingMode: google.maps.drawing.OverlayType.MARKER,
-        drawingControl: true,
-        drawingControlOptions: {
-          position: google.maps.ControlPosition.TOP_CENTER,
-          drawingModes: [
-            google.maps.drawing.OverlayType.MARKER,
-            google.maps.drawing.OverlayType.CIRCLE,
-            google.maps.drawing.OverlayType.POLYGON,
-            google.maps.drawing.OverlayType.POLYLINE,
-            google.maps.drawing.OverlayType.RECTANGLE,
-          ],
-        },
-        markerOptions: {
-          icon: {
-            url: '/your-icon-url.png', // Customize your marker icon
-            scaledSize: new google.maps.Size(30, 30),
-          },
-        },
-        circleOptions: {
-          fillColor: '#FF0000',
-          fillOpacity: 0.5,
-          strokeWeight: 2,
-          clickable: false,
-          editable: true,
-          zIndex: 1,
-        },
-        polygonOptions: {
-          fillColor: '#00FF00',
-          fillOpacity: 0.5,
-          strokeWeight: 2,
-          clickable: false,
-          editable: true,
-          zIndex: 1,
-        },
-        polylineOptions: {
-          strokeColor: '#0000FF',
-          strokeWeight: 2,
-        },
-        rectangleOptions: {
-          fillColor: '#FFFF00',
-          fillOpacity: 0.5,
-          strokeWeight: 2,
-          clickable: false,
-          editable: true,
-          zIndex: 1,
-        },
+  const handleSearch = async () => {
+    if (searchValue) {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ address: searchValue }, (results, status) => {
+        if (status === google.maps.GeocoderStatus.OK && results && results.length > 0) {
+          const location = results[0].geometry.location;
+          if (location) {
+            map?.panTo(location);
+            setCurrentLocation(location);
+            setSearchValue(''); // Clear input after search
+          }
+        } else {
+          alert('City or town not found. Please try again.');
+        }
       });
-      newDrawingManager.setMap(map);
-      setDrawingManager(newDrawingManager);
     }
+  };
+
+  const clearSearch = () => {
+    setSearchValue('');
+    setCurrentLocation(null); // Clear the current location
   };
 
   const setMapType = (type: google.maps.MapTypeId) => {
@@ -174,8 +158,8 @@ const MapComponent: React.FC = () => {
   };
 
   return (
-    <div className="relative h-screen w-screen">
-      <div className="absolute inset-0">
+    <div className="flex h-screen">
+      <div className="relative w-2/3">
         <GoogleMap
           center={center}
           zoom={15}
@@ -193,63 +177,52 @@ const MapComponent: React.FC = () => {
         >
           <Marker position={center} />
           {currentLocation && <Marker position={currentLocation.toJSON()} icon={{ url: '/current-location-icon.png' }} />}
-          {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
         </GoogleMap>
-      </div>
-      <div className="absolute top-4 left-4 p-4 bg-white shadow-lg rounded-lg z-10">
-        <div className="flex gap-2 mb-4">
-          <div className="flex-grow">
-            <Autocomplete>
-              <input
-                type="text"
-                placeholder="Origin"
-                ref={originRef}
-                className="p-2 border border-gray-300 rounded"
-              />
-            </Autocomplete>
-          </div>
-          <div className="flex-grow">
-            <Autocomplete>
-              <input
-                type="text"
-                placeholder="Destination"
-                ref={destinationRef}
-                className="p-2 border border-gray-300 rounded"
-              />
-            </Autocomplete>
-          </div>
-          <Button variant="contained" color="primary" onClick={calculateRoute} disabled={loading}>
-            Calculate Route
+
+        <div className="absolute top-10 left-4 p-2 flex flex-col gap-4 bg-white shadow-lg rounded-lg z-10">
+          <Autocomplete
+            onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
+          >
+            <input
+              type="text"
+              placeholder="Search City or Town"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="p-2 border border-gray-300 rounded"
+            />
+          </Autocomplete>
+          <Button variant="contained" color="primary" onClick={handleSearch}>
+            Search
           </Button>
-          <Button variant="contained" color="secondary" onClick={clearRoute}>
+          <Button variant="contained" color="secondary" onClick={clearSearch}>
             Clear
           </Button>
-          <Button variant="contained" color="primary" onClick={handleLocationClick}>
-            Current Location
+        </div>
+
+        <div className="absolute bottom-10 left-4 p-2 flex gap-2 bg-white shadow-lg rounded-lg z-10">
+          <Button variant="contained" color="primary" onClick={() => setMapType(google.maps.MapTypeId.TERRAIN)}>
+            <FaMountain className="mr-1" /> Terrain
           </Button>
-          <Button variant="contained" color="info" onClick={toggleDrawing}>
-            {drawingManager ? 'Disable Drawing' : 'Enable Drawing'}
-          </Button>
-          <Button variant="contained" color="info" onClick={() => setMapType(google.maps.MapTypeId.TERRAIN)}>
-            Terrain
-          </Button>
-          <Button variant="contained" color="info" onClick={() => setMapType(google.maps.MapTypeId.SATELLITE)}>
-            Satellite
+          <Button variant="contained" color="primary" onClick={() => setMapType(google.maps.MapTypeId.SATELLITE)}>
+            <FaSatellite className="mr-1" /> Satellite
           </Button>
         </div>
-        <div className="flex gap-4">
-          <span>Distance: {distance}</span>
-          <span>Duration: {duration}</span>
-          <Button variant="contained" color="primary" onClick={centerMap}>
-            Center Map
-          </Button>
-        </div>
+
+        {loading && (
+          <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50 z-20">
+            <CircularProgress />
+          </div>
+        )}
       </div>
-      {loading && (
-        <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50 z-20">
-          <CircularProgress />
+      <div className="w-1/3 p-4 overflow-y-auto">
+        <h2 className="text-xl font-bold mb-4">Available Apartments</h2>
+        <div className="grid grid-cols-1 gap-4">
+          {apartments.map((apartment) => (
+            <Apartment key={apartment.id} {...apartment} />
+          ))}
         </div>
-      )}
+        <Footer/>
+      </div>
     </div>
   );
 };
