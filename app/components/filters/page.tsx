@@ -1,8 +1,8 @@
 "use client"; // Add this directive for client-side rendering in Next.js
 
 import React, { useState, useEffect } from 'react';
-import { FaBed, FaHome, FaBuilding, FaCar } from 'react-icons/fa'; // Updated icons
-import { FaStar, FaStarHalf } from 'react-icons/fa'; // For star rating
+import { FaBed, FaHome, FaBuilding, FaCar, FaSortUp, FaSortDown } from 'react-icons/fa';
+import { FaStar, FaStarHalf } from 'react-icons/fa';
 
 interface SearchNavbarProps {
   onSearch: (search: string) => void;
@@ -33,7 +33,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
   const [savedSearches, setSavedSearches] = useState<string[]>([]);
 
   useEffect(() => {
-    // Load saved searches from local storage
     const searches = localStorage.getItem('savedSearches');
     if (searches) {
       setSavedSearches(JSON.parse(searches));
@@ -111,7 +110,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
     onPropertyTypeChange(newType);
   };
 
-
   const handleShowSavedSearches = () => {
     setShowSavedSearches(prev => !prev);
   };
@@ -123,7 +121,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
   return (
     <div className="bg-white shadow-md py-4 px-6 w-full z-50">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        {/* Search Bar */}
         <input
           type="text"
           value={search}
@@ -132,18 +129,16 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
           className="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Filters Container */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* Price Filter */}
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
           <div id="price-filter" className="relative w-full sm:w-48">
             <button
               onClick={handlePriceFilterClick}
-              className="w-full px-4 py-2 border rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-1 border rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             >
               Price
             </button>
             {showPriceFilter && (
-              <div className="absolute top-full left-0 mt-2 p-4 border bg-white shadow-lg rounded-lg w-full">
+              <div className="absolute top-full z-50 left-0 mt-2 p-4 border bg-white shadow-lg rounded-lg w-full">
                 <label className="block mb-2">Min Rent</label>
                 <input
                   type="number"
@@ -170,12 +165,11 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
             )}
           </div>
 
-          {/* Rental Type Filter */}
           <div className="relative w-full sm:w-48">
             <select
               value={rentalType}
               onChange={handleRentalTypeChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+              className="w-full px-3 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm appearance-none bg-white"
             >
               <option value="">Rental Type</option>
               <option value="studio">Studio <FaHome className="inline-block ml-2" /></option>
@@ -186,12 +180,11 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
             </select>
           </div>
 
-          {/* Star Rating Filter */}
           <div className="relative w-full sm:w-48">
             <select
               value={starRating}
               onChange={handleStarRatingChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+              className="w-full px-3 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm appearance-none bg-white"
             >
               <option value="0">Select Star Rating</option>
               <option value="1">1 Star</option>
@@ -202,12 +195,11 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
             </select>
           </div>
 
-          {/* Property Type Filter */}
           <div className="relative w-full sm:w-48">
             <select
               value={propertyType}
               onChange={handlePropertyTypeChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+              className="w-full px-3 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm appearance-none bg-white"
             >
               <option value="">Property Type</option>
               <option value="house">House</option>
@@ -217,17 +209,20 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
             </select>
           </div>
 
-          {/* Sort Order */}
+          {/* Sort Order with Arrow Icons */}
           <button
             onClick={handleSortChange}
-            className="w-full sm:w-48 px-4 py-2 border rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full sm:w-48 px-3 py-1 border rounded-lg flex items-center justify-between focus:outline-none focus:ring-2 ${
+              sortOrder === 'ascending'
+                ? 'bg-white text-blue-600 focus:ring-blue-500'
+                : 'bg-red-100 text-red-600 focus:ring-red-500'
+            } text-sm`}
           >
-            Sort: {sortOrder === 'ascending' ? 'Ascending' : 'Descending'}
+            <span>Sort: {sortOrder === 'ascending' ? 'Ascending' : 'Descending'}</span>
+            {sortOrder === 'ascending' ? <FaSortUp /> : <FaSortDown />}
           </button>
         </div>
         
-
-        {/* Saved Searches Button */}
         <button
           id="saved-searches-button"
           onClick={handleShowSavedSearches}
@@ -236,7 +231,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
           Saved Searches
         </button>
 
-        {/* Saved Searches Modal */}
         {showSavedSearches && (
           <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">

@@ -1,9 +1,10 @@
 "use client";
-import { useJsApiLoader, GoogleMap, Marker, Autocomplete } from '@react-google-maps/api';
+
+import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api';
 import { useRef, useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
-import Footer from "./components/Footer/page";
+import Footer from "./components/Footer/page"; // Adjust this path
 import SearchNavbar from './components/filters/page'; // Adjust this path
 import { FaMap, FaSatellite, FaMountain } from 'react-icons/fa';
 import Apartment from './components/card/page'; // Adjust this path
@@ -55,6 +56,7 @@ const MapComponent: React.FC = () => {
   const [currentLocation, setCurrentLocation] = useState<google.maps.LatLng | null>(null);
   const [filteredApartments, setFilteredApartments] = useState(apartments);
   const [searchValue, setSearchValue] = useState<string>('');
+  const [isMapVisible, setIsMapVisible] = useState<boolean>(true); // Track map visibility
 
   const handleSearch = (search: string) => {
     const lowercasedSearch = search.toLowerCase();
@@ -111,12 +113,12 @@ const MapComponent: React.FC = () => {
   };
 
   if (loadError) {
-    return <div className="p-4 text-red-500">Failed to load Google Maps. Please check the console for more details.</div>;
+    return <div className="p-4 text-center text-red-500">Failed to load Google Maps. Please check the console for more details.</div>;
   }
 
   if (!isLoaded) {
     return (
-      <div className="p-4 flex justify-center items-center">
+      <div className="p-4 flex justify-center mt-40 items-center">
         <CircularProgress />
       </div>
     );
@@ -132,48 +134,68 @@ const MapComponent: React.FC = () => {
         onStarRatingChange={handleStarRatingChange}
         onPropertyTypeChange={handlePropertyTypeChange}
       />
-      <div className="flex h-screen">
-        <div className=" w-2/3  fixed top-0 left-0 right-0 bottom-0 z-0">
-          <GoogleMap
-            center={center}
-            zoom={15}
-            mapContainerStyle={{ width: '100%', height: '100%' }}
-            options={{
-              zoomControl: true,
-              streetViewControl: false,
-              mapTypeControl: false,
-              fullscreenControl: false,
-              mapTypeId: google.maps.MapTypeId.ROADMAP,
-            }}
-            onLoad={(map) => {
-              setMap(map);
-            }}
-          >
-            <Marker position={center} />
-            {currentLocation && <Marker position={currentLocation.toJSON()} icon={{ url: '/current-location-icon.png' }} />}
-          </GoogleMap>
+      <div className="flex h-screen relative">
+        {isMapVisible ? (
+          <div className="md:w-2/3 w-full  fixed top-40 left-0 right-0 bottom-0 z-0">
+            <GoogleMap
+              center={center}
+              zoom={15}
+              mapContainerStyle={{ width: '100%', height: '100%' }}
+              options={{
+                zoomControl: true,
+                streetViewControl: false,
+                mapTypeControl: false,
+                fullscreenControl: false,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+              }}
+              onLoad={(map) => {
+                setMap(map);
+              }}
+            >
+              <Marker position={center} />
+              {currentLocation && <Marker position={currentLocation.toJSON()} icon={{ url: '/current-location-icon.png' }} />}
+            </GoogleMap>
 
-          <div className="absolute bottom-10 left-4 p-2 flex gap-2 bg-white shadow-lg rounded-lg z-10">
-            <Button variant="contained" color="primary" onClick={() => setMapType(google.maps.MapTypeId.TERRAIN)}>
-              <FaMountain className="mr-1" /> Terrain
-            </Button>
-            <Button variant="contained" color="primary" onClick={() => setMapType(google.maps.MapTypeId.SATELLITE)}>
-              <FaSatellite className="mr-1" /> Satellite
-            </Button>
-            <Button variant="contained" color="secondary" onClick={clearSearch}>
-              Clear
+            <div className="absolute bottom-10 left-4 p-2 flex gap-2 bg-white shadow-lg rounded-lg z-10">
+              <Button variant="contained" color="primary" onClick={() => setMapType(google.maps.MapTypeId.TERRAIN)}>
+                <FaMountain className="mr-1" /> Terrain
+              </Button>
+              <Button variant="contained" color="primary" onClick={() => setMapType(google.maps.MapTypeId.SATELLITE)}>
+                <FaSatellite className="mr-1" /> Satellite
+              </Button>
+              <Button variant="contained" color="secondary" onClick={clearSearch}>
+                Clear
+              </Button>
+            </div>
+
+            <Button
+              variant="contained"
+              color="default"
+              onClick={() => setIsMapVisible(false)}
+              className="absolute top-4 right-4 z-10"
+            >
+              Show Apartments
             </Button>
           </div>
-        </div>
-        <div className="w-1/3 p-4 fixed  top-16 right-0 overflow-y-auto">
-          <h2 className="text-xl font-bold mb-4">Available Apartments</h2>
-          <div className="grid grid-cols-1 gap-4">
-            {filteredApartments.map((apartment) => (
-              <Apartment key={apartment.id} {...apartment} />
-            ))}
+        ) : (
+          <div className="w-full h-screen overflow-y-auto p-4">
+            <h2 className="text-xl font-bold mb-4">Available Apartments</h2>
+            <div className="grid grid-cols-1 gap-4">
+              {filteredApartments.map((apartment) => (
+                <Apartment key={apartment.id} {...apartment} />
+              ))}
+            </div>
+            <Button
+              variant="contained"
+              color="default"
+              onClick={() => setIsMapVisible(true)}
+              className="mt-4"
+            >
+              Show Map
+            </Button>
+            <Footer />
           </div>
-          <Footer />
-        </div>
+        )}
       </div>
     </div>
   );

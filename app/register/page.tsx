@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { FaUser, FaEnvelope, FaLock, FaGithub, FaMicrosoft, FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa'; 
+import { FaUser, FaEnvelope, FaLock, FaGithub, FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa'; 
 import Link from 'next/link';
 import { CircularProgress } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
@@ -133,13 +133,7 @@ const RegisterPage: React.FC = () => {
                   />
                   <span className="text-gray-600 mt-2">GitHub</span>
                 </div>
-                <div className="flex flex-col items-center">
-                  <FaMicrosoft
-                    onClick={() => handleSocialLogin('Microsoft')}
-                    className="text-blue-600 text-2xl cursor-pointer hover:text-blue-400"
-                  />
-                  <span className="text-blue-600 mt-2">Microsoft</span>
-                </div>
+              
                 <div className="flex flex-col items-center">
                   <FaGoogle
                     onClick={() => handleSocialLogin('Google')}

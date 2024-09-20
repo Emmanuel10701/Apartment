@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
             </span>
             <span
               className="relative px-4 py-2 border border-transparent text-purple-700 font-semibold rounded-lg hover:border-black hover:bg-purple-50 transition cursor-pointer"
-              onClick={() => router.push('/add-property')}
+              onClick={() => router.push('/fillingform')}
             >
               Add Property
             </span>
