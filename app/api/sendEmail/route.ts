@@ -1,37 +1,38 @@
 // src/app/api/sendEmail/route.ts
 import { NextResponse } from 'next/server';
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 interface EmailRequest {
+  name: string;  // Added name to the interface
   email: string;
   message: string;
 }
 
 export async function POST(request: Request) {
   try {
-    const { email, message }: EmailRequest = await request.json();
+    const { name, email, message }: EmailRequest = await request.json();
 
     // Validate input
-    if (!email || !message) {
-      return NextResponse.json({ error: 'Email and message are required' }, { status: 400 });
+    if (!name || !email || !message) {
+      return NextResponse.json({ error: 'Name, email, and message are required' }, { status: 400 });
     }
 
     // Create a transporter object using SMTP transport
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // or any other email service
+      service: 'gmail', // Replace with your email service
       auth: {
-        user: process.env.EMAIL_USER, // your email address
-        pass: process.env.EMAIL_PASS  // your email password
-      }
+        user: process.env.EMAIL_USER, // Your email address
+        pass: process.env.EMAIL_PASS, // Your email password
+      },
     });
 
     // Email options
     const mailOptions = {
-      from: email, // recipient address
-      to: process.env.EMAIL_USER, // sender address
-      subject: 'Important Update', // Subject line
-      text: message, // plain text body
-      html: `<p>${message}</p>` // HTML body
+      from: process.env.EMAIL_USER, // Your email address
+      to: process.env.EMAIL_USER, // Recipient address
+      subject: 'New Message from ' + name, // Subject line
+      text: `Message from: ${name}\n\n${message}`, // Plain text body
+      html: `<p>Message from: <strong>${name}</strong></p><p>${message}</p>`, // HTML body
     };
 
     await transporter.sendMail(mailOptions); // Send email

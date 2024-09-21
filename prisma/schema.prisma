@@ -20,6 +20,7 @@ model Apartment {
   id          Int      @id @default(autoincrement())
   name        String
   minPrice    Float
+  maxprice    Float
   rentalType  String
   starRating  Int
   propertyType String
