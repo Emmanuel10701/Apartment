@@ -14,6 +14,7 @@ export async function POST(request: Request) {
 
     const { name, email, password } = body;
 
+    // Check for missing fields
     if (!name || !email || !password) {
       return new NextResponse('Missing Fields', { status: 400 });
     }
@@ -36,6 +37,13 @@ export async function POST(request: Request) {
         name,
         email,
         hashedPassword, // Ensure this matches the Prisma schema
+      },
+      select: { // Optional: select only the fields you want to return
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 

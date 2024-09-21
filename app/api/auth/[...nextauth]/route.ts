@@ -5,7 +5,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from 'next-auth/providers/github';
 import bcrypt from 'bcryptjs';
-import { User } from '@prisma/client'; // Import the User type from Prisma
+import { User as PrismaUser } from '@prisma/client'; // Ensure you import the correct User type
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -43,13 +43,21 @@ export const authOptions = {
           throw new Error('Incorrect password');
         }
 
-        return user as User;
+        // Return user details
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role, // Ensure this is included in your User model
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        } as PrismaUser;
       },
     }),
   ],
   secret: process.env.SECRET!,
   session: {
-    strategy: 'jwt' as const, // Use 'as const' to specify the exact string literal type
+    strategy: 'jwt' as const,
   },
   debug: process.env.NODE_ENV === 'development',
 };

@@ -7,27 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
- 
-model User {
-  id           Int      @id @default(autoincrement())
-  name         String
-  email        String   @unique
-  hashedPassword String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+enum Role {
+  USER
+  ADMIN
 }
+
+model User {
+  id             Int        @id @default(autoincrement())
+  name           String     @db.VarChar(255) // Length limit for name
+  email          String     @unique @db.VarChar(255) // Unique email
+  hashedPassword String
+  role           Role       @default(USER) // Default role
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  apartments     Apartment[] @relation("UserApartments") // One-to-many relationship
+}
+
 model Apartment {
   id          Int      @id @default(autoincrement())
   name        String
   minPrice    Float
-  maxprice    Float
+  maxPrice    Float
   rentalType  String
   starRating  Int
   propertyType String
-  images      String[] // Use PostgreSQL array type
+  images      String[] // Array type for images
   phoneNumber String
   email       String
   address     String
+  userId      Int      // Foreign key to User
+  user        User     @relation("UserApartments", fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
