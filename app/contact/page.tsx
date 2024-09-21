@@ -9,6 +9,7 @@ import { MdMarkEmailRead } from 'react-icons/md';
 import { FaPhone } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Button, CircularProgress } from '@mui/material'; // Import Material UI components
 
 // Define the structure for form data
 interface FormData {
@@ -37,7 +38,7 @@ const Contact: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch('/api/sendEmail', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -152,13 +153,16 @@ const Contact: React.FC = () => {
               />
             </div>
             <div className="flex justify-center mt-6">
-              <button
+              <Button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
+                variant="contained"
+                color="primary"
+                className="flex items-center"
                 disabled={loading}
               >
+                {loading && <CircularProgress size={20} color="inherit" className="mr-2" />}
                 {loading ? 'Submitting...' : 'Submit'}
-              </button>
+              </Button>
             </div>
           </form>
         </motion.div>
