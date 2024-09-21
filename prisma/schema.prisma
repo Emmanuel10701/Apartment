@@ -16,11 +16,17 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
-model Apertment {
-  id           Int      @id @default(autoincrement())
-  name         String
-  email        String   @unique
-  hashedPassword String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+model Apartment {
+  id          Int      @id @default(autoincrement())
+  name        String
+  minPrice    Float
+  rentalType  String
+  starRating  Int
+  propertyType String
+  images      String[] // Use PostgreSQL array type
+  phoneNumber String
+  email       String
+  address     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

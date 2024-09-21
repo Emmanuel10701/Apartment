@@ -280,7 +280,6 @@ const ApartmentForm: React.FC = () => {
               />
               {errors.images && (
                 <p className="text-red-500 text-sm">
-                  {errors.images.message}
                 </p>
               )}
             </div>

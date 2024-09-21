@@ -1,5 +1,3 @@
-// pages/index.tsx
-
 "use client";
 
 import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
@@ -36,28 +34,10 @@ const apartments: Apartment[] = [
     propertyType: "Apartment",
     images: [
       "https://images.pexels.com/photos/1234567/pexels-photo-1234567.jpeg",
-      "https://images.pexels.com/photos/1234568/pexels-photo-1234568.jpeg",
-      "https://images.pexels.com/photos/1234569/pexels-photo-1234569.jpeg",
     ],
     phoneNumber: "1234567890",
     email: "luxury@apartment.com",
     address: "123 Luxury St, Beverly Hills, CA",
-  },
-  {
-    id: 2,
-    name: "Cozy Studio",
-    minPrice: 800,
-    rentalType: "Monthly",
-    starRating: 5,
-    propertyType: "Studio",
-    images: [
-      "https://images.pexels.com/photos/7654321/pexels-photo-7654321.jpeg",
-      "https://images.pexels.com/photos/7654322/pexels-photo-7654322.jpeg",
-      "https://images.pexels.com/photos/7654323/pexels-photo-7654323.jpeg",
-    ],
-    phoneNumber: "0987654321",
-    email: "cozy@studio.com",
-    address: "456 Cozy Ave, Seattle, WA",
   },
   // Add more apartments as needed
 ];
@@ -67,12 +47,11 @@ interface SearchFilters {
   minRent?: number;
   maxRent?: number;
   rentalType?: string;
-  sortOrder?: string;
   starRating?: number;
   propertyType?: string;
 }
 
-const MapComponent: React.FC = () => {
+const MainComponent: React.FC = () => {
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
     libraries: ["places"],
@@ -81,7 +60,8 @@ const MapComponent: React.FC = () => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [markers, setMarkers] = useState<google.maps.LatLngLiteral[]>([]);
   const [filteredApartments, setFilteredApartments] = useState<Apartment[]>(apartments);
-  const [isMapVisible, setIsMapVisible] = useState<boolean>(true); // Track map visibility
+  const [isMapVisible, setIsMapVisible] = useState<boolean>(true);
+  const [loadingMarkers, setLoadingMarkers] = useState(false); // Loading state
 
   const geocodeAddress = async (address: string): Promise<google.maps.LatLngLiteral> => {
     const geocoder = new google.maps.Geocoder();
@@ -97,6 +77,7 @@ const MapComponent: React.FC = () => {
   };
 
   const loadApartmentMarkers = async () => {
+    setLoadingMarkers(true); // Start loading
     try {
       const newMarkers = await Promise.all(
         filteredApartments.map(async (apartment) => {
@@ -105,30 +86,35 @@ const MapComponent: React.FC = () => {
             return location;
           } catch (error) {
             console.error(`Error geocoding address for ${apartment.name}:`, error);
-            return null; // Return null for failed geocodes
+            return null;
           }
         })
       );
-      setMarkers(newMarkers.filter(Boolean) as google.maps.LatLngLiteral[]); // Filter out nulls
+      const validMarkers = newMarkers.filter(Boolean) as google.maps.LatLngLiteral[];
+
+      if (validMarkers.length === 0) {
+        console.warn("No valid markers found. Check apartment addresses.");
+      }
+
+      setMarkers(validMarkers);
     } catch (error) {
       console.error("Error loading apartment markers:", error);
+    } finally {
+      setLoadingMarkers(false); // Stop loading
     }
   };
 
-  // Call loadApartmentMarkers when filtered apartments change
   useEffect(() => {
     if (filteredApartments.length > 0) {
       loadApartmentMarkers();
     } else {
-      setMarkers([]); // Clear markers if no apartments are filtered
+      setMarkers([]);
     }
   }, [filteredApartments]);
 
-  // Handle search and filters
   const handleSearch = (filters: SearchFilters) => {
     let filtered = apartments;
 
-    // Apply search keyword
     if (filters.search) {
       const lowercasedSearch = filters.search.toLowerCase();
       filtered = filtered.filter(
@@ -139,52 +125,41 @@ const MapComponent: React.FC = () => {
       );
     }
 
-    // Apply rental type filter
     if (filters.rentalType) {
       filtered = filtered.filter(
         (apartment) => apartment.rentalType === filters.rentalType
       );
     }
 
-    // Apply star rating filter
     if (filters.starRating !== undefined && filters.starRating > 0) {
       filtered = filtered.filter(
         (apartment) => apartment.starRating >= filters.starRating!
       );
     }
 
-    // Apply property type filter
     if (filters.propertyType) {
       filtered = filtered.filter(
         (apartment) => apartment.propertyType === filters.propertyType
       );
     }
 
-    // Apply price range filter
     if (filters.minRent !== undefined && filters.maxRent !== undefined) {
       filtered = filtered.filter(
         (apartment) =>
           apartment.minPrice >= filters.minRent! &&
           apartment.minPrice <= filters.maxRent!
       );
-    } else if (filters.minRent !== undefined && filters.maxRent === undefined) {
+    } else if (filters.minRent !== undefined) {
       filtered = filtered.filter((apartment) => apartment.minPrice >= filters.minRent!);
-    } else if (filters.minRent === undefined && filters.maxRent !== undefined) {
+    } else if (filters.maxRent !== undefined) {
       filtered = filtered.filter((apartment) => apartment.minPrice <= filters.maxRent!);
-    }
-
-    // Apply sorting
-    if (filters.sortOrder) {
-      filtered = [...filtered].sort((a, b) =>
-        filters.sortOrder === "ascending" ? a.minPrice - b.minPrice : b.minPrice - a.minPrice
-      );
     }
 
     setFilteredApartments(filtered);
   };
 
   const clearSearch = () => {
-    setFilteredApartments(apartments); // Reset to original apartments
+    setFilteredApartments(apartments);
   };
 
   const setMapType = (type: google.maps.MapTypeId) => {
@@ -193,10 +168,21 @@ const MapComponent: React.FC = () => {
     }
   };
 
+  const handleReload = () => {
+    window.location.reload();
+  };
+
   if (loadError) {
     return (
-      <div className="p-4 text-center text-red-500">
-        Failed to load Google Maps. Please check the console for more details.
+      <div className="flex flex-col items-center justify-center h-screen text-center">
+        <svg className="w-20 h-20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <circle cx="12" cy="12" r="10" strokeWidth="4" />
+          <path d="M12 6v6l4 2" strokeWidth="2" />
+        </svg>
+        <p className="mb-4">Failed to load Google Maps. Please check your network connection.</p>
+        <Button variant="contained" color="primary" onClick={handleReload}>
+          Reload
+        </Button>
       </div>
     );
   }
@@ -210,14 +196,11 @@ const MapComponent: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="relative">
       <SearchNavbar onSearch={handleSearch} />
       <div className="flex flex-col md:flex-row h-screen relative">
-        {/* Map Section */}
         <div
-          className={`md:w-2/3 w-full ${
-            isMapVisible ? "block" : "hidden"
-          } md:block fixed md:relative top-0 left-0 right-0 bottom-0 z-0`}
+          className={`md:w-2/3 w-full ${isMapVisible ? "block" : "hidden"} md:block fixed md:relative top-0 left-0 right-0 bottom-0 z-0`}
         >
           <GoogleMap
             center={center}
@@ -239,8 +222,6 @@ const MapComponent: React.FC = () => {
               <Marker key={index} position={marker} />
             ))}
           </GoogleMap>
-
-          {/* Map Controls */}
           <div className="absolute bottom-10 left-4 p-2 flex gap-2 bg-white shadow-lg rounded-lg z-10">
             <Button
               variant="contained"
@@ -260,52 +241,49 @@ const MapComponent: React.FC = () => {
               Clear
             </Button>
           </div>
-
-          {/* Toggle Button for Small Screens */}
           <div className="absolute top-4 right-4 z-10 md:hidden">
             <Button variant="contained" color="primary" onClick={() => setIsMapVisible(false)}>
               Show Apartments
             </Button>
           </div>
         </div>
-
-        {/* Apartments Section */}
         <div
-          className={`md:w-1/3 w-full ${
-            isMapVisible ? "hidden" : "block"
-          } md:block fixed md:relative top-0 right-0 bottom-0 overflow-y-auto p-4 bg-white z-10`}
+          className={`md:w-1/3 w-full ${isMapVisible ? "hidden" : "block"} md:block fixed md:relative top-0 right-0 bottom-0 overflow-y-auto p-4 bg-white z-10`}
         >
           <h2 className="text-xl font-bold mb-4">Available Apartments</h2>
+          {loadingMarkers && <CircularProgress />} {/* Loading spinner */}
           <div className="grid grid-cols-1 gap-4">
-            {filteredApartments.length > 0 ? (
-              filteredApartments.map((apartment) => (
-                <ApartmentCard key={apartment.id} {...apartment} />
-              ))
-            ) : (
-              <p className="text-gray-500">No apartments found matching your criteria.</p>
-            )}
-          </div>
+          {filteredApartments.length > 0 ? (
+  filteredApartments.map((apartment) => (
+    <Apartment
+      key={apartment.id}
+      id={apartment.id}
+      name={apartment.name}
+      minPrice={apartment.minPrice}
+      rentalType={apartment.rentalType}
+      starRating={apartment.starRating}
+      propertyType={apartment.propertyType}
+      images={apartment.images}
+      phoneNumber={apartment.phoneNumber}
+      email={apartment.email}
+      address={apartment.address}
+    />
+  ))
+) : (
+  <p>No apartments found.</p>
+)}
 
-          {/* Toggle Button for Small Screens */}
-          <div className="mt-4 md:hidden">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setIsMapVisible(true)}
-              className="w-full"
-            >
+          </div>
+          <div className="absolute bottom-4 left-4 z-10">
+            <Button variant="contained" color="secondary" onClick={() => setIsMapVisible(true)}>
               Show Map
             </Button>
           </div>
-
-          {/* Footer */}
-          <div className="mt-4">
-            <Footer />
-          </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
 
-export default MapComponent;
+export default MainComponent;
