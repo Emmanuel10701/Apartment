@@ -185,12 +185,8 @@ const MapComponent: React.FC = () => {
                 <Apartment key={apartment.id} {...apartment} />
               ))}
             </div>
-            <Button
-              variant="contained"
-              color="default"
-              onClick={() => setIsMapVisible(true)}
-              className="mt-4"
-            >
+            <Button variant="contained" color="default" onClick={() => setIsMapVisible(true)} className="mt-4">
+
               Show Map
             </Button>
             <Footer />
