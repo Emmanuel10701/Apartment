@@ -1,7 +1,7 @@
 "use client";
 
 import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api';
-import { useRef, useState } from 'react';
+import { useRef, useState,useEffect } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
 import Footer from "./components/Footer/page"; // Adjust this path
@@ -26,6 +26,7 @@ const apartments = [
     ],
     phoneNumber: "1234567890",
     email: "luxury@apartment.com",
+    address: "123 Luxury St, Beverly Hills, CA", // Added address
   },
   {
     id: 2,
@@ -41,6 +42,7 @@ const apartments = [
     ],
     phoneNumber: "0987654321",
     email: "cozy@studio.com",
+    address: "456 Cozy Ave, Seattle, WA", // Added address
   },
   // Add more apartments as needed
 ];
@@ -57,6 +59,42 @@ const MapComponent: React.FC = () => {
   const [filteredApartments, setFilteredApartments] = useState(apartments);
   const [searchValue, setSearchValue] = useState<string>('');
   const [isMapVisible, setIsMapVisible] = useState<boolean>(true); // Track map visibility
+  const [markers, setMarkers] = useState<google.maps.LatLngLiteral[]>([]); // Track markers
+
+  const geocodeAddress = async (address: string) => {
+    const geocoder = new google.maps.Geocoder();
+    return new Promise<google.maps.LatLngLiteral>((resolve, reject) => {
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === "OK" && results) {
+          resolve(results[0].geometry.location.toJSON());
+        } else {
+          reject(new Error("Geocode was not successful for the following reason: " + status));
+        }
+      });
+    });
+  };
+
+  const loadApartmentMarkers = async () => {
+    const newMarkers = await Promise.all(
+      filteredApartments.map(async (apartment) => {
+        try {
+          const location = await geocodeAddress(apartment.address);
+          return location;
+        } catch (error) {
+          console.error(`Error geocoding address for ${apartment.name}:`, error);
+          return null; // Return null for failed geocodes
+        }
+      })
+    );
+    setMarkers(newMarkers.filter(Boolean) as google.maps.LatLngLiteral[]); // Filter out nulls
+  };
+
+  // Call loadApartmentMarkers when filtered apartments change
+  useEffect(() => {
+    if (filteredApartments.length > 0) {
+      loadApartmentMarkers();
+    }
+  }, [filteredApartments]);
 
   const handleSearch = (search: string) => {
     const lowercasedSearch = search.toLowerCase();
@@ -125,7 +163,7 @@ const MapComponent: React.FC = () => {
   }
 
   return (
-    <div>
+    <div >
       <SearchNavbar 
         onSearch={handleSearch}
         onPriceFilter={handlePriceFilter}
@@ -133,6 +171,7 @@ const MapComponent: React.FC = () => {
         onSortChange={handleSortChange}
         onStarRatingChange={handleStarRatingChange}
         onPropertyTypeChange={handlePropertyTypeChange}
+      
       />
       <div className="flex h-screen relative">
         {isMapVisible ? (
@@ -154,6 +193,9 @@ const MapComponent: React.FC = () => {
             >
               <Marker position={center} />
               {currentLocation && <Marker position={currentLocation.toJSON()} icon={{ url: '/current-location-icon.png' }} />}
+              {markers.map((marker, index) => (
+                <Marker key={index} position={marker} />
+              ))}
             </GoogleMap>
 
             <div className="absolute bottom-10 left-4 p-2 flex gap-2 bg-white shadow-lg rounded-lg z-10">
@@ -169,26 +211,32 @@ const MapComponent: React.FC = () => {
             </div>
 
             <Button
-              variant="contained"
-              color="default"
-              onClick={() => setIsMapVisible(false)}
-              className="absolute top-4 right-4 z-10"
-            >
-              Show Apartments
-            </Button>
+                variant="contained"
+                color="primary" // Change from "default" to "primary"
+                onClick={() => setIsMapVisible(false)}
+                className="absolute top-4 right-4 z-10"
+              >
+                Show Apartments
+              </Button>
+
           </div>
         ) : (
-          <div className="w-full h-screen overflow-y-auto p-4">
+          <div className="w-[25%] h-screen  absolute right-0 top-0 overflow-y-auto p-4">
             <h2 className="text-xl font-bold mb-4">Available Apartments</h2>
             <div className="grid grid-cols-1 gap-4">
               {filteredApartments.map((apartment) => (
                 <Apartment key={apartment.id} {...apartment} />
               ))}
             </div>
-            <Button variant="contained" color="default" onClick={() => setIsMapVisible(true)} className="mt-4">
-
+            <Button
+              variant="contained"
+              color="primary" // Change from "default" to "primary"
+              onClick={() => setIsMapVisible(true)}
+              className="mt-4"
+            >
               Show Map
             </Button>
+
             <Footer />
           </div>
         )}

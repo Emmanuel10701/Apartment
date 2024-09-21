@@ -11,6 +11,7 @@ interface ApartmentProps {
   images: string[];
   phoneNumber: string;
   email: string;
+  address: string; // Added address field
 }
 
 const Apartment: React.FC<ApartmentProps> = ({
@@ -23,6 +24,7 @@ const Apartment: React.FC<ApartmentProps> = ({
   images,
   phoneNumber,
   email,
+  address, // Destructure address
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isActive, setIsActive] = useState<string | null>(null);
@@ -44,8 +46,16 @@ const Apartment: React.FC<ApartmentProps> = ({
     setCurrentImageIndex(index);
   };
 
+  const handleCall = () => {
+    window.location.href = `tel:${phoneNumber}`;
+  };
+
+  const handleEmail = () => {
+    window.location.href = `mailto:${email}`;
+  };
+
   return (
-    <div className="apartment-card border border-gray-200 rounded-lg shadow-md overflow-hidden transition-transform transform ">
+    <div className="apartment-card border border-gray-200 rounded-lg shadow-md overflow-hidden transition-transform transform">
       <div className="relative">
         <img
           src={images[currentImageIndex]}
@@ -72,6 +82,7 @@ const Apartment: React.FC<ApartmentProps> = ({
         <p className="text-gray-800 font-medium">Min Price: ${minPrice}</p>
         <p className="text-gray-800">Rental Type: {rentalType}</p>
         <p className="text-gray-800">Property Type: {propertyType}</p>
+        <p className="text-gray-800">Address: {address}</p> {/* Display address */}
         <div className="flex items-center mt-2">
           {Array.from({ length: 5 }, (_, index) => (
             <span key={index}>
@@ -84,18 +95,18 @@ const Apartment: React.FC<ApartmentProps> = ({
           ))}
         </div>
         <div className="flex gap-4 mt-4">
-          <a
-            href={`tel:${phoneNumber}`}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-300"
+          <span
+            onClick={handleCall}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 cursor-pointer"
           >
             Call
-          </a>
-          <a
-            href={`mailto:${email}`}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-300"
+          </span>
+          <span
+            onClick={handleEmail}
+            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-300 cursor-pointer"
           >
             Email
-          </a>
+          </span>
         </div>
       </div>
     </div>
@@ -120,6 +131,7 @@ const apartments = [
     ],
     phoneNumber: "1234567890",
     email: "luxury@apartment.com",
+    address: "123 Luxury St, Beverly Hills, CA", // Added address
   },
   {
     id: 2,
@@ -135,5 +147,6 @@ const apartments = [
     ],
     phoneNumber: "0987654321",
     email: "cozy@studio.com",
+    address: "456 Cozy Ave, Seattle, WA", // Added address
   },
 ];
