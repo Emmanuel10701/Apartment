@@ -72,18 +72,14 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSearch = event.target.value;
     setSearch(newSearch);
-    // Optionally, you can call onSearch here for real-time search
-    // onSearch({ search: newSearch });
   };
 
   const handleFiltersSubmit = () => {
-    // Validate Price Range
     if (minRent !== '' && maxRent !== '' && minRent > maxRent) {
       toast.error("Min Rent cannot be greater than Max Rent.");
       return;
     }
 
-    // Prepare Filters Object
     const filters: SearchFilters = {
       search: search.trim(),
     };
@@ -113,19 +109,37 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
       filters.propertyType = propertyType;
     }
 
-    // Call the onSearch prop with the filters
     onSearch(filters);
-
-    // Close the modal
     setShowModal(false);
     toast.success("Filters applied successfully!");
+  };
+
+  const clearFilters = () => {
+    setSearch('');
+    setMinRent('');
+    setMaxRent('');
+    setRentalType('');
+    setSortOrder('ascending');
+    setStarRating(0);
+    setPropertyType('');
+
+    onSearch({
+      search: '',
+      minRent: undefined,
+      maxRent: undefined,
+      rentalType: '',
+      sortOrder: 'ascending',
+      starRating: 0,
+      propertyType: '',
+    });
+
+    toast.success("Filters cleared!");
   };
 
   return (
     <div className="bg-white shadow-md py-4 px-6 w-full z-50">
       <ToastContainer />
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        {/* Search Input */}
         <input
           type="text"
           value={search}
@@ -166,6 +180,14 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
         >
           <span>Sort: {sortOrder === 'ascending' ? 'Ascending' : 'Descending'}</span>
           {sortOrder === 'ascending' ? <FaSortUp /> : <FaSortDown />}
+        </button>
+
+        {/* Clear Filters Button (Outside Navbar) */}
+        <button
+          onClick={clearFilters}
+          className="w-full sm:w-48 px-4 py-2 bg-gray-500 text-white rounded-full hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm"
+        >
+          Clear Filters
         </button>
       </div>
 
@@ -217,11 +239,11 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 >
                   <option value="">Select Rental Type</option>
-                  <option value="studio">Studio <FaHome className="inline-block ml-2" /></option>
-                  <option value="one-bedroom">1 Bedroom <FaBed className="inline-block ml-2" /></option>
-                  <option value="two-bedrooms">2 Bedrooms <FaBuilding className="inline-block ml-2" /></option>
-                  <option value="three-bedrooms">3 Bedrooms <FaCar className="inline-block ml-2" /></option>
-                  <option value="four-bedrooms">4+ Bedrooms <FaCar className="inline-block ml-2" /></option>
+                  <option value="studio">Studio</option>
+                  <option value="one-bedroom">1 Bedroom</option>
+                  <option value="two-bedrooms">2 Bedrooms</option>
+                  <option value="three-bedrooms">3 Bedrooms</option>
+                  <option value="four-bedrooms">4+ Bedrooms</option>
                 </select>
               </div>
 
@@ -236,44 +258,62 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 >
                   <option value="">Select Property Type</option>
+                  <option value="apartment">Apartment</option>
                   <option value="house">House</option>
                   <option value="condo">Condo</option>
-                  <option value="apartment">Apartment</option>
-                  <option value="townhouse">Townhouse</option>
+                  <option value="loft">Loft</option>
                 </select>
               </div>
 
-              {/* Price Range Inputs */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price Range
-                </label>
-                <div className="flex space-x-2">
+              {/* Rent Range */}
+              <div className="flex gap-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Min Rent
+                  </label>
                   <input
                     type="number"
                     value={minRent}
-                    onChange={(e) => setMinRent(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    onChange={(e) => setMinRent(e.target.value !== '' ? Number(e.target.value) : '')}
                     placeholder="Min Rent"
-                    className="w-1/2 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Max Rent
+                  </label>
                   <input
                     type="number"
                     value={maxRent}
-                    onChange={(e) => setMaxRent(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                    onChange={(e) => setMaxRent(e.target.value !== '' ? Number(e.target.value) : '')}
                     placeholder="Max Rent"
-                    className="w-1/2 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   />
                 </div>
               </div>
-            </div>
 
-            {/* Search Button */}
-            <button
-              onClick={handleFiltersSubmit}
-              className="mt-6 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-            >
-              Search
-            </button>
+              {/* Clear Filters Button (Inside Modal) */}
+              <div className="mt-4">
+                <button
+                  onClick={clearFilters}
+                  className="w-full px-4 py-2 bg-gray-500 text-white rounded-full hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm"
+                >
+                  Clear Filters
+                </button>
+              </div>
+
+              {/* Apply Filters Button */}
+              <div className="mt-4">
+                <button
+                  onClick={handleFiltersSubmit}
+                  className="w-full px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                  Apply Filters
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

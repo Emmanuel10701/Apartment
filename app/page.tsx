@@ -256,7 +256,7 @@ const MainComponent: React.FC = () => {
           {filteredApartments.length > 0 ? (
   filteredApartments.map((apartment) => (
     <ApartmentCard
-      key={apartment.name}
+      key={apartment.id}
       name={apartment.name}
       minPrice={apartment.minPrice}
       rentalType={apartment.rentalType}

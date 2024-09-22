@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { FaStar, FaMapMarkerAlt } from "react-icons/fa";
+import EmailModal from "../emailModal/page"; // Adjust the path as necessary
 
 // Define the Apartment type
 interface Apartment {
@@ -60,7 +61,7 @@ const apartments: Apartment[] = [
 ];
 
 // ApartmentCard component
-const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
+const ApartmentCard = ({ apartment, onEmailClick }: { apartment: Apartment; onEmailClick: (apartment: Apartment) => void; }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const handleNext = () => {
@@ -73,10 +74,6 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
 
     const handleCall = () => {
         window.location.href = `tel:${apartment.phoneNumber}`;
-    };
-
-    const handleEmail = () => {
-        window.location.href = `mailto:${apartment.email}`;
     };
 
     return (
@@ -120,7 +117,7 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
                     <span className="text-sm text-gray-500">Min Price: ${apartment.minPrice}</span>
                 </div>
                 <div className="flex justify-between mt-4">
-                    <button onClick={handleEmail} className="bg-green-500 text-white px-4 py-2 rounded-lg">Email</button>
+                    <button onClick={() => onEmailClick(apartment)} className="bg-green-500 text-white px-4 py-2 rounded-lg">Email</button>
                     <button onClick={handleCall} className="bg-blue-500 text-white px-4 py-2 rounded-lg hidden sm:inline">Call</button>
                 </div>
             </div>
@@ -131,11 +128,23 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
 // ApartmentList component
 const ApartmentList = () => {
     const [currentPage, setCurrentPage] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
     const itemsPerPage = 1; // Number of items per page
     const totalPages = Math.ceil(apartments.length / itemsPerPage);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
+    };
+
+    const handleEmailClick = (apartment: Apartment) => {
+        setSelectedApartment(apartment);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedApartment(null);
     };
 
     const displayedApartments = apartments.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
@@ -144,7 +153,7 @@ const ApartmentList = () => {
         <div>
             <div className="grid grid-cols-1 gap-4">
                 {displayedApartments.map((apartment, index) => (
-                    <ApartmentCard key={index} apartment={apartment} />
+                    <ApartmentCard key={index} apartment={apartment} onEmailClick={handleEmailClick} />
                 ))}
             </div>
             <div className="flex justify-center mt-4">
@@ -158,6 +167,14 @@ const ApartmentList = () => {
                     </button>
                 ))}
             </div>
+
+            {isModalOpen && selectedApartment && (
+                <EmailModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    apartment={selectedApartment}
+                />
+            )}
         </div>
     );
 };
