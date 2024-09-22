@@ -263,7 +263,7 @@ const Dashboard: React.FC = () => {
               {/* Recent Orders */}
               <div className="flex-1 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Recent Orders</h3>
+                  <h3 className="text-xl font-semibold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent  bg-clip-text">Recent Orders</h3>
                   <div className="flex space-x-2">
                     <FaSearch className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer" />
                     <FaFilter className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer" />
@@ -313,13 +313,16 @@ const Dashboard: React.FC = () => {
               {/* Properties */}
               <div className="flex-1 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Properties</h3>
+                  <h3 className="text-center  text-gray-800 text-4xl font-extrabold  dark:text-white bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent  bg-clip-text">Your Properties</h3>
                   <div className="flex space-x-2">
                     <FaPlus className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer" onClick={() => { /* You can add additional functionality here */ }} />
                     <FaFilter className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer" />
                   </div>
                 </div>
-                 <Card/>
+                <div className='items-center justify-center flex   '>
+                <Card/>
+
+                </div>
                  <button 
                   onClick={handleAddProperty}
                   className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">

@@ -19,25 +19,12 @@ interface Apartment {
 // Sample apartment data (add more properties as needed)
 const apartments: Apartment[] = [
     {
-        title: 'Cozy Apartment in City Center',
-        images: [
-            '/docs/images/products/apartment1.png',
-            '/docs/images/products/apartment2.png',
-            '/docs/images/products/apartment3.png',
-        ],
-        rating: 4.0,
-        location: '123 Main St, Cityville',
-        availableRooms: 2,
-        rentalType: 'Condo',
-        description: 'This beautiful apartment offers stunning city views and is located near all amenities.',
-        price: 1500,
-        minPrice: 1400,
-    },
-    {
         title: 'Luxury Studio Apartment',
         images: [
-            '/docs/images/products/apartment4.png',
-            '/docs/images/products/apartment5.png',
+            '/images/ap2.jpg',
+            '/images/bed2.jpg',
+            '/images/int2.jpg',
+            '/images/kit2.webp',
         ],
         rating: 4.5,
         location: '456 Elm St, Metropolis',
@@ -47,6 +34,23 @@ const apartments: Apartment[] = [
         price: 1800,
         minPrice: 1700,
     },
+    {
+        title: 'Cozy Apartment in City Center',
+        images: [
+            '/images/ap11.webp',
+            '/images/bd1.jpg',
+            '/images/int3.jpeg',
+            '/images/kit1.webp',
+        ],
+        rating: 4.0,
+        location: '123 Main St, Cityville',
+        availableRooms: 2,
+        rentalType: 'Condo',
+        description: 'This beautiful apartment offers stunning city views and is located near all amenities.',
+        price: 1500,
+        minPrice: 1400,
+    },
+  
     // Add more apartment entries as needed...
 ];
 
@@ -78,7 +82,7 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
             <div className="relative">
                 <div className="flex justify-center">
                     <Image
-                        className="p-8 rounded-t-lg"
+                        className="p-8 w-full h-full rounded-t-lg"
                         src={apartment.images[currentIndex]}
                         alt="apartment image"
                         width={300}
