@@ -2,6 +2,7 @@
 "use client"
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import Link from 'next/link'
+import Card from "../components/apartment2/page"
 import {
   FaCog,
   FaSignOutAlt,
@@ -318,53 +319,12 @@ const Dashboard: React.FC = () => {
                     <FaFilter className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer" />
                   </div>
                 </div>
-                <form onSubmit={handleAddProperty} className="mb-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Property Name"
-                      value={newProperty.name}
-                      onChange={handleInputChange}
-                      className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none"
-                      required
-                    />
-                    <input
-                      type="text"
-                      name="address"
-                      placeholder="Address"
-                      value={newProperty.address}
-                      onChange={handleInputChange}
-                      className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none"
-                      required
-                    />
-                    <input
-                      type="number"
-                      name="roomsAvailable"
-                      placeholder="Rooms Available"
-                      value={newProperty.roomsAvailable}
-                      onChange={handleInputChange}
-                      className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none"
-                      min={1}
-                      required
-                    />
-                    <input
-                      type="text"
-                      name="imageUrl"
-                      placeholder="Image URL"
-                      value={newProperty.imageUrl}
-                      onChange={handleInputChange}
-                      className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none"
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-300"
-                  >
-                    Add Property
-                  </button>
-                </form>
+                 <Card/>
+                 <button 
+                  onClick={handleAddProperty}
+                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                  Add Property
+              </button>
                 <ul className="space-y-4">
                   {properties.map((property) => (
                     <li key={property.id} className="flex items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm">
