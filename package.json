@@ -25,6 +25,7 @@
     "@types/react-leaflet": "^3.0.0",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
     "framer-motion": "^11.5.6",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",

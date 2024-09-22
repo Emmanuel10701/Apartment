@@ -1,152 +1,165 @@
 "use client";
-import React, { useState } from 'react';
 
-interface ApartmentProps {
-  id: number;
-  name: string;
-  minPrice: number;
-  rentalType: string;
-  starRating: number;
-  propertyType: string;
-  images: string[];
-  phoneNumber: string;
-  email: string;
-  address: string; // Added address field
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { FaStar, FaMapMarkerAlt } from "react-icons/fa";
+
+// Define the Apartment type
+interface Apartment {
+    title: string;
+    images: string[];
+    rating: number;
+    location: string;
+    availableRooms: number;
+    rentalType: string;
+    description: string;
+    price: number;
+    phoneNumber: string;
+    email: string;
+    minPrice: number;
 }
 
-const Apartment: React.FC<ApartmentProps> = ({
-  id,
-  name,
-  minPrice,
-  rentalType,
-  starRating,
-  propertyType,
-  images,
-  phoneNumber,
-  email,
-  address, // Destructure address
-}) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isActive, setIsActive] = useState<string | null>(null);
+// Sample apartment data
+const apartments: Apartment[] = [
+    {
+        title: "Luxury Studio Apartment",
+        images: [
+            "/images/ap2.jpg",
+            "/images/bed2.jpg",
+            "/images/int2.jpg",
+            "/images/kit2.webp",
+        ],
+        rating: 4.5,
+        location: "456 Elm St, Metropolis",
+        availableRooms: 1,
+        rentalType: "Studio",
+        description: "A modern studio apartment with luxury amenities.",
+        price: 1800,
+        minPrice: 1700,
+        phoneNumber: "1234567890",
+        email: "luxury@apartment.com",
+    },
+    {
+        title: "Cozy Apartment in City Center",
+        images: [
+            "/images/ap11.webp",
+            "/images/bd1.jpg",
+            "/images/int3.jpeg",
+            "/images/kit1.webp",
+        ],
+        rating: 4.0,
+        location: "123 Main St, Cityville",
+        availableRooms: 2,
+        rentalType: "Condo",
+        description: "This beautiful apartment offers stunning city views and is located near all amenities.",
+        price: 1500,
+        minPrice: 1400,
+        phoneNumber: "0987654321",
+        email: "cozy@apartment.com",
+    },
+];
 
-  const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-  };
+// ApartmentCard component
+const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
 
-  const handlePrevImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-  };
+    const handleNext = () => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % apartment.images.length);
+    };
 
-  const handleButtonClick = (type: string) => {
-    setIsActive(type);
-    setTimeout(() => setIsActive(null), 200);
-  };
+    const handlePrevious = () => {
+        setCurrentIndex((prevIndex) => (prevIndex - 1 + apartment.images.length) % apartment.images.length);
+    };
 
-  const handleImageClick = (index: number) => {
-    setCurrentImageIndex(index);
-  };
+    const handleCall = () => {
+        window.location.href = `tel:${apartment.phoneNumber}`;
+    };
 
-  const handleCall = () => {
-    window.location.href = `tel:${phoneNumber}`;
-  };
+    const handleEmail = () => {
+        window.location.href = `mailto:${apartment.email}`;
+    };
 
-  const handleEmail = () => {
-    window.location.href = `mailto:${email}`;
-  };
-
-  return (
-    <div className="apartment-card border border-gray-200 rounded-lg shadow-md overflow-hidden transition-transform transform">
-      <div className="relative">
-        <img
-          src={images[currentImageIndex]}
-          alt={name}
-          className="w-full h-48 object-cover cursor-pointer"
-          onClick={() => handleImageClick(currentImageIndex)}
-        />
-        <button
-          onClick={() => { handlePrevImage(); handleButtonClick('prev'); }}
-          className={`absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full ${isActive === 'prev' ? 'bg-gray-200 ring-2 ring-blue-500' : 'bg-white'} shadow-md transition duration-300`}
-        >
-          &#10094; {/* Left arrow */}
-        </button>
-        <button
-          onClick={() => { handleNextImage(); handleButtonClick('next'); }}
-          className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full ${isActive === 'next' ? 'bg-gray-200 ring-2 ring-blue-500' : 'bg-white'} shadow-md transition duration-300`}
-        >
-          &#10095; {/* Right arrow */}
-        </button>
-      </div>
-      <div className="p-4">
-        <h3 className="text-xl font-semibold text-gray-800">{name}</h3>
-        <p className="text-gray-600">ID: {id}</p>
-        <p className="text-gray-800 font-medium">Min Price: ${minPrice}</p>
-        <p className="text-gray-800">Rental Type: {rentalType}</p>
-        <p className="text-gray-800">Property Type: {propertyType}</p>
-        <p className="text-gray-800">Address: {address}</p> {/* Display address */}
-        <div className="flex items-center mt-2">
-          {Array.from({ length: 5 }, (_, index) => (
-            <span key={index}>
-              {index < starRating ? (
-                <span className="text-yellow-500">★</span>
-              ) : (
-                <span className="text-gray-300">★</span>
-              )}
-            </span>
-          ))}
+    return (
+        <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <div className="relative">
+                <div className="flex justify-center">
+                    <Image
+                        className="p-8 w-full h-full rounded-t-lg"
+                        src={apartment.images[currentIndex]}
+                        alt="apartment image"
+                        width={300}
+                        height={200}
+                    />
+                </div>
+                <div className="absolute top-1/2 left-0 flex justify-between w-full">
+                    <button onClick={handlePrevious} className="bg-gray-300 rounded-full p-2 m-2">❮</button>
+                    <button onClick={handleNext} className="bg-gray-300 rounded-full p-2 m-2">❯</button>
+                </div>
+            </div>
+            <div className="px-5 pb-5">
+                <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
+                    {apartment.title}
+                </h5>
+                <div className="flex items-center mt-2.5 mb-5">
+                    <div className="flex items-center">
+                        {[...Array(5)].map((_, index) => (
+                            <FaStar key={index} className={`w-4 h-4 ${index < apartment.rating ? 'text-yellow-300' : 'text-gray-200'}`} />
+                        ))}
+                    </div>
+                    <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ms-3">{apartment.rating}</span>
+                </div>
+                <div className="flex items-center">
+                    <FaMapMarkerAlt className="text-red-500" />
+                    <span className="ml-2 text-gray-700">{apartment.location}</span>
+                </div>
+                <p className="mt-2 text-gray-600">Available Rooms: {apartment.availableRooms}</p>
+                <p className="text-gray-600">Rental Type: {apartment.rentalType}</p>
+                <p className="mt-2 text-gray-500">{apartment.description}</p>
+                <div className="flex items-center justify-between mt-4">
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">${apartment.price}/month</span>
+                    <span className="text-sm text-gray-500">Min Price: ${apartment.minPrice}</span>
+                </div>
+                <div className="flex justify-between mt-4">
+                    <button onClick={handleEmail} className="bg-green-500 text-white px-4 py-2 rounded-lg">Email</button>
+                    <button onClick={handleCall} className="bg-blue-500 text-white px-4 py-2 rounded-lg hidden sm:inline">Call</button>
+                </div>
+            </div>
         </div>
-        <div className="flex gap-4 mt-4">
-          <span
-            onClick={handleCall}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 cursor-pointer"
-          >
-            Call
-          </span>
-          <span
-            onClick={handleEmail}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-300 cursor-pointer"
-          >
-            Email
-          </span>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
-export default Apartment;
+// ApartmentList component
+const ApartmentList = () => {
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 1; // Number of items per page
+    const totalPages = Math.ceil(apartments.length / itemsPerPage);
 
-// Example apartments with clickable image URLs
-const apartments = [
-  {
-    id: 1,
-    name: "Luxury Apartment",
-    minPrice: 1500,
-    rentalType: "Monthly",
-    starRating: 4,
-    propertyType: "Apartment",
-    images: [
-      "https://images.pexels.com/photos/2080588/pexels-photo-2080588.jpeg", // New image
-      "https://images.pexels.com/photos/1860780/pexels-photo-1860780.jpeg", // New image
-      "https://images.pexels.com/photos/4502083/pexels-photo-4502083.jpeg", // New image
-    ],
-    phoneNumber: "1234567890",
-    email: "luxury@apartment.com",
-    address: "123 Luxury St, Beverly Hills, CA", // Added address
-  },
-  {
-    id: 2,
-    name: "Cozy Studio",
-    minPrice: 800,
-    rentalType: "Monthly",
-    starRating: 5,
-    propertyType: "Studio",
-    images: [
-      "https://images.pexels.com/photos/4518355/pexels-photo-4518355.jpeg", // New image
-      "https://images.pexels.com/photos/4518347/pexels-photo-4518347.jpeg", // New image
-      "https://images.pexels.com/photos/4502029/pexels-photo-4502029.jpeg", // New image
-    ],
-    phoneNumber: "0987654321",
-    email: "cozy@studio.com",
-    address: "456 Cozy Ave, Seattle, WA", // Added address
-  },
-];
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    const displayedApartments = apartments.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+
+    return (
+        <div>
+            <div className="grid grid-cols-1 gap-4">
+                {displayedApartments.map((apartment, index) => (
+                    <ApartmentCard key={index} apartment={apartment} />
+                ))}
+            </div>
+            <div className="flex justify-center mt-4">
+                {Array.from({ length: totalPages }, (_, index) => (
+                    <button
+                        key={index}
+                        onClick={() => handlePageChange(index)}
+                        className={`mx-1 px-3 py-1 rounded ${currentPage === index ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}
+                    >
+                        {index + 1}
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+export default ApartmentList;

@@ -7,6 +7,16 @@ import GithubProvider from 'next-auth/providers/github';
 import bcrypt from 'bcryptjs';
 import { User as PrismaUser } from '@prisma/client'; // Ensure you import the correct User type
 
+// Define User type
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string; // Adjust based on your user model
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -24,15 +34,21 @@ export const authOptions = {
         email: { label: 'Email', type: 'text', placeholder: 'jsmith@example.com' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(
+        credentials: Record<'email' | 'password', string> | undefined,
+        req: { body?: any; query?: any; headers?: any; method?: any }
+      ): Promise<User | null> {
+        // Check for email and password
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Please enter an email and password');
         }
 
+        // Fetch user from the database
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
+        // Verify user existence and password
         if (!user || !user.hashedPassword) {
           throw new Error('No user found');
         }
@@ -43,7 +59,7 @@ export const authOptions = {
           throw new Error('Incorrect password');
         }
 
-        // Return user details
+        // Return user details if authorization is successful
         return {
           id: user.id,
           name: user.name,
@@ -51,7 +67,7 @@ export const authOptions = {
           role: user.role, // Ensure this is included in your User model
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
-        } as PrismaUser;
+        } as User; // Cast to User type
       },
     }),
   ],

@@ -255,9 +255,8 @@ const MainComponent: React.FC = () => {
           <div className="grid grid-cols-1 gap-4">
           {filteredApartments.length > 0 ? (
   filteredApartments.map((apartment) => (
-    <Apartment
-      key={apartment.id}
-      id={apartment.id}
+    <ApartmentCard
+      key={apartment.name}
       name={apartment.name}
       minPrice={apartment.minPrice}
       rentalType={apartment.rentalType}
@@ -274,7 +273,7 @@ const MainComponent: React.FC = () => {
 )}
 
           </div>
-          <div className="absolute bottom-4 left-4 z-10">
+          <div className=" md:hidden absolute bottom-4 left-4 z-10">
             <Button variant="contained" color="secondary" onClick={() => setIsMapVisible(true)}>
               Show Map
             </Button>
