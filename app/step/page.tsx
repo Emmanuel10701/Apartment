@@ -165,7 +165,7 @@ const StepsLayout = () => {
       </nav>
       <div className="flex flex-col p-4 w-full md:w-1/3"> {/* Reduced width */}
         {loading && <LinearProgress />}
-        {submitted && <p className="text-green-600">Form submitted successfully!</p>}
+        {submitted && <p className="text-green-600">Form submitted successfully there!</p>}
         {renderCurrentStep()}
       </div>
     </article>
