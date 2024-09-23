@@ -168,15 +168,16 @@ const ApartmentForm: React.FC = () => {
     }
 
     try {
-      await axios.post("/api/apartments", formData, {
+      await axios.post("/api/Apartment", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Apartment added successfully!");
       reset(); // Reset form fields
       setCurrentStep(0); // Reset to first step
       setImagePreviews({}); // Clear image previews
-    } catch (error) {
-      toast.error("Failed to process the request.");
+    } catch (error:any) {
+      toast.error("Failed to process the request.", error);
+      console.error(error);
     } finally {
       setProcessing(false);
     }

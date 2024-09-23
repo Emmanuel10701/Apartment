@@ -1,17 +1,38 @@
-{
-    "title": "Stylish Downtown Studio",
-    "logo": "https://via.placeholder.com/48x48?text=Logo",
-    "location": "San Francisco, CA",
-    "images": [
-      "https://via.placeholder.com/600x400?text=Image+1",
-      "https://via.placeholder.com/600x400?text=Image+2",
-      "https://via.placeholder.com/600x400?text=Image+3"
-    ],
-    "priceRange": "$1,800 - $2,200/month",
-    "studioType": "Studio Apartment",
-    "description": "This chic studio apartment offers modern amenities, a spacious layout, and stunning views of downtown San Francisco. Perfect for urban living with easy access to public transportation.",
-    "contactNumber": "+1 (415) 555-1234",
-    "email": "info@stylishstudio.com"
+[
+  {
+      "title": "Luxury Studio Apartment",
+      "images": [
+          "/images/ap2.jpg",
+          "/images/bed2.jpg",
+          "/images/int2.jpg",
+          "/images/kit2.webp"
+      ],
+      "rating": 4.5,
+      "location": "456 Elm St, Metropolis",
+      "availableRooms": 1,
+      "rentalType": "Studio",
+      "description": "A modern studio apartment with luxury amenities.",
+      "price": 1800,
+      "minPrice": 1700,
+      "phoneNumber": "1234567890",
+      "email": "luxury@apartment.com"
+  },
+  {
+      "title": "Cozy Apartment in City Center",
+      "images": [
+          "/images/ap11.webp",
+          "/images/bd1.jpg",
+          "/images/int3.jpeg",
+          "/images/kit1.webp"
+      ],
+      "rating": 4.0,
+      "location": "123 Main St, Cityville",
+      "availableRooms": 2,
+      "rentalType": "Condo",
+      "description": "This beautiful apartment offers stunning city views and is located near all amenities.",
+      "price": 1500,
+      "minPrice": 1400,
+      "phoneNumber": "0987654321",
+      "email": "cozy@apartment.com"
   }
-
-  
+]

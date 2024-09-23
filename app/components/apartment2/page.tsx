@@ -127,7 +127,7 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
 const ApartmentList = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 1; // Number of items per page
-    const totalPages = Math.ceil(apartments.length / itemsPerPage);
+    const totalPages = Math.ceil(apartments.length / itemsPerPage); 
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);

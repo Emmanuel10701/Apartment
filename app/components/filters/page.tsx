@@ -29,9 +29,7 @@ interface SearchFilters {
   propertyType?: string;
 }
 
-const SearchNavbar: React.FC<SearchNavbarProps> = ({
-  onSearch,
-}) => {
+const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
   const [search, setSearch] = useState<string>('');
   const [minRent, setMinRent] = useState<number | ''>('');
   const [maxRent, setMaxRent] = useState<number | ''>('');
@@ -53,11 +51,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        showModal &&
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
+      if (showModal && modalRef.current && !modalRef.current.contains(event.target as Node)) {
         setShowModal(false);
       }
     };
@@ -69,8 +63,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
   }, [showModal]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newSearch = event.target.value;
-    setSearch(newSearch);
+    setSearch(event.target.value);
   };
 
   const handleFiltersSubmit = () => {
@@ -92,21 +85,10 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
       filters.maxRent = Number(maxRent);
     }
 
-    if (rentalType) {
-      filters.rentalType = rentalType;
-    }
-
-    if (sortOrder) {
-      filters.sortOrder = sortOrder;
-    }
-
-    if (starRating > 0) {
-      filters.starRating = starRating;
-    }
-
-    if (propertyType) {
-      filters.propertyType = propertyType;
-    }
+    if (rentalType) filters.rentalType = rentalType;
+    if (sortOrder) filters.sortOrder = sortOrder;
+    if (starRating > 0) filters.starRating = starRating;
+    if (propertyType) filters.propertyType = propertyType;
 
     onSearch(filters);
     setShowModal(false);
@@ -149,13 +131,13 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
           />
         </Autocomplete>
 
-        {/* Filters Button */}
+        {/* Filters Button with icon */}
         <button
           onClick={() => setShowModal(true)}
-          className="w-full sm:w-48 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          className="flex items-center justify-center w-full sm:w-48 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
         >
+          <IoFilterSharp className="mr-2" />
           Filters
-          <IoFilterSharp />
         </button>
 
         {/* Sort Order Button */}
@@ -221,11 +203,9 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 >
                   <option value="0">Select Star Rating</option>
-                  <option value="1">1 Star</option>
-                  <option value="2">2 Stars</option>
-                  <option value="3">3 Stars</option>
-                  <option value="4">4 Stars</option>
-                  <option value="5">5 Stars</option>
+                  {[1, 2, 3, 4, 5].map((rating) => (
+                    <option key={rating} value={rating}>{rating} Star{rating > 1 ? 's' : ''}</option>
+                  ))}
                 </select>
               </div>
 
