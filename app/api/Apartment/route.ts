@@ -1,27 +1,30 @@
-// app/api/apartments/route.ts
 import { NextResponse } from 'next/server';
-import prisma from '../../../libs/prisma';
+import  prisma  from '../../../libs/prisma'; // Adjust the path to your Prisma instance
 
+// GET: Fetch apartments
 export async function GET() {
   try {
-    const apartments = await prisma.apartment.findMany();
-    return NextResponse.json(apartments);
-  } catch (error: unknown) { // Type the error as unknown
-    console.error(error);
-    return NextResponse.json({ error: 'Failed to fetch apartments' }, { status: 500 });
+    const apartments = await prisma.apartment.findMany(); // Fetch all apartments
+    return NextResponse.json(apartments, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching apartments:', error);
+    return NextResponse.json({ message: 'Error fetching apartments' }, { status: 500 });
   }
 }
 
-export async function POST(request: Request) {
-  const { name,maxPrice, minPrice, rentalType, starRating, propertyType, images, phoneNumber, email, address } = await request.json();
-
-  // Input validation
-  if (!name || !minPrice ||!maxPrice || !rentalType || !starRating || !propertyType || !images || !phoneNumber || !email || !address) {
-    return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
-  }
-
+// POST: Create a new apartment
+export async function POST(req: Request) {
   try {
-    const apartment = await prisma.apartment.create({
+    const data = await req.json();
+    const { name, minPrice, maxPrice, rentalType, starRating, propertyType, images, phoneNumber, email, address, userId } = data;
+
+    // Validation can be added here as needed
+    if (!name || !minPrice || !maxPrice || !rentalType || !propertyType || !email) {
+      return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Create the new apartment in the database
+    const newApartment = await prisma.apartment.create({
       data: {
         name,
         minPrice,
@@ -33,12 +36,13 @@ export async function POST(request: Request) {
         phoneNumber,
         email,
         address,
+        userId, // Foreign key to User
       },
     });
-    return NextResponse.json(apartment, { status: 201 });
-  } catch (error: unknown) { // Type the error as unknown
-    console.error(error); // Log the error for debugging
-    const errorMessage = (error as Error).message || 'Failed to create apartment'; // Safely access the error message
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+
+    return NextResponse.json(newApartment, { status: 201 });
+  } catch (error) {
+    console.error('Error creating apartment:', error);
+    return NextResponse.json({ message: 'Error creating apartment' }, { status: 500 });
   }
 }
