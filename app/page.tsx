@@ -61,7 +61,7 @@ const MainComponent: React.FC = () => {
   const [markers, setMarkers] = useState<google.maps.LatLngLiteral[]>([]);
   const [filteredApartments, setFilteredApartments] = useState<Apartment[]>(apartments);
   const [isMapVisible, setIsMapVisible] = useState<boolean>(true);
-  const [loadingMarkers, setLoadingMarkers] = useState(false); // Loading state
+  const [loadingMarkers, setLoadingMarkers] = useState(false);
 
   const geocodeAddress = async (address: string): Promise<google.maps.LatLngLiteral> => {
     const geocoder = new google.maps.Geocoder();
@@ -77,7 +77,7 @@ const MainComponent: React.FC = () => {
   };
 
   const loadApartmentMarkers = async () => {
-    setLoadingMarkers(true); // Start loading
+    setLoadingMarkers(true);
     try {
       const newMarkers = await Promise.all(
         filteredApartments.map(async (apartment) => {
@@ -100,7 +100,7 @@ const MainComponent: React.FC = () => {
     } catch (error) {
       console.error("Error loading apartment markers:", error);
     } finally {
-      setLoadingMarkers(false); // Stop loading
+      setLoadingMarkers(false);
     }
   };
 
@@ -200,7 +200,7 @@ const MainComponent: React.FC = () => {
       <SearchNavbar onSearch={handleSearch} />
       <div className="flex flex-col md:flex-row h-screen relative">
         <div
-          className={`md:w-2/3 w-full ${isMapVisible ? "block" : "hidden"} md:block fixed md:relative top-0 left-0 right-0 bottom-0 z-0`}
+          className={`md:w-2/3 w-full ${isMapVisible ? "fixed" : "hidden"} md:block fixed md:relative top-0 left-0 right-0 bottom-0 z-0`}
         >
           <GoogleMap
             center={center}
@@ -248,32 +248,31 @@ const MainComponent: React.FC = () => {
           </div>
         </div>
         <div
-          className={`md:w-1/3 w-full ${isMapVisible ? "hidden" : "block"} md:block fixed md:relative top-0 right-0 bottom-0 overflow-y-auto p-4 bg-white z-10`}
+          className={`md:w-1/3  w-full ${isMapVisible ? "hidden" : "block"} md:block fixed md:relative top-0 right-0 bottom-0 overflow-y-auto p-4 bg-white z-10`}
         >
           <h2 className="text-xl font-bold mb-4">Available Apartments</h2>
-          {loadingMarkers && <CircularProgress />} {/* Loading spinner */}
+          {loadingMarkers && <CircularProgress />}
           <div className="grid grid-cols-1 gap-4">
-          {filteredApartments.length > 0 ? (
-  filteredApartments.map((apartment) => (
-    <ApartmentCard
-      key={apartment.id}
-      name={apartment.name}
-      minPrice={apartment.minPrice}
-      rentalType={apartment.rentalType}
-      starRating={apartment.starRating}
-      propertyType={apartment.propertyType}
-      images={apartment.images}
-      phoneNumber={apartment.phoneNumber}
-      email={apartment.email}
-      address={apartment.address}
-    />
-  ))
-) : (
-  <p>No apartments found.</p>
-)}
-
+            {filteredApartments.length > 0 ? (
+              filteredApartments.map((apartment) => (
+                <ApartmentCard
+                  key={apartment.id}
+                  name={apartment.name}
+                  minPrice={apartment.minPrice}
+                  rentalType={apartment.rentalType}
+                  starRating={apartment.starRating}
+                  propertyType={apartment.propertyType}
+                  images={apartment.images}
+                  phoneNumber={apartment.phoneNumber}
+                  email={apartment.email}
+                  address={apartment.address}
+                />
+              ))
+            ) : (
+              <p>No apartments found.</p>
+            )}
           </div>
-          <div className=" md:hidden absolute bottom-4 left-4 z-10">
+          <div className="md:hidden absolute bottom-4 left-4 z-10">
             <Button variant="contained" color="secondary" onClick={() => setIsMapVisible(true)}>
               Show Map
             </Button>
