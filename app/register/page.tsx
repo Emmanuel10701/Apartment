@@ -1,5 +1,6 @@
-'use client';
+"use client";
 import React, { useState } from 'react';
+import axios from 'axios';
 import { FaUser, FaEnvelope, FaLock, FaGithub, FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa'; 
 import Link from 'next/link';
 import { CircularProgress } from '@mui/material';
@@ -22,33 +23,36 @@ const RegisterPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email, password }),
+      const response = await axios.post('/api/register', {
+        username,
+        email,
+        password,
       });
 
-      const result = await response.json();
+      toast.success(response.data.message);
+      setUsername('');
+      setEmail('');
+      setPassword('');
+      
+    } catch (error: any) {
+      if (error.response) {
+        // Check if the error response is valid and contains the expected format
+        const result = error.response.data;
 
-      if (response.ok) {
-        toast.success(result.message);
-        setUsername('');
-        setEmail('');
-        setPassword('');
-      } else {
         if (result.errors) {
           Object.keys(result.errors).forEach((key) => {
             toast.error(result.errors[key]);
           });
         } else {
-          toast.error(result.message);
+          toast.error(result.message || 'An error occurred. Please try again.' );
+          console.error(error);
+          
         }
+      } else {
+        toast.error('Registration failed. Please try again.' );
+        console.error(error);
+
       }
-    } catch (error) {
-      toast.error('Registration failed. Please try again.');
-      console.error(error);
     } finally {
       setLoading(false);
     }

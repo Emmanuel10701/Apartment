@@ -57,6 +57,7 @@
     "@types/react-dom": "^18",
     "@types/react-slick": "^0.23.13",
     "@types/swiper": "^5.4.3",
+    "@types/uuid": "^10.0.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.11",
     "postcss": "^8",
