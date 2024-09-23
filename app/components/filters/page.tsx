@@ -13,6 +13,7 @@ import {
 import { IoFilterSharp } from "react-icons/io5";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Autocomplete } from '@react-google-maps/api';
 
 interface SearchNavbarProps {
   onSearch: (filters: SearchFilters) => void;
@@ -43,7 +44,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
 
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Load saved searches from localStorage
   useEffect(() => {
     const searches = localStorage.getItem('savedSearches');
     if (searches) {
@@ -51,7 +51,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
     }
   }, []);
 
-  // Handle clicks outside the modal to close it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -140,13 +139,15 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
     <div className="bg-white shadow-md py-4 px-6 w-full z-50">
       <ToastContainer />
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <input
-          type="text"
-          value={search}
-          onChange={handleSearchChange}
-          placeholder="London, UK"
-          className="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <Autocomplete>
+          <input
+            type="text"
+            value={search}
+            onChange={handleSearchChange}
+            placeholder="London, UK"
+            className="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </Autocomplete>
 
         {/* Filters Button */}
         <button
@@ -182,7 +183,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({
           {sortOrder === 'ascending' ? <FaSortUp /> : <FaSortDown />}
         </button>
 
-        {/* Clear Filters Button (Outside Navbar) */}
+        {/* Clear Filters Button */}
         <button
           onClick={clearFilters}
           className="w-full sm:w-48 px-4 py-2 bg-gray-500 text-white rounded-full hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm"

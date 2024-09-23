@@ -1,12 +1,23 @@
-"use client"
-import React from 'react';
+"use client";
+
+import React, { useState } from 'react';
+
 const Footer: React.FC = () => {
+  const [email, setEmail] = useState('');
+
   const handleLinkClick = (url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+  const handleEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle email submission logic here
+    alert(`Email submitted: ${email}`);
+    setEmail('');
+  };
+
   return (
-    <footer className="bg-gray-800 text-white p-4  w-full">
+    <footer className="bg-gray-800 text-white p-4 w-full">
       <div className="container mx-auto text-center mb-4">
         <p className="text-lg font-semibold mb-4">Contact Us</p>
         <p className="mb-4">123 Apartment St, Suite 101<br />City, State, 12345</p>
@@ -17,7 +28,21 @@ const Footer: React.FC = () => {
           Phone: <span onClick={() => handleLinkClick('tel:+1234567890')} className="text-blue-400 hover:underline cursor-pointer">+1 (234) 567-890</span>
         </p>
       </div>
+      
       <div className="container mx-auto text-center mb-4">
+        <p className="text-lg font-semibold mb-4">Subscribe to Our Newsletter</p>
+        <form onSubmit={handleEmailSubmit} className="flex justify-center mb-4">
+          <input 
+            type="email" 
+            placeholder="Enter your email" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="p-2 rounded-l-md border border-gray-300"
+            required
+          />
+          <button type="submit" className="bg-blue-600 text-white p-2 rounded-r-md">Submit</button>
+        </form>
+        
         <p className="text-lg font-semibold mb-4">Follow Us</p>
         <div className="flex justify-center space-x-6 mb-4">
           <span 

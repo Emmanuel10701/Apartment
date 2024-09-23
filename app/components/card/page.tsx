@@ -89,8 +89,8 @@ const ApartmentCard = ({ apartment, onEmailClick }: { apartment: Apartment; onEm
                     />
                 </div>
                 <div className="absolute top-1/2 left-0 flex justify-between w-full">
-                    <button onClick={handlePrevious} className="bg-gray-300 rounded-full p-2 m-2">❮</button>
-                    <button onClick={handleNext} className="bg-gray-300 rounded-full p-2 m-2">❯</button>
+                    <button onClick={handlePrevious} className="bg-gray-300 rounded-full p-2 m-4">❮</button>
+                    <button onClick={handleNext} className="bg-gray-300 rounded-full p-2 m-4">❯</button>
                 </div>
             </div>
             <div className="px-5 pb-5">
@@ -130,7 +130,7 @@ const ApartmentList = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
-    const itemsPerPage = 1; // Number of items per page
+    const itemsPerPage = 10; // Number of items per page
     const totalPages = Math.ceil(apartments.length / itemsPerPage);
 
     const handlePageChange = (page: number) => {
