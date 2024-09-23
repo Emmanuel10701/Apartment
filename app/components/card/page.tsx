@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import {useRouter} from "next/navigation";
 import { FaStar, FaMapMarkerAlt } from "react-icons/fa";
 import EmailModal from "../emailModal/page"; // Adjust the path as necessary
 
@@ -20,6 +21,8 @@ interface Apartment {
     minPrice: number;
 }
 
+
+const route = useRouter();
 // Sample apartment data
 const apartments: Apartment[] = [
     {
@@ -75,12 +78,18 @@ const ApartmentCard = ({ apartment, onEmailClick }: { apartment: Apartment; onEm
     const handleCall = () => {
         window.location.href = `tel:${apartment.phoneNumber}`;
     };
+ 
+
+  const handleNavigate  = () => {
+    route.push(`/${id}`)
+  }
 
     return (
         <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
             <div className="relative">
                 <div className="flex justify-center">
                     <Image
+                    onClick={handleNavigate}
                         className="p-8 w-full h-full rounded-t-lg"
                         src={apartment.images[currentIndex]}
                         alt="apartment image"
