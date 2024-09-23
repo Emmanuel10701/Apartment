@@ -41,7 +41,13 @@ const LoginPage: React.FC = () => {
       });
 
       if (response?.error) {
-        toast.error(response.error);
+        if (response.error.includes("No user found")) {
+          toast.error("User does not exist. Please check your email.");
+        } else if (response.error.includes("Incorrect password")) {
+          toast.error("Incorrect password. Please try again.");
+        } else {
+          toast.error(response.error);
+        }
       } else {
         toast.success("Login successful!");
         router.push("/dashboard");
@@ -65,7 +71,6 @@ const LoginPage: React.FC = () => {
             🔒 Login
           </h2>
 
-          {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">
               <input
@@ -105,25 +110,25 @@ const LoginPage: React.FC = () => {
               </Link>
             </div>
             <button
-            type="submit"
-            className={`w-full py-4 bg-blue-500 text-white font-bold rounded-lg ${loading ? 'border-2 border-indigo-800' : ''} hover:bg-blue-600 transition-colors relative`}
-          >
-            {loading ? (
-              <div className="flex items-center justify-center space-x-2">
-                <span className="text-white">Processing...</span>
-                <CircularProgress
-                  size={24}
-                  color="inherit" // Inherit the color from the surrounding text or use white
-                  style={{ color: "white" }} // Explicitly set the spinner to white
-                />
-              </div>
-            ) : (
-              "Sign In"
-            )}
-         </button>
+              type="submit"
+              className={`w-full py-4 bg-blue-500 text-white font-bold rounded-lg ${
+                loading ? "border-2 border-indigo-800" : ""
+              } hover:bg-blue-600 transition-colors relative`}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <span className="text-white">Processing...</span>
+                  <CircularProgress
+                    size={24}
+                    color="inherit"
+                    style={{ color: "white" }}
+                  />
+                </div>
+              ) : (
+                "Sign In"
+              )}
+            </button>
 
-
-            {/* Social Login Icons with Labels */}
             <div className="mt-8 text-center">
               <p className="text-lg font-semibold mb-4">Or log in with</p>
               <div className="flex justify-center space-x-8">
@@ -152,7 +157,6 @@ const LoginPage: React.FC = () => {
             </div>
           </form>
 
-          {/* Toast Notifications */}
           <ToastContainer />
         </div>
       </div>

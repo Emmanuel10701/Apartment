@@ -33,6 +33,7 @@
     "nodemailer": "^6.9.15",
     "pdfmake": "^0.2.13",
     "pg": "^8.13.0",
+    "prisma": "^5.19.1",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.53.0",
@@ -59,7 +60,6 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.11",
     "postcss": "^8",
-    "prisma": "^5.19.1",
     "tailwindcss": "^3.4.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2"

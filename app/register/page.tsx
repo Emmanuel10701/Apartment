@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useState } from 'react';
 import { FaUser, FaEnvelope, FaLock, FaGithub, FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa'; 
 import Link from 'next/link';
@@ -48,6 +48,7 @@ const RegisterPage: React.FC = () => {
       }
     } catch (error) {
       toast.error('Registration failed. Please try again.');
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -104,23 +105,16 @@ const RegisterPage: React.FC = () => {
             </div>
             <button
               type="submit"
-              className={`w-full py-4 text-white font-bold rounded-lg transition-colors bg-blue-500 relative ${loading ? 'border-2 border-indigo-800' : ''} ${loading ? 'bg-blue-500' : 'hover:bg-blue-600'}`}
+              className={`w-full py-4 text-white font-bold rounded-lg transition-colors bg-blue-500 relative ${loading ? 'bg-blue-500 border-2 border-indigo-800' : 'hover:bg-blue-600'}`}
             >
-           {loading ? (
-              <>
+              {loading ? (
                 <div className="flex items-center justify-center space-x-2">
                   <span className="text-white">Processing...</span>
-                  <CircularProgress
-                    size={24}
-                    color="inherit" // Inherit the color from the surrounding text or use white
-                    style={{ color: "white" }} // Explicitly set the spinner to white
-                  />
+                  <CircularProgress size={24} color="inherit" style={{ color: "white" }} />
                 </div>
-              </>
-            ) : (
-              "Sign Up"
-            )}
-
+              ) : (
+                "Sign Up"
+              )}
             </button>
 
             <div className="mt-8 text-center">
@@ -133,7 +127,6 @@ const RegisterPage: React.FC = () => {
                   />
                   <span className="text-gray-600 mt-2">GitHub</span>
                 </div>
-              
                 <div className="flex flex-col items-center">
                   <FaGoogle
                     onClick={() => handleSocialLogin('Google')}
