@@ -1,54 +1,42 @@
-import NextAuth from 'next-auth/next';
-import prisma from '../../../libs/prisma'; // Adjust the path if necessary
+// pages/api/auth/[...nextauth].ts
+
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import prisma from '../../../../libs/prisma'; // Correct default import
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from 'next-auth/providers/github';
 import bcrypt from 'bcryptjs';
-import { User as PrismaUser } from '@prisma/client'; // Ensure you import the correct User type
 
-// Define User type
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string; // Adjust based on your user model
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    // GitHub Provider
     GithubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
     }),
+    // Google Provider
     GoogleProvider({
       clientId: process.env.GOOGLE_ID!,
       clientSecret: process.env.GOOGLE_SECRET!,
     }),
+    // Credentials Provider
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'text', placeholder: 'jsmith@example.com' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(
-        credentials: Record<'email' | 'password', string> | undefined,
-        req: { body?: any; query?: any; headers?: any; method?: any }
-      ): Promise<User | null> {
-        // Check for email and password
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Please enter an email and password');
         }
 
-        // Fetch user from the database
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
-        // Verify user existence and password
         if (!user || !user.hashedPassword) {
           throw new Error('No user found');
         }
@@ -59,23 +47,76 @@ export const authOptions = {
           throw new Error('Incorrect password');
         }
 
-        // Return user details if authorization is successful
         return {
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role, // Ensure this is included in your User model
+          role: user.role,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
-        } as User; // Cast to User type
+        };
       },
     }),
   ],
   secret: process.env.SECRET!,
   session: {
-    strategy: 'jwt' as const,
+    strategy: 'jwt',
+    maxAge: 60 * 60, // Session will expire in 60 minutes
   },
-  debug: process.env.NODE_ENV === 'development',
+  callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === 'google' || account?.provider === 'github') {
+        if (!user.email) {
+          throw new Error('Email is required for sign-in');
+        }
+
+        try {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
+          });
+
+          if (!existingUser) {
+            await prisma.user.create({
+              data: {
+                name: user.name || '',
+                email: user.email,
+                hashedPassword: '', // No password for OAuth users
+                role: 'USER', // Set default role for new users
+              },
+            });
+          }
+        } catch (error) {
+          console.error('Error during OAuth user creation:', error);
+          throw new Error('An error occurred while processing sign-in');
+        }
+      }
+      return true;
+    },
+    async session({ session, token }) {
+      if (session.user?.email) {
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+            select: { role: true }, // Ensure role is selected
+          });
+
+          if (user) {
+            (session.user as any).role = user.role; // Add role to the session
+          }
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+        }
+      }
+      return session;
+    },
+    async redirect({ url, baseUrl }) {
+      if (url === baseUrl || url === `${baseUrl}/auth/signin`) {
+        return '/dashboard';
+      }
+      return url;
+    },
+  },
+  debug: process.env.NODE_ENV === "development",
 };
 
 const handler = NextAuth(authOptions);

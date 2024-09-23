@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'; // Ensure consistency with your previous setup
-import prisma from '../../libs/prisma';
+import prisma from '../../../libs/prisma';
 import { NextResponse } from 'next/server';
 
 interface RegisterRequestBody {
