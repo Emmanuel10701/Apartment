@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { FaStar, FaMapMarkerAlt } from "react-icons/fa";
-import EmailModal from "../emailModal/page"; // Adjust the path as necessary
-import apartmentsData from '../../../../apartment/public/data.json'; 
-import ApartmentCard from "../apartment2/page"// Adjust the path as necessary
+import EmailModal from "../emailModal/page";
+import apartmentsData from '../../../../apartment/public/data.json';
+import ApartmentCard from "../apartment2/page";
 
 // Define the Apartment type
 interface Apartment {
@@ -21,19 +18,16 @@ interface Apartment {
     minPrice: number;
 }
 
-// ApartmentCard component...
-// (Keep your ApartmentCard component as it is)
-
 // ApartmentList component
 const ApartmentList = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
-    const [apartments, setApartments] = useState<Apartment[]>([]); // State for apartments
-    const itemsPerPage = 10; // Number of items per page
+    const [apartments, setApartments] = useState<Apartment[]>([]);
+    const itemsPerPage = 10;
 
     useEffect(() => {
-        setApartments(apartmentsData); // Set the apartments data from JSON
+        setApartments(apartmentsData);
     }, []);
 
     const totalPages = Math.ceil(apartments.length / itemsPerPage);
@@ -58,7 +52,9 @@ const ApartmentList = () => {
         <div>
             <div className="grid grid-cols-1 gap-4">
                 {displayedApartments.map((apartment, index) => (
-                    <ApartmentCard key={index} apartment={apartment} onEmailClick={handleEmailClick} />
+                    <div key={index} className="flex justify-between items-center">
+                        <ApartmentCard apartment={apartment} />
+                    </div>
                 ))}
             </div>
             <div className="flex justify-center mt-4">

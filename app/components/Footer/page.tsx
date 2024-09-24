@@ -37,10 +37,10 @@ const Footer: React.FC = () => {
             placeholder="Enter your email" 
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="p-2 rounded-l-md border border-gray-300"
+            className="p-2 rounded-md border md:w-[30%] w-[80%] border-gray-300 space-x-5 gap-4 text-slate-700"
             required
           />
-          <button type="submit" className="bg-blue-600 text-white p-2 rounded-r-md">Submit</button>
+          <button type="submit" className="bg-blue-600 text-white p-2 rounded-md">Submit</button>
         </form>
         
         <p className="text-lg font-semibold mb-4">Follow Us</p>

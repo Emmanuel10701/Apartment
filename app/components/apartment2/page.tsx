@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import EmailModal from "../emailModal/page";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FaStar, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaPhone, FaEnvelope } from 'react-icons/fa';
 
 // Define the Apartment type
 interface Apartment {
@@ -14,6 +16,7 @@ interface Apartment {
     description: string;
     price: number;
     minPrice: number;
+    email: string; // Added email property
 }
 
 // Sample apartment data (add more properties as needed)
@@ -33,6 +36,7 @@ const apartments: Apartment[] = [
         description: 'A modern studio apartment with luxury amenities.',
         price: 1800,
         minPrice: 1700,
+        email: 'luxurystudio@example.com', // Added email
     },
     {
         title: 'Cozy Apartment in City Center',
@@ -49,15 +53,15 @@ const apartments: Apartment[] = [
         description: 'This beautiful apartment offers stunning city views and is located near all amenities.',
         price: 1500,
         minPrice: 1400,
+        email: 'cozycenter@example.com', // Added email
     },
-  
     // Add more apartment entries as needed...
 ];
 
-// ApartmentCard component using the defined Apartment type
 const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const router = useRouter();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -67,6 +71,16 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
         return () => clearInterval(intervalId); // Cleanup on unmount
     }, [apartment.images.length]);
 
+    const handleEmailClick = () => {
+        setSelectedApartment(apartment);
+        setIsModalOpen(true);
+    };
+    
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedApartment(null);
+    };
+
     const handleNext = () => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % apartment.images.length);
     };
@@ -75,7 +89,9 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
         setCurrentIndex((prevIndex) => (prevIndex - 1 + apartment.images.length) % apartment.images.length);
     };
 
-  
+    const handleCallClick = () => {
+        window.location.href = `tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER}`;
+    };
 
     return (
         <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
@@ -117,8 +133,28 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
                     <span className="text-3xl font-bold text-gray-900 dark:text-white">${apartment.price}/month</span>
                     <span className="text-sm text-gray-500">Min Price: ${apartment.minPrice}</span>
                 </div>
-               
             </div>
+            <div className="flex items-center">
+                <button
+                    onClick={handleCallClick}
+                    className="text-slate-100 bg-indigo-600 cursor-pointer hover:bg-indigo-700 ml-3 flex items-center border-2 rounded-full px-5 py-2 transition duration-300"
+                >
+                    <FaPhone className="mr-1" /> Call
+                </button>
+                <button
+                    onClick={handleEmailClick}
+                    className="text-slate-100 bg-green-600 cursor-pointer hover:bg-green-700 ml-3 flex items-center border-2 rounded-full px-5 py-2 transition duration-300"
+                >
+                    <FaEnvelope className="mr-1" /> Email
+                </button>
+            </div>
+            {isModalOpen && selectedApartment && (
+                <EmailModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    apartment={selectedApartment}
+                />
+            )}
         </div>
     );
 };

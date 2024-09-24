@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef  } from "react";
 import { FaTimes } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Autocomplete } from '@react-google-maps/api';
+
 
 interface Apartment {
   title: string;
@@ -25,6 +27,8 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
   const [userLocation, setUserLocation] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+
 
   // Reset form when modal is closed
   useEffect(() => {
@@ -208,20 +212,23 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
             </div>
 
             {/* User Location Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Your Location
-              </label>
-              <input
-                type="text"
-                value={userLocation}
-                onChange={(e) => setUserLocation(e.target.value)}
-                placeholder="Enter your location"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                required
-              />
-            </div>
-
+           {/* User Location Input */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Your Location
+  </label>
+  <Autocomplete
+      >
+        <input
+          type="text"
+          value={userLocation}
+          onChange={(e) => setUserLocation(e.target.value)}
+          placeholder="Enter your location"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          required
+        />
+      </Autocomplete>
+    </div>
             {/* Message Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
