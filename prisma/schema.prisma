@@ -24,6 +24,7 @@ model User {
   accounts             Account[]               // Relation to NextAuth Accounts
   sessions             Session[]               // Relation to NextAuth Sessions
   verificationTokens    VerificationToken[]    // Relation for password reset tokens
+  passwordReset    passwordReset[]    // Relation for password reset tokens
 }
 
 model Apartment {
@@ -85,4 +86,14 @@ model VerificationToken {
   user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([identifier, token])
+}
+
+model passwordReset {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId               String   @db.ObjectId
+  token                String   @unique
+  createdAt            DateTime @default(now())
+  expires              DateTime
+
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

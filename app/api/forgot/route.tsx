@@ -21,14 +21,17 @@ export async function POST(req: Request) {
     }
 
     const token = uuidv4(); // Generate a unique token
-    const resetLink = `${process.env.NEXT_PUBLIC_URL}/reset-password?token=${token}`;
+    const resetLink = `${process.env.NEXT_PUBLIC_URL}/reset?token=${token}`;
+
+    // Set expiration to 1 hour from now
+    const expires = new Date(Date.now() + 3600000); // 1 hour in milliseconds
 
     // Store the token and associate it with the user in the database
     await prisma.passwordReset.create({
       data: {
         userId: user.id,
         token,
-        // Optionally, add an expiration date
+        expires,
       },
     });
 
