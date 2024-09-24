@@ -17,6 +17,7 @@ type ApartmentFormData = {
   description: string;
   apartmentTowerImage: FileList;
   livingRoomImage: FileList;
+  kitchenImage: FileList;
   bedroomsImage: FileList;
 };
 
@@ -37,18 +38,21 @@ const ApartmentForm: React.FC = () => {
   const [imagePreviews, setImagePreviews] = useState<{
     apartmentTowerImage?: string;
     livingRoomImage?: string;
+    kitchenImage?: string;
     bedroomsImage?: string;
   }>({});
 
   // Watch each image input individually
   const watchApartmentTowerImage = watch("apartmentTowerImage");
   const watchLivingRoomImage = watch("livingRoomImage");
+  const watchkitchenImage = watch("livingRoomImage");
   const watchBedroomsImage = watch("bedroomsImage");
 
   useEffect(() => {
     const newPreviews: {
       apartmentTowerImage?: string;
       livingRoomImage?: string;
+      kitchenImage?: string;
       bedroomsImage?: string;
     } = {};
 
@@ -62,6 +66,10 @@ const ApartmentForm: React.FC = () => {
     if (watchLivingRoomImage && watchLivingRoomImage.length > 0) {
       const file = watchLivingRoomImage[0];
       newPreviews.livingRoomImage = URL.createObjectURL(file);
+    }
+    if (watchkitchenImage && watchkitchenImage.length > 0) {
+      const file = watchkitchenImage[0];
+      newPreviews.kitchenImage = URL.createObjectURL(file);
     }
 
     // Bedrooms Image
@@ -94,9 +102,10 @@ const ApartmentForm: React.FC = () => {
       validationErrors.apartmentTowerImage = "Apartment Tower image is required.";
     } else {
       const file = data.apartmentTowerImage[0];
-      if (!["image/jpeg", "image/png", "image/gif"].includes(file.type)) {
-        validationErrors.apartmentTowerImage = "Only JPEG, PNG, and GIF images are allowed.";
-      }
+      if (!["image/jpeg", "image/png", "image/gif", "image/avif", "image/webp", "image/jpg"].includes(file.type)) {
+        validationErrors.apartmentTowerImage = "Only JPEG, JPG, PNG, GIF, AVIF, and WebP images are allowed.";
+    }
+    
       // Optional: Validate file size (e.g., max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         validationErrors.apartmentTowerImage = "Image size should not exceed 5MB.";
@@ -108,11 +117,25 @@ const ApartmentForm: React.FC = () => {
       validationErrors.livingRoomImage = "Living Room image is required.";
     } else {
       const file = data.livingRoomImage[0];
-      if (!["image/jpeg", "image/png", "image/gif"].includes(file.type)) {
-        validationErrors.livingRoomImage = "Only JPEG, PNG, and GIF images are allowed.";
-      }
+      if (!["image/jpeg", "image/png", "image/gif", "image/avif", "image/webp", "image/jpg"].includes(file.type)) {
+        validationErrors.livingRoomImage = "Only JPEG, JPG, PNG, GIF, AVIF, and WebP images are allowed.";
+    }
+    
       if (file.size > 5 * 1024 * 1024) {
         validationErrors.livingRoomImage = "Image size should not exceed 5MB.";
+      }
+    }
+    // Validate Living Room Image
+    if (!data.kitchenImage || data.kitchenImage.length === 0) {
+      validationErrors.kitchenImage = "Living Room image is required.";
+    } else {
+      const file = data.kitchenImage[0];
+      if (!["image/jpeg", "image/png", "image/gif", "image/avif", "image/webp", "image/jpg"].includes(file.type)) {
+        validationErrors.bedroomsImage = "Only JPEG, JPG, PNG, GIF, AVIF, and WebP images are allowed.";
+    }
+    
+      if (file.size > 5 * 1024 * 1024) {
+        validationErrors.kitchenImage = "Image size should not exceed 5MB.";
       }
     }
 
@@ -121,9 +144,10 @@ const ApartmentForm: React.FC = () => {
       validationErrors.bedroomsImage = "Bedrooms image is required.";
     } else {
       const file = data.bedroomsImage[0];
-      if (!["image/jpeg", "image/png", "image/gif"].includes(file.type)) {
-        validationErrors.bedroomsImage = "Only JPEG, PNG, and GIF images are allowed.";
-      }
+      if (!["image/jpeg", "image/png", "image/gif", "image/avif", "image/webp", "image/jpg"].includes(file.type)) {
+        validationErrors.bedroomsImage = "Only JPEG, JPG, PNG, GIF, AVIF, and WebP images are allowed.";
+    }
+    
       if (file.size > 5 * 1024 * 1024) {
         validationErrors.bedroomsImage = "Image size should not exceed 5MB.";
       }
@@ -160,6 +184,9 @@ const ApartmentForm: React.FC = () => {
     // Append Living Room Image
     if (data.livingRoomImage && data.livingRoomImage.length > 0) {
       formData.append("livingRoomImage", data.livingRoomImage[0]);
+    }
+    if (data.kitchenImage && data.kitchenImage.length > 0) {
+      formData.append("livingRoomImage", data.kitchenImage[0]);
     }
 
     // Append Bedrooms Image
@@ -255,7 +282,10 @@ const ApartmentForm: React.FC = () => {
                 <option value="">Select Condo Type</option>
                 <option value="1 Bedroom">1 Bedroom</option>
                 <option value="2 Bedroom">2 Bedroom</option>
-                <option value="3 Bedroom">3 Bedroom</option>
+                <option value="2 Bedroom">3 Bedroom</option>
+                <option value="2 Bedroom">4+ Bedroom</option>
+                <option value="3 Bedroom">Apartment</option>
+                <option value="3 Bedroom">House</option>
               </select>
               {errors.condoType && <p className="text-red-500 text-sm">{errors.condoType.message}</p>}
             </div>
@@ -295,6 +325,20 @@ const ApartmentForm: React.FC = () => {
                   accept="image/*"
                   {...register("livingRoomImage", {
                     onChange: () => clearErrors("livingRoomImage"),
+                  })}
+                  className="mt-1 block w-full text-gray-800 border-gray-300 rounded-md shadow-sm p-3"
+                />
+                {errors.livingRoomImage && (
+                  <p className="text-red-500 text-sm">{errors.livingRoomImage.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Kitchen</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  {...register("kitchenImage", {
+                    onChange: () => clearErrors("kitchenImage"),
                   })}
                   className="mt-1 block w-full text-gray-800 border-gray-300 rounded-md shadow-sm p-3"
                 />
@@ -352,6 +396,16 @@ const ApartmentForm: React.FC = () => {
                   <h4 className="font-medium mb-2">Bedrooms Image Preview:</h4>
                   <img
                     src={imagePreviews.bedroomsImage}
+                    alt="Bedrooms Preview"
+                    className="w-full h-32 object-cover rounded-md"
+                  />
+                </div>
+              )}
+              {imagePreviews.kitchenImage && (
+                <div>
+                  <h4 className="font-medium mb-2">kitchen Image Preview:</h4>
+                  <img
+                    src={imagePreviews.kitchenImage}
                     alt="Bedrooms Preview"
                     className="w-full h-32 object-cover rounded-md"
                   />
@@ -419,6 +473,17 @@ const ApartmentForm: React.FC = () => {
                   <h4 className="font-medium mb-2">Bedrooms Image:</h4>
                   <img
                     src={imagePreviews.bedroomsImage}
+                    alt="Bedrooms Preview"
+                    className="w-full h-32 object-cover rounded-md"
+                  />
+                </div>
+              )}
+              {/* Bedrooms Preview */}
+              {imagePreviews.kitchenImage && (
+                <div>
+                  <h4 className="font-medium mb-2">kitchen Image:</h4>
+                  <img
+                    src={imagePreviews.kitchenImage}
                     alt="Bedrooms Preview"
                     className="w-full h-32 object-cover rounded-md"
                   />
