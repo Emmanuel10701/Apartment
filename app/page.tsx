@@ -221,7 +221,7 @@ const MainComponent: React.FC = () => {
               <Marker key={index} position={marker} />
             ))}
           </GoogleMap>
-          <div className="absolute bottom-10 left-4 p-2 flex gap-2 bg-white shadow-lg rounded-lg z-10">
+          <div className="absolute bottom-20 left-4 p-2 flex gap-2 bg-white shadow-lg rounded-lg z-10">
             <Button
               variant="contained"
               color="primary"
@@ -270,6 +270,7 @@ const MainComponent: React.FC = () => {
             ) : (
               <p>No apartments found.</p>
             )}
+            <Footer/>
           </div>
           <div className="md:hidden absolute bottom-4 left-4 z-10">
             <Button variant="contained" color="secondary" onClick={() => setIsMapVisible(true)}>
@@ -278,7 +279,6 @@ const MainComponent: React.FC = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

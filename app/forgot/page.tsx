@@ -1,9 +1,9 @@
-// app/forgot-password/page.tsx
-
 'use client';
 import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import CircularProgress from '@mui/material/CircularProgress';
+import Button from '@mui/material/Button';
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,7 +14,7 @@ const ForgotPasswordPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/forgot-password', {
+      const response = await fetch('/api/forgot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,24 +39,34 @@ const ForgotPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 p-4">
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-8 rounded-md shadow-md">
-        <h2 className="text-2xl font-bold mb-6">Forgot Password</h2>
+    <div className="flex items-center justify-center min-h-screen p-4 bg-slate-100">
+      <form onSubmit={handleSubmit} className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
+        <h2 className="ext-3xl mt-10 text-slate-700 font-extrabold mb-6 text-center">🔓Forgot Password</h2>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
-          className="w-full p-2 border border-gray-300 rounded-md mb-4"
+          className="w-full p-2 border border-gray-300 rounded-md mb-4 focus:border-green-500 focus:outline-none transition-colors"
           required
         />
-        <button
+        <div className="flex justify-center mb-4"></div>
+
+        <Button
           type="submit"
-          className={`w-full py-2 bg-blue-500 text-white rounded-md ${loading ? 'opacity-50' : ''}`}
+          variant="contained"
+          className={`w-full text-white ${loading ? 'bg-green-500' : 'bg-indigo-600'} transition-all duration-300`}
           disabled={loading}
         >
-          {loading ? 'Sending...' : 'Send Reset Link'}
-        </button>
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <CircularProgress size={24} color="inherit" />
+              <span className="ml-2">Processing...</span>
+            </div>
+          ) : (
+            'Send Reset Link'
+          )}
+        </Button>
       </form>
       <ToastContainer />
     </div>

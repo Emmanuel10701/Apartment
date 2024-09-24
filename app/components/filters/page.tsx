@@ -6,10 +6,11 @@ import {
   FaHome,
   FaBuilding,
   FaCar,
-  FaSortUp,
-  FaSortDown,
   FaTimes
 } from 'react-icons/fa';
+import { FaArrowDown } from "react-icons/fa6";
+import { FaArrowUp } from "react-icons/fa6";
+
 import { IoFilterSharp } from "react-icons/io5";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -162,7 +163,9 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
           } text-sm`}
         >
           <span>Sort: {sortOrder === 'ascending' ? 'Ascending' : 'Descending'}</span>
-          {sortOrder === 'ascending' ? <FaSortUp /> : <FaSortDown />}
+          {sortOrder === 'ascending' ? <FaArrowUp />
+: <FaArrowDown />
+}
         </button>
 
         {/* Clear Filters Button */}

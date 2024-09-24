@@ -5,11 +5,24 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import CircularProgress from '@mui/material/CircularProgress';
+import { z } from 'zod';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import from react-icons
+
+const passwordSchema = z.object({
+  newPassword: z.string().min(8, 'Password must be at least 8 characters long').regex(/[0-9]/, 'Password must contain a number').regex(/[a-zA-Z]/, 'Password must contain a letter'),
+  confirmPassword: z.string().min(8, 'Confirm Password must be at least 8 characters long'),
+}).refine(data => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"], // path of error
+});
 
 const ResetPasswordPage: React.FC = () => {
   const router = useRouter();
   const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const token = new URLSearchParams(window.location.search).get('token');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,7 +30,14 @@ const ResetPasswordPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/reset-password', {
+      const validationResult = passwordSchema.safeParse({ newPassword, confirmPassword });
+      if (!validationResult.success) {
+        toast.error(validationResult.error.errors[0].message);
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch('/api/reset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,23 +62,51 @@ const ResetPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 p-4">
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-8 rounded-md shadow-md">
-        <h2 className="text-2xl font-bold mb-6">Reset Password</h2>
-        <input
-          type="password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          placeholder="New Password"
-          className="w-full p-2 border border-gray-300 rounded-md mb-4"
-          required
-        />
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      <form onSubmit={handleSubmit} className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
+        <h2 className="text-3xl mt-10 text-slate-700 font-extrabold mb-6 text-center">🛅 Reset Password</h2>
+        
+        <div className="relative mb-4">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="New Password"
+            className={`w-full p-2 border ${newPassword ? 'border-green-500' : 'border-gray-300'} rounded-md transition-colors`}
+            required
+          />
+          <span onClick={() => setShowPassword(!showPassword)} className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer">
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        </div>
+
+        <div className="relative mb-4">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm Password"
+            className={`w-full p-2 border ${confirmPassword ? 'border-green-500' : 'border-gray-300'} rounded-md transition-colors`}
+            required
+          />
+          <span onClick={() => setShowPassword(!showPassword)} className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer">
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        </div>
+
         <button
           type="submit"
           className={`w-full py-2 bg-blue-500 text-white rounded-md ${loading ? 'opacity-50' : ''}`}
           disabled={loading}
         >
-          {loading ? 'Resetting...' : 'Reset Password'}
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <CircularProgress size={24} color="inherit" />
+              <span className="ml-2">Processing...</span>
+            </div>
+          ) : (
+            'Reset Password'
+          )}
         </button>
       </form>
       <ToastContainer />

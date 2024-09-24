@@ -103,7 +103,7 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
             <div className="text-end mt-4">
-              <Link href="/forgot-password">
+              <Link href="/forgot">
                 <span className="text-blue-500 hover:underline">
                   Forgot Password?
                 </span>
