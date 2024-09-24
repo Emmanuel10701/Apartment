@@ -1,9 +1,10 @@
-'use client';
+"use client";
 import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
+import Link from 'next/link'; // Import Link from Next.js
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -41,7 +42,7 @@ const ForgotPasswordPage: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-slate-100">
       <form onSubmit={handleSubmit} className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
-        <h2 className="ext-3xl mt-10 text-slate-700 font-extrabold mb-6 text-center">🔓Forgot Password</h2>
+        <h2 className="text-3xl mt-10 text-slate-700 font-extrabold mb-6 text-center">🔓Forgot Password</h2>
         <input
           type="email"
           value={email}
@@ -64,9 +65,17 @@ const ForgotPasswordPage: React.FC = () => {
               <span className="ml-2">Processing...</span>
             </div>
           ) : (
-            'Send Reset Link'
+            'Send Link'
           )}
         </Button>
+
+        {/* Link to go back to the login page */}
+        <div className="text-center mt-4">
+          <p className="text-sm">
+            Remembered your password? 
+            <Link href="/login" className="text-blue-500 hover:underline ml-1">Log in</Link>
+          </p>
+        </div>
       </form>
       <ToastContainer />
     </div>

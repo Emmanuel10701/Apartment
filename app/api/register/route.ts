@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs'; // Ensure consistency with your previous setup
+import bcrypt from 'bcryptjs'; 
 import prisma from '../../../libs/prisma';
 import { NextResponse } from 'next/server';
 
@@ -6,11 +6,14 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, password } = body;
+    const { username, email, password } = body;
 
     // Check for missing fields
-    if (!name || !email || !password) {
-      return new NextResponse('Missing Fields', { status: 400 });
+    if (!username || !email || !password) {
+      return new NextResponse(
+        JSON.stringify({ message: 'Missing Fields' }),
+        { status: 400 }
+      );
     }
 
     // Check if user already exists
@@ -19,7 +22,10 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
-      return new NextResponse('Email already exists', { status: 400 });
+      return new NextResponse(
+        JSON.stringify({ message: 'Email already exists' }),
+        { status: 400 }
+      );
     }
 
     // Hash the password
@@ -28,7 +34,7 @@ export async function POST(request: Request) {
     // Create new user
     const user = await prisma.user.create({
       data: {
-        name,
+        name: username, // Change here to save username as name
         email,
         hashedPassword,
       },
@@ -41,10 +47,13 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json(user, { status: 201 });
+    return new NextResponse(JSON.stringify(user), { status: 201 });
   } catch (error) {
     console.error(error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return new NextResponse(
+      JSON.stringify({ message: 'Internal Server Error' }),
+      { status: 500 }
+    );
   }
 }
 
@@ -61,9 +70,12 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(users, { status: 200 });
+    return new NextResponse(JSON.stringify(users), { status: 200 });
   } catch (error) {
     console.error(error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return new NextResponse(
+      JSON.stringify({ message: 'Internal Server Error' }),
+      { status: 500 }
+    );
   }
 }

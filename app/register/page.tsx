@@ -7,6 +7,8 @@ import { CircularProgress } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import {useRouter} from "next/navigation"
+
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -18,6 +20,9 @@ const RegisterPage: React.FC = () => {
     console.log(`Sign in with ${provider}`);
   };
 
+
+  const router = useRouter()
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -29,10 +34,11 @@ const RegisterPage: React.FC = () => {
         password,
       });
 
-      toast.success(response.data.message);
+      toast.success("successifuly registered login");
       setUsername('');
       setEmail('');
       setPassword('');
+      router.push('/login')
       
     } catch (error: any) {
       if (error.response) {
