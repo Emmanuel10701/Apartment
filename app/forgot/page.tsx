@@ -4,11 +4,12 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
-import Link from 'next/link'; // Import Link from Next.js
+import Link from 'next/link';
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [gmailEnabled, setGmailEnabled] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +29,7 @@ const ForgotPasswordPage: React.FC = () => {
       if (response.ok) {
         toast.success(result.message);
         setEmail('');
+        setGmailEnabled(true); // Enable Gmail button after processing
       } else {
         toast.error(result.message);
       }
@@ -37,6 +39,11 @@ const ForgotPasswordPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGmailClick = () => {
+    // Open Gmail app using the mailto URL scheme
+    window.location.href = `mailto:${email}`;
   };
 
   return (
@@ -51,23 +58,37 @@ const ForgotPasswordPage: React.FC = () => {
           className="w-full p-2 border border-gray-300 rounded-md mb-4 focus:border-green-500 focus:outline-none transition-colors"
           required
         />
-        <div className="flex justify-center mb-4"></div>
+        <div className="flex justify-center mb-4 gap-2">
+  <Button
+    type="submit"
+    variant="contained"
+    className={`flex-1 text-white ${loading ? 'bg-green-500' : 'bg-indigo-600'} transition-all duration-300`}
+    disabled={loading}
+  >
+    {loading ? (
+      <div className="flex items-center justify-center">
+        <CircularProgress size={24} color="inherit" />
+        <span className="ml-1 text-sm">Processing...</span> {/* Smaller text */}
+      </div>
+    ) : (
+      <span className="text-sm">Send Link</span> 
+    )}
+  </Button>
 
-        <Button
-          type="submit"
-          variant="contained"
-          className={`w-full text-white ${loading ? 'bg-green-500' : 'bg-indigo-600'} transition-all duration-300`}
-          disabled={loading}
-        >
-          {loading ? (
-            <div className="flex items-center justify-center">
-              <CircularProgress size={24} color="inherit" />
-              <span className="ml-2">Processing...</span>
-            </div>
-          ) : (
-            'Send Link'
-          )}
-        </Button>
+  <Button
+    variant="outlined"
+    className={`flex-1 text-indigo-600 ${!gmailEnabled ? 'bg-gray-300' : 'hover:bg-indigo-600 hover:text-white'}`}
+    disabled={!gmailEnabled}
+    onClick={handleGmailClick}
+  >
+    <span className="text-sm">{gmailEnabled ? 'Open Gmail' : 'Get The Link'}</span> 
+  </Button>
+</div>
+
+
+
+
+       
 
         {/* Link to go back to the login page */}
         <div className="text-center mt-4">

@@ -15,6 +15,11 @@ import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import "react-toastify/dist/ReactToastify.css";
 
+const providers = [
+  { name: "GitHub", icon: <FaGithub />, id: "github" },
+  { name: "Google", icon: <FaGoogle />, id: "google" },
+];
+
 const LoginPage: React.FC = () => {
   const { data: session } = useSession();
   const router = useRouter();
@@ -41,13 +46,8 @@ const LoginPage: React.FC = () => {
       });
 
       if (response?.error) {
-        if (response.error.includes("No user found")) {
-          toast.error("User does not exist. Please check your email.");
-        } else if (response.error.includes("Incorrect password")) {
-          toast.error("Incorrect password. Please try again.");
-        } else {
-          toast.error(response.error);
-        }
+        const errorMessage = getErrorMessage(response.error);
+        toast.error(errorMessage);
       } else {
         toast.success("Login successful!");
         router.push("/dashboard");
@@ -57,6 +57,16 @@ const LoginPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getErrorMessage = (error: string) => {
+    if (error.includes("No user found")) {
+      return "User does not exist. Please check your email.";
+    }
+    if (error.includes("Incorrect password")) {
+      return "Incorrect password. Please try again.";
+    }
+    return "An unexpected error occurred. Please try again.";
   };
 
   const handleSocialLogin = (provider: string) => {
@@ -70,6 +80,11 @@ const LoginPage: React.FC = () => {
           <h2 className="text-4xl font-extrabold text-center mb-6 text-slate-600">
             🔒 Login
           </h2>
+          
+          {/* Greeting message */}
+          <h3 className="text-lg text-center mb-4">
+            Hi, {session ? session.user?.name : 'User'}!
+          </h3>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">
@@ -111,18 +126,12 @@ const LoginPage: React.FC = () => {
             </div>
             <button
               type="submit"
-              className={`w-full py-4 bg-blue-500 text-white font-bold rounded-lg ${
-                loading ? "border-2 border-indigo-800" : ""
-              } hover:bg-blue-600 transition-colors relative`}
+              className={`w-full py-4 bg-blue-500 text-white font-bold rounded-lg ${loading ? "border-2 border-indigo-800" : ""} hover:bg-blue-600 transition-colors relative`}
             >
               {loading ? (
                 <div className="flex items-center justify-center space-x-2">
                   <span className="text-white">Processing...</span>
-                  <CircularProgress
-                    size={24}
-                    color="inherit"
-                    style={{ color: "white" }}
-                  />
+                  <CircularProgress size={24} color="inherit" style={{ color: "white" }} />
                 </div>
               ) : (
                 "Sign In"
@@ -132,20 +141,17 @@ const LoginPage: React.FC = () => {
             <div className="mt-8 text-center">
               <p className="text-lg font-semibold mb-4">Or log in with</p>
               <div className="flex justify-center space-x-8">
-                <div className="flex flex-col items-center">
-                  <FaGithub
-                    onClick={() => handleSocialLogin("github")}
-                    className="text-gray-800 text-2xl cursor-pointer hover:text-gray-600"
-                  />
-                  <span className="text-gray-600 mt-2">GitHub</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <FaGoogle
-                    onClick={() => handleSocialLogin("google")}
-                    className="text-red-600 text-2xl cursor-pointer hover:text-red-400"
-                  />
-                  <span className="text-red-600 mt-2">Google</span>
-                </div>
+                {providers.map(({ name, icon, id }) => (
+                  <div key={id} className="flex flex-col items-center">
+                    <div
+                      onClick={() => handleSocialLogin(id)}
+                      className="text-2xl cursor-pointer hover:text-gray-600"
+                    >
+                      {icon}
+                    </div>
+                    <span className="text-gray-600 mt-2">{name}</span>
+                  </div>
+                ))}
               </div>
             </div>
 

@@ -1,5 +1,3 @@
-// pages/api/auth/[...nextauth].ts
-
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import prisma from '../../../../libs/prisma';
@@ -14,10 +12,20 @@ export const authOptions: NextAuthOptions = {
     GithubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
+      profile: (profile) => ({
+        id: profile.id,
+        name: profile.name,
+        email: profile.email,
+      }),
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_ID!,
       clientSecret: process.env.GOOGLE_SECRET!,
+      profile: (profile) => ({
+        id: profile.sub,
+        name: profile.name,
+        email: profile.email,
+      }),
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -58,7 +66,12 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.SECRET!,
   session: {
     strategy: 'jwt',
-    maxAge: 60 * 60, // Session expires in 60 minutes
+    maxAge: 60, // Session expires in 1 minute (60 seconds)
+  },
+  pages: {
+    signIn: '/login',     // Custom login page
+    newUser: '/register', // Custom registration page
+    error: '/auth/error', // Error page
   },
   callbacks: {
     async signIn({ user, account }) {
@@ -96,7 +109,8 @@ export const authOptions: NextAuthOptions = {
             where: { email: session.user.email },
             select: { role: true },
           });
-
+         console.log(session.user)
+         
           if (user) {
             (session.user as any).role = user.role; // Add role to the session
           }
@@ -107,15 +121,11 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      if (url === baseUrl || url === `${baseUrl}/auth/signin`) {
-        return '/dashboard';
-      }
-      return url;
+      return baseUrl + '/dashboard'; // Default to dashboard for all successful logins
     },
   },
-  debug: process.env.NODE_ENV === "development",
+  debug: true, // Enable debug logging
 };
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
-

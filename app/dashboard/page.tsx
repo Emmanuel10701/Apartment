@@ -1,8 +1,9 @@
-// pages/index.tsx
 "use client"
-import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
-import Link from 'next/link'
-import Card from "../components/apartment2/page"
+import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
+import Link from 'next/link';
+import Card from "../components/apartment2/page";
+import { useSession } from 'next-auth/react';
+
 import {
   FaCog,
   FaSignOutAlt,
@@ -22,108 +23,121 @@ import {
   FaMapMarkerAlt,
   FaBed,
   FaImage,
-} from 'react-icons/fa'
-
-
+} from 'react-icons/fa';
 
 // Define the structure of a Property
 interface Property {
-  id: number
-  name: string
-  imageUrl: string
-  address: string
-  roomsAvailable: number
+  id: number;
+  name: string;
+  imageUrl: string;
+  address: string;
+  roomsAvailable: number;
+}
+
+// Define the structure of a User
+interface User {
+  name: string;
+  email: string;
+  image?: string;
 }
 
 const Dashboard: React.FC = () => {
-  // State for active menu item
-  const [activeMenu, setActiveMenu] = useState<number>(0)
-
-  // State for search form visibility on small screens
-  const [searchFormVisible, setSearchFormVisible] = useState(false)
-
-  // State for dark mode
-  const [isDarkMode, setIsDarkMode] = useState(false)
-
-  // State for properties
-  const [properties, setProperties] = useState<Property[]>([])
-
-  // State for form inputs
+  const [activeMenu, setActiveMenu] = useState<number>(0);
+  const [searchFormVisible, setSearchFormVisible] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [newProperty, setNewProperty] = useState<Omit<Property, 'id'>>({
     name: '',
     imageUrl: '',
     address: '',
     roomsAvailable: 1,
-  })
+  });
 
-  // State for user profile
-  const [userName, setUserName] = useState<string>('John Doe')
-  const [userEmail, setUserEmail] = useState<string>('johndoe@example.com')
-  const [userImage, setUserImage] = useState<string>('/img/people.png')
+  const { data: session } = useSession();
+  const [user, setUser] = useState<User | null>(null);
+  const [userImage, setUserImage] = useState<string>('');
 
   // Handle window resize for responsive behavior
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 576) {
-        setSearchFormVisible(false)
+        setSearchFormVisible(false);
       }
-    }
+    };
 
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Load user image from localStorage on component mount
   useEffect(() => {
-    const storedImage = localStorage.getItem('userImage')
+    const storedImage = localStorage.getItem('userImage');
     if (storedImage) {
-      setUserImage(storedImage)
+      setUserImage(storedImage);
     }
-  }, [])
+  }, []);
 
   // Handle profile image change
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        const base64String = reader.result as string
-        setUserImage(base64String)
-        localStorage.setItem('userImage', base64String)
-      }
-      reader.readAsDataURL(file)
+        const base64String = reader.result as string;
+        setUserImage(base64String);
+        localStorage.setItem('userImage', base64String);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   // Handle form input changes
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setNewProperty((prev) => ({
       ...prev,
       [name]: name === 'roomsAvailable' ? Number(value) : value,
-    }))
-  }
+    }));
+  };
 
   // Handle form submission
   const handleAddProperty = (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (newProperty.name && newProperty.address && newProperty.imageUrl) {
       const newProp: Property = {
         id: properties.length + 1,
         ...newProperty,
-      }
-      setProperties([...properties, newProp])
+      };
+      setProperties([...properties, newProp]);
       setNewProperty({
         name: '',
         imageUrl: '',
         address: '',
         roomsAvailable: 1,
-      })
+      });
     }
+  };
+
+  useEffect(() => {
+    if (session && !user) {
+      setUser(session.user as User); // Set user in context if not already set
+    }
+  }, [session, user]);
+
+  if (!session) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full max-w-xs p-6 border border-gray-300 rounded-lg shadow-md bg-gray-50 mx-auto my-4">
+        <h2 className="text-xl font-semibold">Please Log In</h2>
+        <p className="mt-2 text-gray-600">You need to log in to access this page.</p>
+        <button
+          className="mt-4 px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-500 transition"
+          onClick={() => window.location.href = '/login'}
+        >
+          Go to Login
+        </button>
+      </div>
+    );
   }
-
-
- 
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
@@ -160,7 +174,7 @@ const Dashboard: React.FC = () => {
                   className="px-4 py-2 bg-blue-500 text-white rounded-r-full focus:outline-none"
                   onClick={() => {
                     if (window.innerWidth < 576) {
-                      setSearchFormVisible(!searchFormVisible)
+                      setSearchFormVisible(!searchFormVisible);
                     }
                   }}
                 >
@@ -180,9 +194,7 @@ const Dashboard: React.FC = () => {
                   />
                   <div className="w-12 h-6 bg-gray-300 rounded-full shadow-inner transition-colors duration-300"></div>
                   <div
-                    className={`absolute top-1 left-1 w-4 h-4 bg-blue-500 rounded-full transition-transform duration-300 ${
-                      isDarkMode ? 'transform translate-x-6' : ''
-                    }`}
+                    className={`absolute top-1 left-1 w-4 h-4 bg-blue-500 rounded-full transition-transform duration-300 ${isDarkMode ? 'transform translate-x-6' : ''}`}
                   ></div>
                 </div>
               </label>
@@ -195,7 +207,7 @@ const Dashboard: React.FC = () => {
                   onClick={() => document.getElementById('profileImageInput')?.click()}
                   className="focus:outline-none"
                 >
-                  <img src={userImage} alt="Profile" className="w-9 h-9 rounded-full" />
+                  <img src={userImage || '/default-profile.png'} alt="Profile" className="w-9 h-9 rounded-full" />
                 </button>
                 <input
                   type="file"
@@ -227,10 +239,8 @@ const Dashboard: React.FC = () => {
                 </ul>
               </div>
               <h1 className="bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent text-2xl bg-clip-text">
-                  Welcome back <span className='text-3xl font-extrabold'>Emmanuel</span>
-               </h1>
-
-             
+                Welcome back <span className='text-3xl font-extrabold'>{user?.name }</span>
+              </h1>
             </div>
 
             {/* Box Info */}
@@ -263,7 +273,7 @@ const Dashboard: React.FC = () => {
               {/* Recent Orders */}
               <div className="flex-1 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent  bg-clip-text">Recent Orders</h3>
+                  <h3 className="text-xl font-semibold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">Recent Orders</h3>
                   <div className="flex space-x-2">
                     <FaSearch className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer" />
                     <FaFilter className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer" />
@@ -313,21 +323,20 @@ const Dashboard: React.FC = () => {
               {/* Properties */}
               <div className="flex-1 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-center  text-gray-800 text-4xl font-extrabold  dark:text-white bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent  bg-clip-text">Your Properties</h3>
+                  <h3 className="text-center text-gray-800 text-4xl font-extrabold dark:text-white bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">Your Properties</h3>
                   <div className="flex space-x-2">
-                    <FaPlus className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer" onClick={() => { /* You can add additional functionality here */ }} />
+                    <FaPlus className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer" onClick={() => { /* Add additional functionality here */ }} />
                     <FaFilter className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer" />
                   </div>
                 </div>
-                <div className='items-center justify-center flex   '>
-                <Card/>
-
+                <div className='items-center justify-center flex'>
+                  <Card />
                 </div>
-                 <button 
+                <button 
                   onClick={handleAddProperty}
                   className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                   Add Property
-              </button>
+                </button>
                 <ul className="space-y-4">
                   {properties.map((property) => (
                     <li key={property.id} className="flex items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm">
@@ -346,7 +355,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Dashboard
+export default Dashboard;
