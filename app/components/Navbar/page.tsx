@@ -1,15 +1,15 @@
-// Navbar.tsx
-
 "use client";
 
 import React, { useState } from 'react';
 import { CiMenuBurger } from "react-icons/ci";
-import { useRouter } from 'next/navigation'; // Import useRouter
-import Sidebar from './../sidebar/page'; // Import the Sidebar component
+import { useRouter } from 'next/navigation';
+import Sidebar from './../sidebar/page';
+import { useSession, signOut } from 'next-auth/react'; // Import useSession and signOut
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const router = useRouter(); // Get the router instance
+  const router = useRouter();
+  const { data: session } = useSession(); // Get session data
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -34,24 +34,40 @@ const Navbar: React.FC = () => {
 
           {/* Button Group */}
           <div className="hidden lg:flex lg:items-center lg:ml-auto lg:space-x-4">
-            <span
-              className="px-4 py-2 border border-transparent text-purple-700 font-semibold rounded-lg hover:border-black hover:bg-purple-50 transition cursor-pointer"
-              onClick={() => router.push('/login')}
-            >
-              Sign In
-            </span>
-            <span
-              className="px-4 py-2 border border-transparent text-purple-700 font-semibold rounded-lg hover:border-black hover:bg-purple-50 transition cursor-pointer"
-              onClick={() => router.push('/register')}
-            >
-              Sign Up
-            </span>
-            <span
-              className="relative px-4 py-2 border border-transparent text-purple-700 font-semibold rounded-lg hover:border-black hover:bg-purple-50 transition cursor-pointer"
-              onClick={() => router.push('/fillingform')}
-            >
-              Add Property
-            </span>
+            {!session ? (
+              <>
+                <span
+                  className="px-4 py-2 border border-transparent text-purple-700 font-semibold rounded-lg hover:border-black hover:bg-purple-50 transition cursor-pointer"
+                  onClick={() => router.push('/login')}
+                >
+                  Sign In
+                </span>
+                <span
+                  className="px-4 py-2 border border-transparent text-purple-700 font-semibold rounded-lg hover:border-black hover:bg-purple-50 transition cursor-pointer"
+                  onClick={() => router.push('/register')}
+                >
+                  Sign Up
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-purple-700 font-semibold">
+                  Hi, {session.user?.name} {/* Display user's name */}
+                </span>
+                <span
+                  className="relative px-4 py-2 border border-transparent text-purple-700 font-semibold rounded-lg hover:border-black hover:bg-purple-50 transition cursor-pointer"
+                  onClick={() => router.push('/fillingform')}
+                >
+                  Add Property
+                </span>
+                <span
+                  className="px-4 py-2 border border-transparent text-red-700 font-semibold rounded-lg hover:border-black hover:bg-red-50 transition cursor-pointer"
+                  onClick={() => signOut()} // Logout functionality
+                >
+                  Logout
+                </span>
+              </>
+            )}
           </div>
         </div>
       </nav>
