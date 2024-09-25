@@ -195,6 +195,7 @@ const Dashboard: React.FC = () => {
 
   if (!session) {
     return (
+      
      <div className='flex items-center justify-center'>
        <div className="flex flex-col items-center justify-center mt-20 w-full max-w-xs p-6 border border-gray-300 rounded-xl shadow-lg bg-white mx-auto my-4">
         <h2 className="text-2xl font-bold">Please Log In</h2>
@@ -398,6 +399,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </main>
+        <ToastContainer />
 
         <EmailModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSend={handleSendEmail} />
       </div>

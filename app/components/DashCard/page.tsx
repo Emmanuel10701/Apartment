@@ -146,26 +146,36 @@ const ApartmentCard = ({ apartment, onDelete }: { apartment: Apartment; onDelete
                     <>
                         <button
                             onClick={handleUpdate}
-                            className="flex items-center text-slate-100 bg-green-600 cursor-pointer hover:bg-green-700 ml-3 border-2 rounded-full px-5 py-2 transition duration-300"
+                            className="flex items-center text-slate-100 bg-green-600 cursor-pointer hover:bg-green-700 ml-3 border-2 rounded-sm px-5 py-1 transition duration-300"
                             disabled={loading}
                         >
-                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Apply Changes'}
+                            {loading ? (
+                                <>
+                                    <CircularProgress size={24} color="inherit" />
+                                    <span className="ml-2">Applying...</span>
+                                </>
+                            ) : 'Apply Changes'}
                         </button>
-                        <button onClick={() => setIsEditing(false)} className="text-slate-100 bg-red-600 cursor-pointer hover:bg-red-700 ml-3 flex items-center border-2 rounded-full px-5 py-2 transition duration-300">
+                        <button onClick={() => setIsEditing(false)} className="text-slate-100 bg-red-600 cursor-pointer hover:bg-red-700 ml-3 flex items-center border-2 rounded-sm px-5 py-1 transition duration-300">
                             Cancel
                         </button>
                     </>
                 ) : (
                     <>
-                        <button onClick={() => setIsEditing(true)} className="text-slate-100 bg-indigo-600 cursor-pointer hover:bg-indigo-700 ml-3 flex items-center border-2 rounded-full px-5 py-2 transition duration-300">
+                        <button onClick={() => setIsEditing(true)} className="text-slate-100 bg-indigo-600 cursor-pointer hover:bg-indigo-700 flex items-center border-2 rounded-md ml-8 px-5 py-1 transition duration-300">
                             Edit
                         </button>
                         <button
                             onClick={handleDelete}
-                            className="flex items-center text-slate-100 bg-red-600 cursor-pointer hover:bg-red-700 ml-3 border-2 rounded-full px-5 py-2 transition duration-300"
+                            className="flex items-center text-slate-100 bg-red-600 cursor-pointer hover:bg-red-700 ml-3 border-2 rounded-sm px-5 py-1 transition duration-300"
                             disabled={loading}
                         >
-                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Delete'}
+                            {loading ? (
+                                <>
+                                    <CircularProgress size={24} color="inherit" />
+                                    <span className="ml-2">Deleting...</span>
+                                </>
+                            ) : 'Delete'}
                         </button>
                     </>
                 )}
