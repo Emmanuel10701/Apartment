@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import  prisma  from '../../../libs/prisma'; // Adjust the path to your Prisma instance
+import prisma from '../../../libs/prisma'; // Adjust the path to your Prisma instance
 
 // GET: Fetch apartments
 export async function GET() {
@@ -16,11 +16,32 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const { name, minPrice, maxPrice, rentalType, starRating, propertyType, images, phoneNumber, email, address, userId } = data;
+    const {
+      name,
+      minPrice,
+      maxPrice,
+      rentalType,
+      starRating,
+      propertyType,
+      images,       // Should ideally handle image uploading via another method
+      phoneNumber,
+      email,
+      address,
+      userId        // Ensure the user ID exists in the User model
+    } = data;
 
-    // Validation can be added here as needed
+    // Validation for required fields
     if (!name || !minPrice || !maxPrice || !rentalType || !propertyType || !email) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Check if user exists
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
     // Create the new apartment in the database
@@ -32,11 +53,11 @@ export async function POST(req: Request) {
         rentalType,
         starRating,
         propertyType,
-        images,
+        images,       // Ensure proper handling of image uploads
         phoneNumber,
         email,
         address,
-        userId, // Foreign key to User
+        userId,       // Foreign key to User
       },
     });
 

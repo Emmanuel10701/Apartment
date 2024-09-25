@@ -10,7 +10,6 @@ import {
 } from 'react-icons/fa';
 import { FaArrowDown } from "react-icons/fa6";
 import { FaArrowUp } from "react-icons/fa6";
-
 import { IoFilterSharp } from "react-icons/io5";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -22,6 +21,7 @@ interface SearchNavbarProps {
 
 interface SearchFilters {
   search: string;
+  location: string;  // Added location property
   minRent?: number;
   maxRent?: number;
   rentalType?: string;
@@ -32,14 +32,15 @@ interface SearchFilters {
 
 const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
   const [search, setSearch] = useState<string>('');
-  const [minRent, setMinRent] = useState<number | ''>('');
-  const [maxRent, setMaxRent] = useState<number | ''>('');
-  const [rentalType, setRentalType] = useState<string>('');
-  const [sortOrder, setSortOrder] = useState<string>('ascending');
-  const [starRating, setStarRating] = useState<number>(0);
-  const [propertyType, setPropertyType] = useState<string>('');
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [savedSearches, setSavedSearches] = useState<string[]>([]);
+  const [location, setLocation] = useState<string>('');  // New state for location
+  const [minRent, setMinRent] = useState<number | ''>('');  
+  const [maxRent, setMaxRent] = useState<number | ''>('');  
+  const [rentalType, setRentalType] = useState<string>('');  
+  const [sortOrder, setSortOrder] = useState<string>('ascending');  
+  const [starRating, setStarRating] = useState<number>(0);  
+  const [propertyType, setPropertyType] = useState<string>('');  
+  const [showModal, setShowModal] = useState<boolean>(false);  
+  const [savedSearches, setSavedSearches] = useState<string[]>([]);  
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -67,6 +68,10 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
     setSearch(event.target.value);
   };
 
+  const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLocation(event.target.value);  // Handle location input
+  };
+
   const handleFiltersSubmit = () => {
     if (minRent !== '' && maxRent !== '' && minRent > maxRent) {
       toast.error("Min Rent cannot be greater than Max Rent.");
@@ -75,6 +80,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
 
     const filters: SearchFilters = {
       search: search.trim(),
+      location: location.trim(),  // Include location in filters
     };
 
     if (minRent !== '' && maxRent !== '') {
@@ -98,6 +104,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
 
   const clearFilters = () => {
     setSearch('');
+    setLocation('');  // Clear location state
     setMinRent('');
     setMaxRent('');
     setRentalType('');
@@ -107,6 +114,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
 
     onSearch({
       search: '',
+      location: '',  // Clear location in filters
       minRent: undefined,
       maxRent: undefined,
       rentalType: '',
@@ -127,12 +135,21 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
             type="text"
             value={search}
             onChange={handleSearchChange}
-            placeholder="London, UK"
+            placeholder="Search (e.g., 2 Bedroom)"
             className="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </Autocomplete>
 
-        {/* Filters Button with icon */}
+        <Autocomplete>
+          <input
+            type="text"
+            value={location}
+            onChange={handleLocationChange}  // Handle location change
+            placeholder="Location (e.g., London, UK)"
+            className="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </Autocomplete>
+
         <button
           onClick={() => setShowModal(true)}
           className="flex items-center justify-center w-full sm:w-48 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -141,13 +158,13 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
           Filters
         </button>
 
-        {/* Sort Order Button */}
         <button
           onClick={() => {
             const newOrder = sortOrder === 'ascending' ? 'descending' : 'ascending';
             setSortOrder(newOrder);
             onSearch({
               search: search.trim(),
+              location: location.trim(),  // Include location in sorting
               sortOrder: newOrder,
               rentalType,
               starRating,
@@ -163,12 +180,9 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
           } text-sm`}
         >
           <span>Sort: {sortOrder === 'ascending' ? 'Ascending' : 'Descending'}</span>
-          {sortOrder === 'ascending' ? <FaArrowUp />
-: <FaArrowDown />
-}
+          {sortOrder === 'ascending' ? <FaArrowUp /> : <FaArrowDown />}
         </button>
 
-        {/* Clear Filters Button */}
         <button
           onClick={clearFilters}
           className="w-full sm:w-48 px-4 py-2 bg-gray-500 text-white rounded-full hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm"
@@ -177,14 +191,12 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
         </button>
       </div>
 
-      {/* Filters Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
           <div
             ref={modalRef}
             className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full relative"
           >
-            {/* Close Button */}
             <button
               onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -195,7 +207,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
             <h2 className="text-2xl font-semibold mb-4">Filters</h2>
 
             <div className="space-y-4">
-              {/* Star Rating Selector */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Star Rating
@@ -212,7 +223,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
                 </select>
               </div>
 
-              {/* Rental Type Selector */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Rental Type
@@ -231,7 +241,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
                 </select>
               </div>
 
-              {/* Property Type Selector */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Property Type
@@ -249,7 +258,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
                 </select>
               </div>
 
-              {/* Rent Range */}
               <div className="flex gap-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -278,7 +286,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
                 </div>
               </div>
 
-              {/* Clear Filters Button (Inside Modal) */}
               <div className="mt-4">
                 <button
                   onClick={clearFilters}
@@ -288,7 +295,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
                 </button>
               </div>
 
-              {/* Apply Filters Button */}
               <div className="mt-4">
                 <button
                   onClick={handleFiltersSubmit}

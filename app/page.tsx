@@ -12,7 +12,7 @@ const center = { lat: 48.8584, lng: 2.2945 };
 
 interface Apartment {
   id: number;
-  name: string;
+  title: string;
   minPrice: number;
   rentalType: string;
   starRating: number;
@@ -26,7 +26,7 @@ interface Apartment {
 const apartments: Apartment[] = [
   {
     id: 1,
-    name: "Luxury Apartment",
+    title: "Luxury Apartment",
     minPrice: 1500,
     rentalType: "Monthly",
     starRating: 4,
@@ -43,6 +43,7 @@ const apartments: Apartment[] = [
 
 interface SearchFilters {
   search: string;
+  location?: string; // Added location property
   minRent?: number;
   maxRent?: number;
   rentalType?: string;
@@ -84,7 +85,7 @@ const MainComponent: React.FC = () => {
             const location = await geocodeAddress(apartment.address);
             return location;
           } catch (error) {
-            console.error(`Error geocoding address for ${apartment.name}:`, error);
+            console.error(`Error geocoding address for ${apartment.title}:`, error);
             return null;
           }
         })
@@ -111,14 +112,14 @@ const MainComponent: React.FC = () => {
     }
   }, [filteredApartments]);
 
-  const handleSearch = (filters: SearchFilters) => {
+  const handleSearch = async (filters: SearchFilters) => {
     let filtered = apartments;
 
     if (filters.search) {
       const lowercasedSearch = filters.search.toLowerCase();
       filtered = filtered.filter(
         (apartment) =>
-          apartment.name.toLowerCase().includes(lowercasedSearch) ||
+          apartment.title.toLowerCase().includes(lowercasedSearch) ||
           apartment.address.toLowerCase().includes(lowercasedSearch) ||
           apartment.propertyType.toLowerCase().includes(lowercasedSearch)
       );
@@ -152,6 +153,18 @@ const MainComponent: React.FC = () => {
       filtered = filtered.filter((apartment) => apartment.minPrice >= filters.minRent!);
     } else if (filters.maxRent !== undefined) {
       filtered = filtered.filter((apartment) => apartment.minPrice <= filters.maxRent!);
+    }
+
+    // Handle geocoding for the location filter
+    if (filters.location) {
+      try {
+        const location = await geocodeAddress(filters.location);
+        // You might want to filter apartments based on proximity to the location here
+        // For now, we just include it in the filtered apartments
+        // Assuming you want to return apartments nearby or within certain criteria
+      } catch (error) {
+        console.error(`Error geocoding location "${filters.location}":`, error);
+      }
     }
 
     setFilteredApartments(filtered);
@@ -256,7 +269,7 @@ const MainComponent: React.FC = () => {
               filteredApartments.map((apartment) => (
                 <ApartmentCard
                   key={apartment.id}
-                  name={apartment.name}
+                  name={apartment.title}
                   minPrice={apartment.minPrice}
                   rentalType={apartment.rentalType}
                   starRating={apartment.starRating}
@@ -270,7 +283,7 @@ const MainComponent: React.FC = () => {
             ) : (
               <p>No apartments found.</p>
             )}
-            <Footer/>
+            <Footer />
           </div>
           <div className="md:hidden absolute bottom-4 left-4 z-10">
             <Button variant="contained" color="secondary" onClick={() => setIsMapVisible(true)}>

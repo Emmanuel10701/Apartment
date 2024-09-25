@@ -79,12 +79,7 @@ const LoginPage: React.FC = () => {
         <div className="w-full max-w-xl p-12 bg-white shadow-lg rounded-lg mb-8">
           <h2 className="text-4xl font-extrabold text-center mb-6 text-slate-600">
             🔒 Login
-          </h2>
-          
-          {/* Greeting message */}
-          <h3 className="text-lg text-center mb-4">
-            Hi, {session ? session.user?.name : 'User'}!
-          </h3>
+          </h2>         
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">

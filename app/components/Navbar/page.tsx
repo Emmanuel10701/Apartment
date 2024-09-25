@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
             onClick={toggleMenu}
             aria-label="Toggle navigation"
           >
-            <CiMenuBurger className="w-10 h-10 bg-slate-200 hover:bg-slate-300 p-1 font-extrabold stroke-black/100 focus:outline-2 dark:stroke-neutral-700" />
+            <CiMenuBurger className="w-8 h-8 bg-slate-300 hover:bg-slate-400 rounded-md p-1 font-extrabold stroke-black/100 focus:outline-2 dark:stroke-neutral-700" />
           </button>
 
           {/* Sidebar */}

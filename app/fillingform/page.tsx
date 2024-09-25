@@ -9,11 +9,13 @@ import "react-toastify/dist/ReactToastify.css";
 
 type ApartmentFormData = {
   name: string;
+  email: string;
+  phoneNumber: string;
   address: string;
   minPrice: number;
   maxPrice: number;
   rentalType: "Monthly" | "Yearly";
-  condoType: "1 Bedroom" | "2 Bedroom" | "3 Bedroom";
+  condoType: "1 Bedroom" | "2 Bedroom" | "3 Bedroom"| "4+ Bedroom"| "Apartment" | "House";
   description: string;
   apartmentTowerImage: FileList;
   livingRoomImage: FileList;
@@ -91,6 +93,8 @@ const ApartmentForm: React.FC = () => {
 
     if (!data.name.trim()) validationErrors.name = "Name is required.";
     if (!data.address.trim()) validationErrors.address = "Address is required.";
+    if (!data.phoneNumber.trim()) validationErrors.phoneNumber = "Phone Number is required.";
+    if (!data.email.trim()) validationErrors.email = "Email is required.";
     if (data.minPrice < 0) validationErrors.minPrice = "Min Price cannot be negative.";
     if (data.maxPrice <= data.minPrice) validationErrors.maxPrice = "Max Price must be greater than Min Price.";
     if (!data.rentalType) validationErrors.rentalType = "Rental Type is required.";
@@ -170,6 +174,8 @@ const ApartmentForm: React.FC = () => {
 
     formData.append("name", data.name);
     formData.append("address", data.address);
+    formData.append("email", data.email);
+    formData.append("phoneNumber", data.phoneNumber);
     formData.append("minPrice", data.minPrice.toString());
     formData.append("maxPrice", data.maxPrice.toString());
     formData.append("rentalType", data.rentalType);
@@ -225,6 +231,24 @@ const ApartmentForm: React.FC = () => {
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3"
               />
               {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+              <input
+                type="tel"
+                {...register("name")}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3"
+              />
+              {errors.name && <p className="text-red-500 text-sm">{errors.phoneNumber?.message}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">email</label>
+              <input
+                type="email"
+                {...register("name")}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-3"
+              />
+              {errors.name && <p className="text-red-500 text-sm">{errors.email?.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">Address</label>
@@ -421,6 +445,12 @@ const ApartmentForm: React.FC = () => {
             <h3 className="text-2xl font-bold mt-10 text-slate-700 mb-4">Review Your Information</h3>
             <p>
               <strong>Name:</strong> {watch("name")}
+            </p>
+            <p>
+              <strong>Phone:</strong> {watch("phoneNumber")}
+            </p>
+            <p>
+              <strong>Email:</strong> {watch("email")}
             </p>
             <p>
               <strong>Address:</strong> {watch("address")}
