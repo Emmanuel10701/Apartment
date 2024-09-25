@@ -66,7 +66,7 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.SECRET!,
   session: {
     strategy: 'jwt',
-    maxAge: 60, // Session expires in 1 minute (60 seconds)
+    maxAge: 60*60*2, // Session expires in 2 hrs
   },
   pages: {
     signIn: '/login',     // Custom login page
@@ -110,7 +110,7 @@ export const authOptions: NextAuthOptions = {
             select: { role: true },
           });
          console.log(session.user)
-         
+
           if (user) {
             (session.user as any).role = user.role; // Add role to the session
           }

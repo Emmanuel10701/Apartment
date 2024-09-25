@@ -93,8 +93,8 @@ const ApartmentForm: React.FC = () => {
 
     if (!data.name.trim()) validationErrors.name = "Name is required.";
     if (!data.address.trim()) validationErrors.address = "Address is required.";
-    if (!data.phoneNumber.trim()) validationErrors.phoneNumber = "Phone Number is required.";
-    if (!data.email.trim()) validationErrors.email = "Email is required.";
+    if (!data.phoneNumber) validationErrors.phoneNumber = "Phone Number is required.";
+    if (!data.email) validationErrors.email = "Email is required.";
     if (data.minPrice < 0) validationErrors.minPrice = "Min Price cannot be negative.";
     if (data.maxPrice <= data.minPrice) validationErrors.maxPrice = "Max Price must be greater than Min Price.";
     if (!data.rentalType) validationErrors.rentalType = "Rental Type is required.";

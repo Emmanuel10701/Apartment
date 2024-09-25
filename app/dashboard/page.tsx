@@ -1,8 +1,9 @@
 "use client"
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import Link from 'next/link';
-import Card from "../components/apartment2/page";
+import Card from "../components/DashCard/page";
 import { useSession } from 'next-auth/react';
+import {useRouter} from 'next/navigation'
 import CircularProgress from '@mui/material/CircularProgress';
 
 import {
@@ -91,7 +92,7 @@ const Dashboard: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-
+const route = useRouter()
   // Handle form input changes
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -104,6 +105,7 @@ const Dashboard: React.FC = () => {
   // Handle form submission
   const handleAddProperty = (e: FormEvent) => {
     e.preventDefault();
+    route.push("/fillingform")
     if (newProperty.name && newProperty.address && newProperty.imageUrl) {
       const newProp: Property = {
         id: properties.length + 1,
@@ -234,6 +236,11 @@ const Dashboard: React.FC = () => {
                   <Link href="/" className="text-blue-500 text-lg hover:underline">Home</Link>
                 </li>
               </ul>
+              <button 
+                onClick={handleAddProperty}
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                Add Property
+              </button>
             </div>
             <h1 className="bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent text-2xl bg-clip-text">
               Welcome back <span className='text-3xl font-extrabold'>{user?.name }</span>
@@ -315,11 +322,7 @@ const Dashboard: React.FC = () => {
               <div className='items-center justify-center flex'>
                 <Card />
               </div>
-              <button 
-                onClick={handleAddProperty}
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                Add Property
-              </button>
+              
               <ul className="space-y-4">
                 {properties.map((property) => (
                   <li key={property.id} className="flex items-center p-4 bg-gray-100 rounded-lg shadow-sm">
