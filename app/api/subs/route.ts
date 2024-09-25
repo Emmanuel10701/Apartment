@@ -10,6 +10,15 @@ export async function POST(request: Request) {
   }
 
   try {
+    // Check if the email already exists
+    const existingSubscription = await prisma.subscription.findUnique({
+      where: { email },
+    });
+
+    if (existingSubscription) {
+      return NextResponse.json({ error: 'Email already exists.' }, { status: 409 }); // Conflict status
+    }
+
     // Create a new subscription
     const subscription = await prisma.subscription.create({
       data: {
@@ -20,14 +29,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Subscription successful!', subscription }, { status: 201 });
   } catch (error) {
     console.error('Error creating subscription:', error);
-    return NextResponse.json({ error: 'Subscription failed. Email might already exist.' }, { status: 500 });
+    return NextResponse.json({ error: 'Subscription failed. Please try again later.' }, { status: 500 });
   }
 }
 
 export async function GET() {
   try {
-    // Fetch all subscriptions
-    const subscriptions = await prisma.subscription.findMany();
+    // Fetch all subscriptions ordered from the latest to the oldest
+    const subscriptions = await prisma.subscription.findMany({
+      orderBy: {
+        createdAt: 'desc', // Assuming you have a `createdAt` field for timestamps
+      },
+    });
 
     return NextResponse.json(subscriptions, { status: 200 });
   } catch (error) {

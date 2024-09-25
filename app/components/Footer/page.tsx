@@ -2,20 +2,42 @@
 
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import { CircularProgress } from '@mui/material';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Footer: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLinkClick = (url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle email submission logic here
-    toast.success(`Email submitted: ${email}`);
-    setEmail('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/subs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit email');
+      }
+
+      const data = await response.json();
+      toast.success(`Email submitted: ${data.email}`);
+      setEmail('');
+    } catch (error) {
+      toast.error('Error submitting email. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,10 +62,19 @@ const Footer: React.FC = () => {
             placeholder="Enter your email" 
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="p-2 rounded-md border w-[100%] border-gray-300 space-x-5 gap-4 text-slate-700"
+            className="p-2 rounded-md border w-[70%] border-gray-300 text-slate-700"
             required
           />
-          <button type="submit" className="bg-blue-600 text-white p-2 rounded-md">Submit</button>
+          <button type="submit" className="bg-blue-600 text-white p-2 rounded-md ml-2">
+            {loading ? (
+              <span className="flex items-center">
+                <CircularProgress size={20} color="inherit" className="mr-2" />
+                Submitting...
+              </span>
+            ) : (
+              'Submit'
+            )}
+          </button>
         </form>
         
         <p className="text-lg font-semibold mb-4">Follow Us</p>
