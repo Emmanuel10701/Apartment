@@ -1,11 +1,8 @@
 "use client";
 
-import React, { useState, useEffect,useRef  } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaTimes } from "react-icons/fa";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Autocomplete } from '@react-google-maps/api';
-
 
 interface Apartment {
   title: string;
@@ -27,8 +24,8 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
   const [userLocation, setUserLocation] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-
 
   // Reset form when modal is closed
   useEffect(() => {
@@ -40,6 +37,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
       setOccupation("");
       setUserLocation("");
       setMessage("");
+      setSuccessMessage(null); // Reset success message
     }
   }, [isOpen]);
 
@@ -48,7 +46,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
 
     // Basic validation
     if (!name.trim() || !email.trim() || !message.trim()) {
-      toast.error("Name, email, and message are required.");
+      alert("Name, email, and message are required.");
       return;
     }
 
@@ -78,22 +76,18 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("Email sent successfully!");
+        setSuccessMessage("Email sent successfully!"); // Set success message
         // Reset form
-        setName("");
-        setEmail("");
-        setHouseType("");
-        setStarRating(0);
-        setOccupation("");
-        setUserLocation("");
-        setMessage("");
-        onClose();
+        setTimeout(() => {
+          onClose(); // Close modal after displaying message
+          setSuccessMessage(null); // Clear success message after closing
+        }, 2000); // Close modal after 2 seconds
       } else {
         throw new Error(data.error || "Failed to send email.");
       }
     } catch (error: any) {
       console.error("Error sending email:", error);
-      toast.error(error.message || "An error occurred.");
+      alert(error.message || "An error occurred.");
     } finally {
       setIsSending(false);
     }
@@ -121,6 +115,12 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
           </button>
 
           <h2 className="text-2xl font-semibold mb-4">Send Email</h2>
+
+          {successMessage && (
+            <div className="p-4 mb-4 text-green-700 bg-green-100 rounded">
+              {successMessage}
+            </div>
+          )}
 
           <form onSubmit={handleSendEmail} className="space-y-4">
             {/* Name Input */}
@@ -212,23 +212,22 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
             </div>
 
             {/* User Location Input */}
-           {/* User Location Input */}
-<div>
-  <label className="block text-sm font-medium text-gray-700 mb-1">
-    Your Location
-  </label>
-  <Autocomplete
-      >
-        <input
-          type="text"
-          value={userLocation}
-          onChange={(e) => setUserLocation(e.target.value)}
-          placeholder="Enter your location"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-          required
-        />
-      </Autocomplete>
-    </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Your Location
+              </label>
+              <Autocomplete>
+                <input
+                  type="text"
+                  value={userLocation}
+                  onChange={(e) => setUserLocation(e.target.value)}
+                  placeholder="Enter your location"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  required
+                />
+              </Autocomplete>
+            </div>
+
             {/* Message Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -245,11 +244,11 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end">
+            <div className="flex justify-end space-x-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="mr-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm"
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm"
               >
                 Cancel
               </button>
@@ -260,11 +259,17 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
                   isSending ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {isSending ? "Sending..." : "Send Email"}
+                {isSending ? (
+                  <>
+                    <span className="spinner-border animate-spin mr-2" role="status"></span>
+                    Sending...
+                  </>
+                ) : (
+                  "Send Email"
+                )}
               </button>
             </div>
           </form>
-          <ToastContainer />
         </div>
       </div>
     </>
