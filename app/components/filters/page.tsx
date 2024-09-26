@@ -127,32 +127,12 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
   };
 
   return (
-    <div className="bg-white shadow-md py-4 px-6 w-full z-50">
+    <div className="bg-white shadow-md py-4 px- my-4 w-full z-50">
       <ToastContainer />
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <Autocomplete>
-          <input
-            type="text"
-            value={search}
-            onChange={handleSearchChange}
-            placeholder="Search (e.g., 2 Bedroom)"
-            className="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </Autocomplete>
-
-        <Autocomplete>
-          <input
-            type="text"
-            value={location}
-            onChange={handleLocationChange}  // Handle location change
-            placeholder="Location (e.g., London, UK)"
-            className="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </Autocomplete>
-
+      <div className="flex flex-col sm:flex-row items-center justify-evenly gap-4">
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center justify-center w-full sm:w-48 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          className="flex items-center justify-center w-full sm:w-48 px-4 py-3 hover:outline-2 bg-slate-100 text-slate-500 rounded-md hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
         >
           <IoFilterSharp className="mr-2" />
           Filters
@@ -173,7 +153,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
               maxRent: maxRent !== '' ? Number(maxRent) : undefined,
             });
           }}
-          className={`w-full sm:w-48 px-3 py-1 border rounded-lg flex items-center justify-between focus:outline-none focus:ring-2 ${
+          className={`w-full sm:w-48 px-3 py-3 border rounded-md flex items-center justify-between focus:outline-2 hover:outline-2 focus:ring-2 ${
             sortOrder === 'ascending'
               ? 'bg-white text-blue-600 focus:ring-blue-500'
               : 'bg-red-100 text-red-600 focus:ring-red-500'
@@ -185,7 +165,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
 
         <button
           onClick={clearFilters}
-          className="w-full sm:w-48 px-4 py-2 bg-gray-500 text-white rounded-full hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm"
+          className="w-full sm:w-48 px-4 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-2 focus:ring-2 focus:ring-gray-500 text-sm"
         >
           Clear Filters
         </button>
@@ -285,6 +265,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
                   />
                 </div>
               </div>
+              <div className='flex gap-2 items-center justify-evenly'>
 
               <div className="mt-4">
                 <button
@@ -303,6 +284,10 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
                   Apply Filters
                 </button>
               </div>
+                
+              </div>
+
+             
             </div>
           </div>
         </div>

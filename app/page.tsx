@@ -8,7 +8,7 @@ import SearchNavbar from "./components/filters/page"; // Adjust this path
 import ApartmentCard from "./components/card/page"; // Adjust this path
 import { FaSatellite, FaMountain } from "react-icons/fa";
 
-const center = { lat: 48.8584, lng: 2.2945 };
+const center = { lat: 41.8781, lng: -87.6298 };
 
 interface Apartment {
   id: number;
@@ -20,7 +20,7 @@ interface Apartment {
   images: string[];
   phoneNumber: string;
   email: string;
-  address: string;
+  location: string;
 }
 
 const apartments: Apartment[] = [
@@ -36,7 +36,7 @@ const apartments: Apartment[] = [
     ],
     phoneNumber: "1234567890",
     email: "luxury@apartment.com",
-    address: "123 Luxury St, Beverly Hills, CA",
+    location: "123 Luxury St, Beverly Hills, CA",
   },
   // Add more apartments as needed
 ];
@@ -63,10 +63,10 @@ const MainComponent: React.FC = () => {
   const [isMapVisible, setIsMapVisible] = useState<boolean>(true);
   const [loadingMarkers, setLoadingMarkers] = useState(false);
 
-  const geocodeAddress = async (address: string): Promise<google.maps.LatLngLiteral> => {
+  const geocodeLocation = async (location: string): Promise<google.maps.LatLngLiteral> => {
     const geocoder = new google.maps.Geocoder();
     return new Promise<google.maps.LatLngLiteral>((resolve, reject) => {
-      geocoder.geocode({ address }, (results, status) => {
+      geocoder.geocode({ addreses: location }, (results, status) => {
         if (status === "OK" && results && results[0].geometry.location) {
           resolve(results[0].geometry.location.toJSON());
         } else {
@@ -82,10 +82,10 @@ const MainComponent: React.FC = () => {
       const newMarkers = await Promise.all(
         filteredApartments.map(async (apartment) => {
           try {
-            const location = await geocodeAddress(apartment.address);
+            const location = await geocodeLocation(apartment.location);
             return location;
           } catch (error) {
-            console.error(`Error geocoding address for ${apartment.title}:`, error);
+            console.error(`Error geocoding location for ${apartment.title}:`, error);
             return null;
           }
         })
@@ -93,7 +93,7 @@ const MainComponent: React.FC = () => {
       const validMarkers = newMarkers.filter(Boolean) as google.maps.LatLngLiteral[];
 
       if (validMarkers.length === 0) {
-        console.warn("No valid markers found. Check apartment addresses.");
+        console.warn("No valid markers found. Check apartment locations.");
       }
 
       setMarkers(validMarkers);
@@ -120,7 +120,7 @@ const MainComponent: React.FC = () => {
       filtered = filtered.filter(
         (apartment) =>
           apartment.title.toLowerCase().includes(lowercasedSearch) ||
-          apartment.address.toLowerCase().includes(lowercasedSearch) ||
+          apartment.location.toLowerCase().includes(lowercasedSearch) ||
           apartment.propertyType.toLowerCase().includes(lowercasedSearch)
       );
     }
@@ -158,10 +158,9 @@ const MainComponent: React.FC = () => {
     // Handle geocoding for the location filter
     if (filters.location) {
       try {
-        const location = await geocodeAddress(filters.location);
+        const location = await geocodeLocation(filters.location);
         // You might want to filter apartments based on proximity to the location here
         // For now, we just include it in the filtered apartments
-        // Assuming you want to return apartments nearby or within certain criteria
       } catch (error) {
         console.error(`Error geocoding location "${filters.location}":`, error);
       }
@@ -260,7 +259,7 @@ const MainComponent: React.FC = () => {
           </div>
         </div>
         <div
-          className={`md:w-1/3  w-full ${isMapVisible ? "hidden" : "block"} md:block fixed md:relative top-0 right-0 bottom-0 overflow-y-auto p-4 bg-white z-10`}
+          className={`md:w-1/3 w-full ${isMapVisible ? "hidden" : "block"} md:block fixed md:relative top-0 right-0 bottom-0 overflow-y-auto p-4 bg-white z-10`}
         >
           <h2 className="text-xl font-bold mb-4">Available Apartments</h2>
           {loadingMarkers && <CircularProgress />}
@@ -277,7 +276,7 @@ const MainComponent: React.FC = () => {
                   images={apartment.images}
                   phoneNumber={apartment.phoneNumber}
                   email={apartment.email}
-                  address={apartment.address}
+                  location={apartment.location}
                 />
               ))
             ) : (
@@ -285,7 +284,7 @@ const MainComponent: React.FC = () => {
             )}
             <Footer />
           </div>
-          <div className="md:hidden absolute bottom-4 left-4 z-10">
+          <div className="md:hidden absolute top-2 left-4 z-10">
             <Button variant="contained" color="secondary" onClick={() => setIsMapVisible(true)}>
               Show Map
             </Button>
