@@ -12,6 +12,7 @@ import apartmentsData from "../../../apartment/public/data.json"; // Adjust the 
 const center = { lat: 41.8781, lng: -87.6298 };
 
 interface Apartment {
+  id:number;
   title: string;          // Title of the apartment
   images: string[];       // Array of image URLs
   rating: number;         // Rating of the apartment
@@ -252,7 +253,7 @@ const MainComponent: React.FC = () => {
             {filteredApartments.length > 0 ? (
               filteredApartments.map((apartment) => (
                 <ApartmentCard
-                  key={apartment.title}
+                  key={apartment.id}
                   title={apartment.title}
                   minPrice={apartment.minPrice}
                   rentalType={apartment.rentalType}

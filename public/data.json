@@ -1,38 +1,136 @@
 [
-  {
-      "title": "Luxury Studio Apartment",
-      "images": [
-          "/images/ap2.jpg",
-          "/images/bed2.jpg",
-          "/images/int2.jpg",
-          "/images/kit2.webp"
-      ],
-      "rating": 4.5,
-      "location": "456 Elm St, Metropolis",
-      "availableRooms": 1,
-      "rentalType": "Studio",
-      "description": "A modern studio apartment with luxury amenities.",
-      "price": 1800,
-      "minPrice": 1700,
-      "phoneNumber": "1234567890",
-      "email": "luxury@apartment.com"
-  },
-  {
-      "title": "Cozy Apartment in City Center",
-      "images": [
-          "/images/ap11.webp",
-          "/images/bd1.jpg",
-          "/images/int3.jpeg",
-          "/images/kit1.webp"
-      ],
-      "rating": 4.0,
-      "location": "123 Main St, Cityville",
-      "availableRooms": 2,
-      "rentalType": "Condo",
-      "description": "This beautiful apartment offers stunning city views and is located near all amenities.",
-      "price": 1500,
-      "minPrice": 1400,
-      "phoneNumber": "0987654321",
-      "email": "cozy@apartment.com"
-  }
-]
+    {
+        "id": 1,
+        "title": "Luxury Studio Apartment",
+        "images": [
+            "/images/ap2.jpg",
+            "/images/bed2.jpg",
+            "/images/int2.jpg",
+            "/images/kit2.webp"
+        ],
+        "rating": 4.5,
+        "location": "456 Elm St, Metropolis",
+        "availableRooms": 1,
+        "rentalType": "Studio",
+        "description": "A modern studio apartment with luxury amenities.",
+        "price": 1800,
+        "minPrice": 1700,
+        "phoneNumber": "1234567890",
+        "email": "luxury@apartment.com"
+    },
+    {
+        "id": 2,
+        "title": "Cozy Apartment in City Center",
+        "images": [
+            "/images/ap11.webp",
+            "/images/bd1.jpg",
+            "/images/int3.jpeg",
+            "/images/kit1.webp"
+        ],
+        "rating": 4.0,
+        "location": "123 Main St, Cityville",
+        "availableRooms": 2,
+        "rentalType": "Condo",
+        "description": "This beautiful apartment offers stunning city views and is located near all amenities.",
+        "price": 1500,
+        "minPrice": 1400,
+        "phoneNumber": "0987654321",
+        "email": "cozy@apartment.com"
+    },
+    {
+        "id": 3,
+        "title": "Modern Two-Bedroom Apartment",
+        "images": [
+            "/images/ap3.jpg",
+            "/images/bed3.jpg",
+            "/images/int4.jpg",
+            "/images/kit3.webp"
+        ],
+        "rating": 4.2,
+        "location": "789 Oak St, Suburbia",
+        "availableRooms": 2,
+        "rentalType": "Apartment",
+        "description": "A spacious two-bedroom apartment perfect for families.",
+        "price": 2000,
+        "minPrice": 1900,
+        "phoneNumber": "2345678901",
+        "email": "modern@apartment.com"
+    },
+    {
+        "id": 4,
+        "title": "Charming Cottage Style Apartment",
+        "images": [
+            "/images/ap4.jpg",
+            "/images/bed4.jpg",
+            "/images/int5.jpg",
+            "/images/kit4.webp"
+        ],
+        "rating": 4.3,
+        "location": "321 Maple Ave, Countryside",
+        "availableRooms": 1,
+        "rentalType": "Cottage",
+        "description": "A cozy cottage-style apartment surrounded by nature.",
+        "price": 1600,
+        "minPrice": 1500,
+        "phoneNumber": "3456789012",
+        "email": "charming@apartment.com"
+    },
+    {
+        "id": 5,
+        "title": "Elegant Penthouse Suite",
+        "images": [
+            "/images/ap5.jpg",
+            "/images/bed5.jpg",
+            "/images/int6.jpg",
+            "/images/kit5.webp"
+        ],
+        "rating": 5.0,
+        "location": "555 High St, Cityview",
+        "availableRooms": 1,
+        "rentalType": "Penthouse",
+        "description": "An elegant penthouse suite with stunning views of the skyline.",
+        "price": 3000,
+        "minPrice": 2900,
+        "phoneNumber": "4567890123",
+        "email": "elegant@apartment.com"
+    },
+    {
+        "id": 6,
+        "title": "Sunny Beachfront Apartment",
+        "images": [
+            "/images/ap6.jpg",
+            "/images/bed6.jpg",
+            "/images/int7.jpg",
+            "/images/kit6.webp"
+        ],
+        "rating": 4.7,
+        "location": "789 Ocean Dr, Beachside",
+        "availableRooms": 2,
+        "rentalType": "Beachfront",
+        "description": "A sunny apartment right on the beach, perfect for vacations.",
+        "price": 2500,
+        "minPrice": 2400,
+        "phoneNumber": "5678901234",
+        "email": "sunny@apartment.com"
+    },
+    {
+        "id": 7,
+        "title": "Urban Loft Apartment",
+        "images": [
+            "/images/ap7.jpg",
+            "/images/bed7.jpg",
+            "/images/int8.jpg",
+            "/images/kit7.webp"
+        ],
+        "rating": 4.6,
+        "location": "101 Industrial St, Metropolis",
+        "availableRooms": 1,
+        "rentalType": "Loft",
+        "description": "An urban loft with high ceilings and an open floor plan.",
+        "price": 2200,
+        "minPrice": 2100,
+        "phoneNumber": "6789012345",
+        "email": "urban@apartment.com"
+    }
+  ]
+  

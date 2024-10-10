@@ -1,28 +1,34 @@
+// ApartmentCard component
+"use client"
 import { useState, useEffect } from 'react';
 import EmailModal from "../emailModal/page";
 import Image from 'next/image';
 import { FaStar, FaMapMarkerAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
 import apartmentsData from '../../../../apartment/public/data.json';
 
-// Define the Apartment type
+
 interface Apartment {
-    title: string;
-    images: string[];
-    rating: number;
-    location: string;
-    availableRooms: number;
-    rentalType: string;
-    description: string;
-    price: number;
-    minPrice: number;
-    email: string;
-}
+    id: number;           // Unique identifier for the apartment
+    title: string;          // Title of the apartment
+    images: string[];       // Array of image URLs
+    rating: number;         // Rating of the apartment
+    location: string;       // Address or location
+    availableRooms: number; // Number of available rooms
+    rentalType: string;     // Type of rental (e.g., Condo)
+    description: string;    // Description of the apartment
+    price: number;          // Current price for rental
+    minPrice: number;       // Minimum price for rental
+    phoneNumber: string;    // Contact phone number
+    email: string;          // Contact email address
+  }
 
 // ApartmentCard component
 const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
+    const router = useRouter(); // Initialize the router
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -54,9 +60,13 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
         window.location.href = `tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER}`;
     };
 
+    const handleImageClick = () => {
+        router.push(`/homepage/${apartment.id}`); // Navigate to the apartment detail page
+    };
+
     return (
         <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-            <div className="relative">
+            <div className="relative cursor-pointer" onClick={handleImageClick}> {/* Make the image clickable */}
                 <div className="flex justify-center">
                     <Image
                         className="w-full h-56 object-cover rounded-t-lg"
