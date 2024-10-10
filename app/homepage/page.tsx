@@ -3,50 +3,37 @@ import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
 import { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
-import Footer from "./components/Footer/page"; // Adjust this path
-import SearchNavbar from "./components/filters/page"; // Adjust this path
-import ApartmentCard from "./components/card/page"; // Adjust this path
+import Footer from "../components/Footer/page"; // Adjust this path
+import SearchNavbar from "../components/filters/page"; // Adjust this path
+import ApartmentCard from "../components/card/page"; // Adjust this path
 import { FaSatellite, FaMountain } from "react-icons/fa";
+import apartmentsData from "../../../apartment/public/data.json"; // Adjust the path to your data
 
 const center = { lat: 41.8781, lng: -87.6298 };
 
 interface Apartment {
-  id: number;
-  title: string;
-  minPrice: number;
-  rentalType: string;
-  starRating: number;
-  propertyType: string;
-  images: string[];
-  phoneNumber: string;
-  email: string;
-  location: string;
+  title: string;          // Title of the apartment
+  images: string[];       // Array of image URLs
+  rating: number;         // Rating of the apartment
+  location: string;       // Address or location
+  availableRooms: number; // Number of available rooms
+  rentalType: string;     // Type of rental (e.g., Condo)
+  description: string;    // Description of the apartment
+  price: number;          // Current price for rental
+  minPrice: number;       // Minimum price for rental
+  phoneNumber: string;    // Contact phone number
+  email: string;          // Contact email address
 }
 
-const apartments: Apartment[] = [
-  {
-    id: 1,
-    title: "Luxury Apartment",
-    minPrice: 1500,
-    rentalType: "Monthly",
-    starRating: 4,
-    propertyType: "Apartment",
-    images: [
-      "https://images.pexels.com/photos/1234567/pexels-photo-1234567.jpeg",
-    ],
-    phoneNumber: "1234567890",
-    email: "luxury@apartment.com",
-    location: "123 Luxury St, Beverly Hills, CA",
-  },
-  // Add more apartments as needed
-];
+
 
 interface SearchFilters {
   search: string;
-  location?: string; // Added location property
+  location: string;  
   minRent?: number;
   maxRent?: number;
   rentalType?: string;
+  sortOrder?: string;
   starRating?: number;
   propertyType?: string;
 }
@@ -59,14 +46,14 @@ const MainComponent: React.FC = () => {
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [markers, setMarkers] = useState<google.maps.LatLngLiteral[]>([]);
-  const [filteredApartments, setFilteredApartments] = useState<Apartment[]>(apartments);
+  const [filteredApartments, setFilteredApartments] = useState<Apartment[]>(apartmentsData);
   const [isMapVisible, setIsMapVisible] = useState<boolean>(true);
   const [loadingMarkers, setLoadingMarkers] = useState(false);
 
   const geocodeLocation = async (location: string): Promise<google.maps.LatLngLiteral> => {
     const geocoder = new google.maps.Geocoder();
     return new Promise<google.maps.LatLngLiteral>((resolve, reject) => {
-      geocoder.geocode({ addreses: location }, (results, status) => {
+      geocoder.geocode({ address: location }, (results, status) => {
         if (status === "OK" && results && results[0].geometry.location) {
           resolve(results[0].geometry.location.toJSON());
         } else {
@@ -113,64 +100,62 @@ const MainComponent: React.FC = () => {
   }, [filteredApartments]);
 
   const handleSearch = async (filters: SearchFilters) => {
-    let filtered = apartments;
-
+    let filtered = apartmentsData;
+  
     if (filters.search) {
       const lowercasedSearch = filters.search.toLowerCase();
       filtered = filtered.filter(
         (apartment) =>
           apartment.title.toLowerCase().includes(lowercasedSearch) ||
           apartment.location.toLowerCase().includes(lowercasedSearch) ||
-          apartment.propertyType.toLowerCase().includes(lowercasedSearch)
+          apartment.rentalType.toLowerCase().includes(lowercasedSearch)
       );
     }
-
+  
     if (filters.rentalType) {
       filtered = filtered.filter(
         (apartment) => apartment.rentalType === filters.rentalType
       );
     }
-
+  
     if (filters.starRating !== undefined && filters.starRating > 0) {
       filtered = filtered.filter(
-        (apartment) => apartment.starRating >= filters.starRating!
+        (apartment) => apartment.rating >= filters.starRating
       );
     }
-
+  
     if (filters.propertyType) {
       filtered = filtered.filter(
-        (apartment) => apartment.propertyType === filters.propertyType
+        (apartment) => apartment.rentalType === filters.propertyType
       );
     }
-
+  
     if (filters.minRent !== undefined && filters.maxRent !== undefined) {
       filtered = filtered.filter(
         (apartment) =>
-          apartment.minPrice >= filters.minRent! &&
-          apartment.minPrice <= filters.maxRent!
+          apartment.minPrice >= filters.minRent &&
+          apartment.minPrice <= filters.maxRent
       );
-    } else if (filters.minRent !== undefined) {
-      filtered = filtered.filter((apartment) => apartment.minPrice >= filters.minRent!);
     } else if (filters.maxRent !== undefined) {
-      filtered = filtered.filter((apartment) => apartment.minPrice <= filters.maxRent!);
+      filtered = filtered.filter((apartment) => apartment.minPrice >= filters.minRent);
+    } else if (filters.maxRent !== undefined) {
+      filtered = filtered.filter((apartment) => apartment.minPrice <= filters.maxRent);
     }
-
+  
     // Handle geocoding for the location filter
     if (filters.location) {
       try {
-        const location = await geocodeLocation(filters.location);
-        // You might want to filter apartments based on proximity to the location here
-        // For now, we just include it in the filtered apartments
+        await geocodeLocation(filters.location);
       } catch (error) {
         console.error(`Error geocoding location "${filters.location}":`, error);
       }
     }
-
+  
     setFilteredApartments(filtered);
   };
-
+  
   const clearSearch = () => {
-    setFilteredApartments(apartments);
+    setFilteredApartments(apartmentsData);
   };
 
   const setMapType = (type: google.maps.MapTypeId) => {
@@ -267,12 +252,12 @@ const MainComponent: React.FC = () => {
             {filteredApartments.length > 0 ? (
               filteredApartments.map((apartment) => (
                 <ApartmentCard
-                  key={apartment.id}
-                  name={apartment.title}
+                  key={apartment.title}
+                  title={apartment.title}
                   minPrice={apartment.minPrice}
                   rentalType={apartment.rentalType}
-                  starRating={apartment.starRating}
-                  propertyType={apartment.propertyType}
+                  starRating={apartment.rating}
+                  propertyType={apartment.rentalType}
                   images={apartment.images}
                   phoneNumber={apartment.phoneNumber}
                   email={apartment.email}

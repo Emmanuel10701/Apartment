@@ -1,17 +1,17 @@
-"use client"
+"use client"; // Ensure this component runs on the client side
+
 import React from 'react';
 import Testimony from "../app/components/testimony/page";
 import { FaUser, FaSearch, FaFileAlt, FaBriefcase, FaHome, FaKey } from 'react-icons/fa';
 import Link from 'next/link';
-import Image from 'next/image'; // Import Next.js Image component
-import stepsBg from'./../public/assets/bg1.png';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import stepsBg from './../public/assets/bg1.png';
 import heroImage from './../public/assets/bg1.png';
-import icon from'./../public/assets/bg2.webp';
-// Offers
+import icon from './../public/assets/bg2.webp';
 import Offer1 from './../public/assets/bed11.jpeg';
 import Offer2 from './../public/assets/ling.jpeg';
 import Offer3 from './../public/assets/kitchen1.jpeg';
-
 
 const MyPage: React.FC = () => {
   const stepsData = [
@@ -41,7 +41,7 @@ const MyPage: React.FC = () => {
     },
   ];
 
-  const Offers = [
+  const offers = [
     {
       id: '1',
       title: 'Expert Advice',
@@ -62,10 +62,12 @@ const MyPage: React.FC = () => {
     },
   ];
 
+  const router = useRouter();
+
   return (
     <div className="font-poppins">
       {/* Navigation */}
-      <header className="relative text-center py-16 bg-purple-50">
+      <header className="relative text-center py-16 bg-cover bg-center" style={{ backgroundImage: "url('/images/f.avif')" }}>
         <div className="mx-4 md:mx-40 mt-20 flex flex-col-reverse md:flex-row items-center">
           <div className="md:w-1/2">
             <h2 className="inline-flex items-center justify-center gap-2 px-4 py-2 mb-4 text-orange-500 bg-orange-100 rounded-full">
@@ -138,7 +140,7 @@ const MyPage: React.FC = () => {
           </p>
 
           <div className="flex flex-wrap justify-center gap-6">
-            {Offers.map((offer, index) => (
+            {offers.map((offer, index) => (
               <div
                 key={index}
                 className="flex flex-col items-center p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition-transform duration-500 transform hover:scale-103 w-full sm:w-1/2 lg:w-1/4"
@@ -160,6 +162,16 @@ const MyPage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Homepage Navigation Button */}
+      <div className="flex justify-center my-8">
+        <button
+          onClick={() => router.push('/homepage')}
+          className="bg-transparent border-2 border-blue-600 text-blue-600 font-semibold py-2 px-4 rounded-full transition duration-300 ease-in-out hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
+        >
+          Go to Homepage
+        </button>
+      </div>
 
       <div className='mt-10 flex items-center justify-center'>
         <Testimony />
