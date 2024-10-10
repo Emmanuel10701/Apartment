@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { AiOutlineUser } from 'react-icons/ai';
+import { CircularProgress } from '@mui/material';
 import Modal from '../components/modal2/page'; // Create a Modal component for login/register
 
 interface PropertyFormValues {
@@ -52,6 +53,7 @@ const PropertyForm: React.FC = () => {
     apartmentImage: '',
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -63,16 +65,50 @@ const PropertyForm: React.FC = () => {
         : value,
     }));
   };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session) {
       setIsModalOpen(true);
       return;
     }
-    console.log('Form submitted:', formValues);
-    // Add your submission logic here
+
+    setIsSubmitting(true);
+
+    const imagesArray = [
+      formValues.kitchenImage,
+      formValues.livingRoomImage,
+      formValues.bedroomImage,
+      formValues.apartmentImage,
+    ].filter(image => image); // Filter out any empty image URLs
+
+    const propertyData = {
+      ...formValues,
+      images: imagesArray,
+    };
+
+    try {
+      const response = await fetch('http://localhost:3000/api/Apartment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(propertyData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Handle success (reset form or show a success message)
+      console.log('Property submitted:', propertyData);
+      handleCancel(); // Reset the form
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   const handleCancel = () => {
     setFormValues({
@@ -286,20 +322,26 @@ const PropertyForm: React.FC = () => {
         </div>
 
         <div className="flex justify-between mt-4">
-          <button 
-            type="button" 
-            onClick={handleCancel} 
-            className="w-1/3 p-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Cancel
-          </button>
-          <button 
-            type="submit" 
-            className="w-1/3 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Submit
-          </button>
-        </div>
+      <button
+        type="button"
+        onClick={handleCancel}
+        className="w-1/3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition duration-200"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        onClick={handleSubmit}
+        className="relative w-1/3 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? (
+          <CircularProgress size={24} className="absolute left-1/2 transform -translate-x-1/2" />
+        ) : (
+          'Submit'
+        )}
+      </button>
+    </div>
       </form>
 
       {/* Modal for login/register */}
