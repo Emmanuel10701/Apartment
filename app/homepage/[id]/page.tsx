@@ -1,7 +1,7 @@
 // /pages/apartments/[id].tsx
 "use client"
 import { useRouter } from 'next/router';
-import apartments from '../../app/components/data/page'; // Adjust the path as necessary
+import apartments from '../../components/data/page'; // Adjust the path as necessary
 import Image from 'next/image';
 import { FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 
