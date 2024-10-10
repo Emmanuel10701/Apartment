@@ -44,7 +44,6 @@
     "react-slick": "^0.30.2",
     "react-toastify": "^10.0.5",
     "slick-carousel": "^1.8.1",
-    "swiper": "^11.1.14",
     "swr": "^2.2.5",
     "zod": "^3.23.8"
   },
