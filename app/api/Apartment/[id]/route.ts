@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
-import prisma from '../../../../libs/prisma'; // Adjust the path to your Prisma instance
+import prisma from '../../../../libs/prisma';
 
-// GET: Fetch a specific apartment by ID
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+// GET: Fetch a single apartment by ID
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
 
   try {
     const apartment = await prisma.apartment.findUnique({
-      where: { id: String(id) }, // Assuming the ID is numeric
+      where: { id: String(id) },
     });
 
     if (!apartment) {
@@ -22,32 +23,21 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // PUT: Update an existing apartment
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function PUT(req: Request) {
+  const { id, ...data } = await req.json();
 
   try {
-    const data = await req.json();
-    const { name, minPrice, maxPrice, rentalType, starRating, propertyType, images, phoneNumber, email, address } = data;
+    const apartmentExists = await prisma.apartment.findUnique({
+      where: { id: String(id) },
+    });
 
-    // Validation can be added here as needed
-    if (!name || !minPrice || !maxPrice || !rentalType || !propertyType || !email) {
-      return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+    if (!apartmentExists) {
+      return NextResponse.json({ message: 'Apartment not found' }, { status: 404 });
     }
 
     const updatedApartment = await prisma.apartment.update({
       where: { id: String(id) },
-      data: {
-        name,
-        minPrice,
-        maxPrice,
-        rentalType,
-        starRating,
-        propertyType,
-        images,
-        phoneNumber,
-        email,
-        address,
-      },
+      data,
     });
 
     return NextResponse.json(updatedApartment, { status: 200 });
@@ -58,15 +48,24 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 }
 
 // DELETE: Delete an apartment
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function DELETE(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
 
   try {
+    const apartmentExists = await prisma.apartment.findUnique({
+      where: { id: String(id) },
+    });
+
+    if (!apartmentExists) {
+      return NextResponse.json({ message: 'Apartment not found' }, { status: 404 });
+    }
+
     await prisma.apartment.delete({
       where: { id: String(id) },
     });
 
-    return NextResponse.json({ message: 'Apartment deleted successfully' }, { status: 204 });
+    return NextResponse.json({ message: 'Apartment deleted successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error deleting apartment:', error);
     return NextResponse.json({ message: 'Error deleting apartment' }, { status: 500 });
