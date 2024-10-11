@@ -69,43 +69,53 @@ const ApartmentDetail = () => {
     }
 
     if (!apartment) {
-        return <div>No apartment found.</div>;
-    }
+        return (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-3xl font-bold bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">
+              No apartment found.
+            </div>
+          </div>
+        );
+      }
+      
 
     return (
         <div className="max-w-full mx-auto p-4">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-500 via-blue-500 to-blue-600 bg-clip-text text-transparent">
                 {apartment.title}
             </h1>
-            <div className="relative flex">
-                <div className="flex gap-6 p-8">
-                    <Image
-                        src={mainImage || apartment.images[0]}
-                        alt={apartment.title}
-                        width={800}
-                        height={500}
-                        className="rounded-lg col-span-1 row-span-2 cursor-pointer mt-4"
-                    />
-                    <div className="flex gap-6 p-8 flex-col">
-                        {apartment.images.map((image, index) => {
-                            if (index !== imageIndex) {
-                                return (
-                                    <Image
-                                        src={image}
-                                        alt={apartment.title}
-                                        width={400}
-                                        height={300}
-                                        className="rounded-lg cursor-pointer"
-                                        key={index}
-                                        onClick={() => handleImageClick(index)}
-                                    />
-                                );
-                            }
-                            return null;
-                        })}
-                    </div>
-                </div>
+            <div className="relative flex-col gap-2">
+  <div className="md:flex flex-col gap-3 p-4 md:gap-6 md:p-8">
+    <Image
+      src={mainImage || apartment.images[0]}
+      alt={apartment.title}
+      width={800}
+      height={500}
+      className="rounded-lg cursor-pointer mt-4 md:w-full md:h-[500px]" // Full width on medium screens and height adjustment
+    />
+    <div className="flex flex-wrap p-3 gap-3 md:gap-6 md:p-8">
+      {apartment.images.map((image, index) => {
+        if (index !== imageIndex) {
+          return (
+            <div className="flex-1">
+              <Image
+                src={image}
+                alt={apartment.title}
+                width={400}
+                height={300}
+                className="rounded-lg cursor-pointer w-full h-full object-cover" // Ensure the image covers the area
+                key={index}
+                onClick={() => handleImageClick(index)}
+              />
             </div>
+          );
+        }
+        return null;
+      })}
+    </div>
+  </div>
+</div>
+
             <div className='md:w-[70%] mx-auto w-full shadow-lg rounded-lg'>
                 <div className="p-4 bg-white">
                     <div className="flex items-center mt-2">
