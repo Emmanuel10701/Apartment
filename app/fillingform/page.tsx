@@ -1,8 +1,6 @@
-// components/PropertyForm.tsx
-"use client"
+"use client";
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { AiOutlineUser } from 'react-icons/ai';
 import { CircularProgress } from '@mui/material';
 import Modal from '../components/modal2/page'; // Create a Modal component for login/register
 
@@ -17,16 +15,16 @@ interface PropertyFormValues {
   email: string;
   address: string;
   userId: string; 
-  kitchenImage: string; 
-  livingRoomImage: string; 
-  bedroomImage: string; 
-  apartmentImage: string; 
+  kitchenImage: File | null; 
+  livingRoomImage: File | null; 
+  bedroomImage: File | null; 
+  apartmentImage: File | null; 
 }
 
 declare module 'next-auth' {
   interface Session {
     user: {
-      id: string; // Ensure id property exists
+      id: string; 
       name?: string | null;
       email?: string | null;
       image?: string | null;
@@ -46,69 +44,83 @@ const PropertyForm: React.FC = () => {
     phoneNumber: '',
     email: '',
     address: '',
-    userId: session?.user?.id || '', // Safe access to user id
-    kitchenImage: '',
-    livingRoomImage: '',
-    bedroomImage: '',
-    apartmentImage: '',
+    userId: session?.user?.id || '',
+    kitchenImage: null,
+    livingRoomImage: null,
+    bedroomImage: null,
+    apartmentImage: null,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormValues((prev) => ({
-      ...prev,
-      [name]: name === 'minPrice' || name === 'maxPrice' || name === 'starRating'
-        ? Number(value)
-        : value,
-    }));
+    const { name, value, type } = e.target;
+
+    if (type === 'file') {
+      const files = (e.target as HTMLInputElement).files;
+      setFormValues((prev) => ({
+        ...prev,
+        [name]: files ? files[0] : null,
+      }));
+    } else {
+      setFormValues((prev) => ({
+        ...prev,
+        [name]: name === 'minPrice' || name === 'maxPrice' || name === 'starRating'
+          ? Number(value)
+          : value,
+      }));
+    }
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session) {
       setIsModalOpen(true);
       return;
     }
-
+  
     setIsSubmitting(true);
-
-    const imagesArray = [
-      formValues.kitchenImage,
-      formValues.livingRoomImage,
-      formValues.bedroomImage,
-      formValues.apartmentImage,
-    ].filter(image => image); // Filter out any empty image URLs
-
-    const propertyData = {
-      ...formValues,
-      images: imagesArray,
-    };
+    setFeedbackMessage('');
+  
+    const formData = new FormData();
+    formData.append('name', formValues.name);
+    formData.append('minPrice', formValues.minPrice.toString());
+    formData.append('maxPrice', formValues.maxPrice.toString());
+    formData.append('rentalType', formValues.rentalType);
+    formData.append('starRating', formValues.starRating.toString());
+    formData.append('propertyType', formValues.propertyType);
+    formData.append('phoneNumber', formValues.phoneNumber);
+    formData.append('email', formValues.email);
+    formData.append('address', formValues.address);
+    formData.append('userId', session.user.id);
+    
+    if (formValues.kitchenImage) formData.append('kitchenImage', formValues.kitchenImage);
+    if (formValues.livingRoomImage) formData.append('livingRoomImage', formValues.livingRoomImage);
+    if (formValues.bedroomImage) formData.append('bedroomImage', formValues.bedroomImage);
+    if (formValues.apartmentImage) formData.append('apartmentImage', formValues.apartmentImage);
 
     try {
-      const response = await fetch('http://localhost:3000/api/Apartment', {
+      const response = await fetch('/api/Apartment', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(propertyData),
+        body: formData,
       });
-
+  
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to submit property');
       }
-
-      // Handle success (reset form or show a success message)
-      console.log('Property submitted:', propertyData);
+  
+      setFeedbackMessage('Property submitted successfully!');
       handleCancel(); // Reset the form
     } catch (error) {
       console.error('Error submitting form:', error);
+      setFeedbackMessage('Error submitting property: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setIsSubmitting(false);
     }
   };
-
 
   const handleCancel = () => {
     setFormValues({
@@ -122,29 +134,20 @@ const PropertyForm: React.FC = () => {
       email: '',
       address: '',
       userId: session?.user?.id || '',
-      kitchenImage: '',
-      livingRoomImage: '',
-      bedroomImage: '',
-      apartmentImage: '',
+      kitchenImage: null,
+      livingRoomImage: null,
+      bedroomImage: null,
+      apartmentImage: null,
     });
   };
 
   return (
     <div className="max-w-4xl mx-auto p-4 border border-gray-300 rounded-md bg-white shadow-md">
-      {/* Image placeholders */}
-      <div className="flex justify-center mb-4">
-        <img src={formValues.kitchenImage || "/images/kitchen_placeholder.jpg"} alt="Kitchen" className="w-1/4 h-auto rounded-lg shadow-lg mx-2" />
-        <img src={formValues.livingRoomImage || "/images/livingroom_placeholder.jpg"} alt="Living Room" className="w-1/4 h-auto rounded-lg shadow-lg mx-2" />
-        <img src={formValues.bedroomImage || "/images/bedroom_placeholder.jpg"} alt="Bedroom" className="w-1/4 h-auto rounded-lg shadow-lg mx-2" />
-        <img src={formValues.apartmentImage || "/images/apartment_placeholder.jpg"} alt="Apartment" className="w-1/4 h-auto rounded-lg shadow-lg mx-2" />
-      </div>
-
       <h2 className="text-2xl mb-4">Property Details</h2>
-
       <form onSubmit={handleSubmit}>
-        {/* Property Details Section */}
+        {/* Property Name */}
         <div className="mb-6">
-          <label className="block mb-1" htmlFor="name">Property Name</label>
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="name">Property Name</label>
           <input
             type="text"
             id="name"
@@ -152,12 +155,13 @@ const PropertyForm: React.FC = () => {
             value={formValues.name}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
           />
         </div>
 
+        {/* Price Inputs */}
         <div className="mb-6">
-          <label className="block mb-1" htmlFor="minPrice">Minimum Price</label>
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="minPrice">Minimum Price</label>
           <input
             type="number"
             id="minPrice"
@@ -165,12 +169,12 @@ const PropertyForm: React.FC = () => {
             value={formValues.minPrice}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
           />
         </div>
 
         <div className="mb-6">
-          <label className="block mb-1" htmlFor="maxPrice">Maximum Price</label>
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="maxPrice">Maximum Price</label>
           <input
             type="number"
             id="maxPrice"
@@ -178,74 +182,85 @@ const PropertyForm: React.FC = () => {
             value={formValues.maxPrice}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
           />
         </div>
 
+        {/* Rental Type Dropdown */}
         <div className="mb-6">
-          <label className="block mb-1" htmlFor="rentalType">Rental Type</label>
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="rentalType">Rental Type</label>
           <select
             id="rentalType"
             name="rentalType"
             value={formValues.rentalType}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
           >
             <option value="">Select rental type</option>
-            <option value="Loft">Loft</option>
-            <option value="Penthouse">Penthouse</option>
-            <option value="Townhouse">Townhouse</option>
-            <option value="Apartment">Apartment</option>
+            <option value="Studio">Studio</option>
+            <option value="One-bedroom">1 Bedroom</option>
+            <option value="Two-bedrooms">2 Bedrooms</option>
+            <option value="Three-bedrooms">3 Bedrooms</option>
+            <option value="Four-bedrooms">4+ Bedrooms</option>
           </select>
         </div>
 
+        {/* Star Rating Dropdown */}
         <div className="mb-6">
-          <label className="block mb-1" htmlFor="starRating">Star Rating</label>
-          <input
-            type="number"
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="starRating">Star Rating</label>
+          <select
             id="starRating"
             name="starRating"
             value={formValues.starRating}
             onChange={handleChange}
-            min="1"
-            max="5"
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-          />
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+          >
+            <option value="0">Select Star Rating</option>
+            {[1, 2, 3, 4, 5].map((rating) => (
+              <option key={rating} value={rating}>{rating} Star{rating > 1 ? 's' : ''}</option>
+            ))}
+          </select>
         </div>
 
-        {/* Contact Information Section */}
-        <h2 className="text-2xl mb-4">Contact Information</h2>
-
+        {/* Property Type Dropdown */}
         <div className="mb-6">
-          <label className="block mb-1" htmlFor="propertyType">Property Type</label>
-          <input
-            type="text"
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="propertyType">Property Type</label>
+          <select
             id="propertyType"
             name="propertyType"
             value={formValues.propertyType}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-          />
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+          >
+            <option value="">Select Property Type</option>
+            <option value="Apartment">Apartment</option>
+            <option value="House">House</option>
+            <option value="Condo">Condo</option>
+            <option value="Loft">Loft</option>
+          </select>
         </div>
 
+        {/* Contact Information */}
+        <h2 className="text-2xl mb-4">Contact Information</h2>
+
         <div className="mb-6">
-          <label className="block mb-1" htmlFor="phoneNumber">Phone Number</label>
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="phoneNumber">Phone Number</label>
           <input
-            type="text"
+            type="tel"
             id="phoneNumber"
             name="phoneNumber"
             value={formValues.phoneNumber}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
           />
         </div>
 
         <div className="mb-6">
-          <label className="block mb-1" htmlFor="email">Email</label>
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="email">Email</label>
           <input
             type="email"
             id="email"
@@ -253,12 +268,12 @@ const PropertyForm: React.FC = () => {
             value={formValues.email}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
           />
         </div>
 
         <div className="mb-6">
-          <label className="block mb-1" htmlFor="address">Address</label>
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="address">Address</label>
           <input
             type="text"
             id="address"
@@ -266,83 +281,53 @@ const PropertyForm: React.FC = () => {
             value={formValues.address}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
           />
         </div>
 
         {/* Image Uploads Section */}
         <h2 className="text-2xl mb-4">Upload Images</h2>
 
-        <div className="mb-6">
-          <label className="block mb-1" htmlFor="kitchenImage">Kitchen Image URL</label>
-          <input
-            type="text"
-            id="kitchenImage"
-            name="kitchenImage"
-            value={formValues.kitchenImage}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-1" htmlFor="livingRoomImage">Living Room Image URL</label>
-          <input
-            type="text"
-            id="livingRoomImage"
-            name="livingRoomImage"
-            value={formValues.livingRoomImage}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-1" htmlFor="bedroomImage">Bedroom Image URL</label>
-          <input
-            type="text"
-            id="bedroomImage"
-            name="bedroomImage"
-            value={formValues.bedroomImage}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-1" htmlFor="apartmentImage">Apartment Image URL</label>
-          <input
-            type="text"
-            id="apartmentImage"
-            name="apartmentImage"
-            value={formValues.apartmentImage}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-          />
-        </div>
+        {['kitchenImage', 'livingRoomImage', 'bedroomImage', 'apartmentImage'].map((imageField) => (
+          <div className="mb-6" key={imageField}>
+            <label className="block mb-1 focus-within:text-blue-600" htmlFor={imageField}>
+              {imageField.replace('Image', ' Image').replace(/([A-Z])/g, ' $1').trim()}
+            </label>
+            <input
+              type="file"
+              id={imageField}
+              name={imageField}
+              accept="image/*"
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+            />
+          </div>
+        ))}
 
         <div className="flex justify-between mt-4">
-      <button
-        type="button"
-        onClick={handleCancel}
-        className="w-1/3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition duration-200"
-      >
-        Cancel
-      </button>
-      <button
-        type="submit"
-        onClick={handleSubmit}
-        className="relative w-1/3 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200"
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? (
-          <CircularProgress size={24} className="absolute left-1/2 transform -translate-x-1/2" />
-        ) : (
-          'Submit'
-        )}
-      </button>
-    </div>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="w-1/3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition duration-200"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="relative w-1/3 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <CircularProgress size={24} className="absolute left-1/2 transform -translate-x-1/2" />
+            ) : (
+              'Submit'
+            )}
+          </button>
+        </div>
       </form>
+
+      {/* Feedback Message */}
+      {feedbackMessage && <div className="mt-4 text-red-600">{feedbackMessage}</div>}
 
       {/* Modal for login/register */}
       {isModalOpen && <Modal onClose={() => setIsModalOpen(false)} />}

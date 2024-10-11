@@ -1,4 +1,5 @@
 "use client";
+
 import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
 import { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -12,21 +13,19 @@ import apartmentsData from "../../../apartment/public/data.json"; // Adjust the 
 const center = { lat: 41.8781, lng: -87.6298 };
 
 interface Apartment {
-  id:number;
-  title: string;          // Title of the apartment
-  images: string[];       // Array of image URLs
-  rating: number;         // Rating of the apartment
-  location: string;       // Address or location
-  availableRooms: number; // Number of available rooms
-  rentalType: string;     // Type of rental (e.g., Condo)
-  description: string;    // Description of the apartment
-  price: number;          // Current price for rental
-  minPrice: number;       // Minimum price for rental
-  phoneNumber: string;    // Contact phone number
-  email: string;          // Contact email address
+  id: number;
+  title: string;
+  images: string[];
+  rating: number;
+  location: string;
+  availableRooms: number;
+  rentalType: string;
+  description: string;
+  price: number;
+  minPrice: number;
+  phoneNumber: string;
+  email: string;
 }
-
-
 
 interface SearchFilters {
   search: string;
@@ -119,9 +118,9 @@ const MainComponent: React.FC = () => {
       );
     }
   
-    if (filters.starRating !== undefined && filters.starRating > 0) {
+    if (filters.starRating !== undefined) {
       filtered = filtered.filter(
-        (apartment) => apartment.rating >= filters.starRating
+        (apartment) => apartment.rating >= (filters.starRating ?? 0) // Use 0 if starRating is undefined
       );
     }
   
@@ -131,16 +130,12 @@ const MainComponent: React.FC = () => {
       );
     }
   
-    if (filters.minRent !== undefined && filters.maxRent !== undefined) {
-      filtered = filtered.filter(
-        (apartment) =>
-          apartment.minPrice >= filters.minRent &&
-          apartment.minPrice <= filters.maxRent
-      );
-    } else if (filters.maxRent !== undefined) {
-      filtered = filtered.filter((apartment) => apartment.minPrice >= filters.minRent);
-    } else if (filters.maxRent !== undefined) {
-      filtered = filtered.filter((apartment) => apartment.minPrice <= filters.maxRent);
+    if (filters.minRent !== undefined || filters.maxRent !== undefined) {
+      filtered = filtered.filter((apartment) => {
+        const isAboveMin = filters.minRent !== undefined ? apartment.minPrice >= filters.minRent : true;
+        const isBelowMax = filters.maxRent !== undefined ? apartment.minPrice <= filters.maxRent : true;
+        return isAboveMin && isBelowMax;
+      });
     }
   
     // Handle geocoding for the location filter
@@ -154,6 +149,7 @@ const MainComponent: React.FC = () => {
   
     setFilteredApartments(filtered);
   };
+  
   
   const clearSearch = () => {
     setFilteredApartments(apartmentsData);
@@ -254,6 +250,7 @@ const MainComponent: React.FC = () => {
               filteredApartments.map((apartment) => (
                 <ApartmentCard
                   key={apartment.id}
+                  id={apartment.id}
                   title={apartment.title}
                   minPrice={apartment.minPrice}
                   rentalType={apartment.rentalType}

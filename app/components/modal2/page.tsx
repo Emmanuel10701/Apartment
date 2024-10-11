@@ -1,6 +1,6 @@
-// components/Modal.tsx
 import React, { useState } from 'react';
 import { Button, CircularProgress } from '@mui/material';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 interface ModalProps {
   onClose: () => void;
@@ -8,6 +8,7 @@ interface ModalProps {
 
 const Modal: React.FC<ModalProps> = ({ onClose }) => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const router = useRouter(); // Initialize useRouter
 
   const handleLogin = () => {
     setIsProcessing(true);
@@ -16,6 +17,9 @@ const Modal: React.FC<ModalProps> = ({ onClose }) => {
       console.log('User logged in'); // Add your login logic here
       setIsProcessing(false);
       onClose(); // Close modal after processing
+
+      // Redirect to the desired route after login
+      router.push('/login'); // Change '/desired-route' to the route you want to navigate to
     }, 2000);
   };
 

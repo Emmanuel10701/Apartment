@@ -1,8 +1,8 @@
+// app/layout.tsx
 import { Inter } from 'next/font/google';
-import SessionProviderWrapper from '../app/sessionwraper/page'; // Import the new wrapper
-import Footer from './components/Footer/page'; // Adjust the path as needed
-import Navbar from './components/Navbar/page'; // Adjust the path as needed
-import './globals.css'; // Adjust the path as needed
+import SessionProviderWrapper from '../app/sessionwraper/page'; // Import the session wrapper
+import ClientLayout from './clientLayout'; // Import the ClientLayout
+import './globals.css'; // Import global styles
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,9 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={inter.className}>
         <SessionProviderWrapper>
-          <Navbar />
-          <main>{children}</main>
-         <Footer /> 
+          <ClientLayout>{children}</ClientLayout> {/* Use ClientLayout here */}
         </SessionProviderWrapper>
       </body>
     </html>
