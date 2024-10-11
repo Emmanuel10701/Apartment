@@ -15,10 +15,7 @@ interface PropertyFormValues {
   email: string;
   address: string;
   userId: string; 
-  kitchenImage: File | null; 
-  livingRoomImage: File | null; 
-  bedroomImage: File | null; 
-  apartmentImage: File | null; 
+  images: File[]; // Changed to an array
 }
 
 declare module 'next-auth' {
@@ -36,8 +33,8 @@ const PropertyForm: React.FC = () => {
   const { data: session } = useSession();
   const [formValues, setFormValues] = useState<PropertyFormValues>({
     name: '',
-    minPrice: 0,
-    maxPrice: 0,
+    minPrice: 67,
+    maxPrice: 776,
     rentalType: '',
     starRating: 0,
     propertyType: '',
@@ -45,10 +42,7 @@ const PropertyForm: React.FC = () => {
     email: '',
     address: '',
     userId: session?.user?.id || '',
-    kitchenImage: null,
-    livingRoomImage: null,
-    bedroomImage: null,
-    apartmentImage: null,
+    images: [], // Initialize as empty array
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,10 +54,12 @@ const PropertyForm: React.FC = () => {
 
     if (type === 'file') {
       const files = (e.target as HTMLInputElement).files;
-      setFormValues((prev) => ({
-        ...prev,
-        [name]: files ? files[0] : null,
-      }));
+      if (files) {
+        setFormValues((prev) => ({
+          ...prev,
+          images: [...prev.images, ...Array.from(files)], // Add selected files to array
+        }));
+      }
     } else {
       setFormValues((prev) => ({
         ...prev,
@@ -80,10 +76,10 @@ const PropertyForm: React.FC = () => {
       setIsModalOpen(true);
       return;
     }
-  
+
     setIsSubmitting(true);
     setFeedbackMessage('');
-  
+
     const formData = new FormData();
     formData.append('name', formValues.name);
     formData.append('minPrice', formValues.minPrice.toString());
@@ -96,22 +92,22 @@ const PropertyForm: React.FC = () => {
     formData.append('address', formValues.address);
     formData.append('userId', session.user.id);
     
-    if (formValues.kitchenImage) formData.append('kitchenImage', formValues.kitchenImage);
-    if (formValues.livingRoomImage) formData.append('livingRoomImage', formValues.livingRoomImage);
-    if (formValues.bedroomImage) formData.append('bedroomImage', formValues.bedroomImage);
-    if (formValues.apartmentImage) formData.append('apartmentImage', formValues.apartmentImage);
+    // Append images as an array
+    formValues.images.forEach((image) => {
+      formData.append('images', image);
+    });
 
     try {
       const response = await fetch('/api/Apartment', {
         method: 'POST',
         body: formData,
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to submit property');
       }
-  
+
       setFeedbackMessage('Property submitted successfully!');
       handleCancel(); // Reset the form
     } catch (error) {
@@ -125,8 +121,8 @@ const PropertyForm: React.FC = () => {
   const handleCancel = () => {
     setFormValues({
       name: '',
-      minPrice: 0,
-      maxPrice: 0,
+      minPrice: 67,
+      maxPrice: 776,
       rentalType: '',
       starRating: 0,
       propertyType: '',
@@ -134,10 +130,7 @@ const PropertyForm: React.FC = () => {
       email: '',
       address: '',
       userId: session?.user?.id || '',
-      kitchenImage: null,
-      livingRoomImage: null,
-      bedroomImage: null,
-      apartmentImage: null,
+      images: [], // Reset images
     });
   };
 
@@ -155,13 +148,13 @@ const PropertyForm: React.FC = () => {
             value={formValues.name}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
         </div>
 
         {/* Price Inputs */}
         <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="minPrice">Minimum Price</label>
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="minPrice">Minimum Price ($)</label>
           <input
             type="number"
             id="minPrice"
@@ -169,12 +162,12 @@ const PropertyForm: React.FC = () => {
             value={formValues.minPrice}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
         </div>
 
         <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="maxPrice">Maximum Price</label>
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="maxPrice">Maximum Price ($)</label>
           <input
             type="number"
             id="maxPrice"
@@ -182,7 +175,7 @@ const PropertyForm: React.FC = () => {
             value={formValues.maxPrice}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
         </div>
 
@@ -195,7 +188,7 @@ const PropertyForm: React.FC = () => {
             value={formValues.rentalType}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
           >
             <option value="">Select rental type</option>
             <option value="Studio">Studio</option>
@@ -215,7 +208,7 @@ const PropertyForm: React.FC = () => {
             value={formValues.starRating}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
           >
             <option value="0">Select Star Rating</option>
             {[1, 2, 3, 4, 5].map((rating) => (
@@ -233,7 +226,7 @@ const PropertyForm: React.FC = () => {
             value={formValues.propertyType}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
           >
             <option value="">Select Property Type</option>
             <option value="Apartment">Apartment</option>
@@ -255,7 +248,7 @@ const PropertyForm: React.FC = () => {
             value={formValues.phoneNumber}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
         </div>
 
@@ -268,7 +261,7 @@ const PropertyForm: React.FC = () => {
             value={formValues.email}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
         </div>
 
@@ -281,7 +274,7 @@ const PropertyForm: React.FC = () => {
             value={formValues.address}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
         </div>
 
@@ -299,7 +292,8 @@ const PropertyForm: React.FC = () => {
               name={imageField}
               accept="image/*"
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition duration-200"
+              multiple // Allow multiple file uploads
+              className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
             />
           </div>
         ))}

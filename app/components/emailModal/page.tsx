@@ -110,8 +110,9 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
             <FaTimes size={20} />
           </button>
 
-          <h2 className="text-2xl font-semibold mb-4">Send Email</h2>
-
+          <h2 className="text-2xl text-center font-semibold mb-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-transparent bg-clip-text">
+            Send Email
+          </h2>
           {successMessage && (
             <div className="p-4 mb-4 text-green-700 bg-green-100 rounded">
               {successMessage}

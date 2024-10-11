@@ -10,22 +10,21 @@ import ApartmentCard from "../components/card/page"; // Adjust this path
 import { FaSatellite, FaMountain } from "react-icons/fa";
 import apartmentsData from '../../../apartment/public/data.json'; // Importing JSON data
 
-
 const center = { lat: 41.8781, lng: -87.6298 };
 
 interface Apartment {
-    id: number;           // Unique identifier for the apartment
-    title: string;       // Title of the apartment
-    images: string[];    // Array of image URLs
-    rating: number;      // Rating of the apartment
-    location: string;    // Address or location
-    availableRooms: number; // Number of available rooms
-    rentalType: string;  // Type of rental (e.g., Condo)
-    description: string; // Description of the apartment
-    price: number;       // Current price for rental
-    minPrice: number;    // Minimum price for rental
-    phoneNumber: string; // Contact phone number
-    email: string;       // Contact email address
+    id: number;
+    title: string;
+    images: string[];
+    rating: number;
+    location: string;
+    availableRooms: number;
+    rentalType: string;
+    description: string;
+    price: number;
+    minPrice: number;
+    phoneNumber: string;
+    email: string;
 }
 
 interface SearchFilters {
@@ -125,7 +124,7 @@ const MainComponent: React.FC<MainComponentProps> = ({ apartments }) => {
 
         if (filters.starRating !== undefined) {
             filtered = filtered.filter(
-                (apartment) => apartment.rating >= (filters.starRating ?? 0)
+                (apartment) => apartment.rating === (filters.starRating ?? 0)
             );
         }
 
@@ -196,7 +195,7 @@ const MainComponent: React.FC<MainComponentProps> = ({ apartments }) => {
             <SearchNavbar onSearch={handleSearch} />
             <div className="flex flex-col md:flex-row h-screen relative">
                 <div
-                    className={`md:w-2/3 w-full ${isMapVisible ?  "fixed" : "hidden"} md:hidded fixed md:relative top-0 mt-40 left-0 right-0 bottom-0 z-0`}
+                    className={`md:w-2/3 w-full ${isMapVisible ? "fixed" : "hidden"} md:hidded fixed md:relative top-0 mt-40 md:mt-10 left-0 right-0 bottom-0 z-0`}
                 >
                     <GoogleMap
                         center={center}
@@ -237,9 +236,8 @@ const MainComponent: React.FC<MainComponentProps> = ({ apartments }) => {
                             Clear
                         </Button>
                     </div>
-                    <Button  onClick={() => setIsMapVisible(false)} className="absolute top-4 right-4 z-10  md:hidden rounded-full  bg-white border border-blue-500 hover:outline-2 ">
-                            Show Apartments
-                        
+                    <Button onClick={() => setIsMapVisible(false)} className="absolute top-4 right-4 z-10 md:hidden rounded-full bg-white border border-blue-500 hover:outline-2">
+                        Show Apartments
                     </Button>
                 </div>
 
@@ -252,18 +250,18 @@ const MainComponent: React.FC<MainComponentProps> = ({ apartments }) => {
                     <div className="grid grid-cols-1 gap-4 place-items-center mx-auto">
                         {filteredApartments.length > 0 ? (
                             filteredApartments.map((apartment) => (
-                              <ApartmentCard
-                              key={apartment.id}
-                              title={apartment.title}
-                              minPrice={apartment.minPrice}
-                              rentalType={apartment.rentalType}
-                              starRating={apartment.rating}
-                              propertyType={apartment.rentalType}
-                              images={apartment.images}
-                              phoneNumber={apartment.phoneNumber}
-                              email={apartment.email}
-                              location={apartment.location}
-                          />
+                                <ApartmentCard
+                                    key={apartment.id}
+                                    title={apartment.title}
+                                    minPrice={apartment.minPrice}
+                                    rentalType={apartment.rentalType}
+                                    starRating={apartment.rating}
+                                    propertyType={apartment.rentalType}
+                                    images={apartment.images}
+                                    phoneNumber={apartment.phoneNumber}
+                                    email={apartment.email}
+                                    location={apartment.location}
+                                />
                             ))
                         ) : (
                             <div className="flex items-center justify-center h-full">
@@ -274,8 +272,8 @@ const MainComponent: React.FC<MainComponentProps> = ({ apartments }) => {
                         )}
                         <Footer />
                     </div>
-                    <Button onClick={() => setIsMapVisible(true)} className="md:hidden bg-white absolute rounded-full   border border-blue-500 hover:outline-2  top-2 right-4 z-10">
-                            Show Map
+                    <Button onClick={() => setIsMapVisible(true)} className="md:hidden bg-white absolute rounded-full border border-blue-500 hover:outline-2 top-2 right-4 z-10">
+                        Show Map
                     </Button>
                 </div>
             </div>

@@ -1,73 +1,80 @@
-import { NextResponse } from 'next/server';
-import prisma from '../../../../libs/prisma';
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '../../../../libs/prisma'; // Adjust this path to your Prisma instance
 
-// GET: Fetch a single apartment by ID
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get('id');
+// GET: Retrieve a single apartment by ID
+export async function GET(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const id = pathname.split('/').pop(); // Extract the apartment ID from the URL
 
-  try {
-    const apartment = await prisma.apartment.findUnique({
-      where: { id: String(id) },
-    });
-
-    if (!apartment) {
-      return NextResponse.json({ message: 'Apartment not found' }, { status: 404 });
-    }
-
-    return NextResponse.json(apartment, { status: 200 });
-  } catch (error) {
-    console.error('Error fetching apartment:', error);
-    return NextResponse.json({ message: 'Error fetching apartment' }, { status: 500 });
+  if (!id) {
+    return new NextResponse(
+      JSON.stringify({ message: 'ID is required' }),
+      { status: 400 }
+    );
   }
+
+  const apartment = await prisma.apartment.findUnique({
+    where: { id: String(id) },
+  });
+
+  if (!apartment) {
+    return new NextResponse(
+      JSON.stringify({ message: 'Apartment not found' }),
+      { status: 404 }
+    );
+  }
+
+  return NextResponse.json(apartment);
 }
 
-// PUT: Update an existing apartment
-export async function PUT(req: Request) {
-  const { id, ...data } = await req.json();
+// PUT: Update an apartment by ID
+export async function PUT(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const id = pathname.split('/').pop(); // Extract the apartment ID from the URL
+  const body = await req.json();
 
-  try {
-    const apartmentExists = await prisma.apartment.findUnique({
-      where: { id: String(id) },
-    });
-
-    if (!apartmentExists) {
-      return NextResponse.json({ message: 'Apartment not found' }, { status: 404 });
-    }
-
-    const updatedApartment = await prisma.apartment.update({
-      where: { id: String(id) },
-      data,
-    });
-
-    return NextResponse.json(updatedApartment, { status: 200 });
-  } catch (error) {
-    console.error('Error updating apartment:', error);
-    return NextResponse.json({ message: 'Error updating apartment' }, { status: 500 });
+  if (!id) {
+    return new NextResponse(
+      JSON.stringify({ message: 'ID is required' }),
+      { status: 400 }
+    );
   }
+
+  const updatedApartment = await prisma.apartment.update({
+    where: { id: String(id) },
+    data: {
+      name: body.name,
+      minPrice: body.minPrice,
+      maxPrice: body.maxPrice,
+      rentalType: body.rentalType,
+      starRating: body.starRating,
+      propertyType: body.propertyType,
+      images: body.images,
+      phoneNumber: body.phoneNumber,
+      email: body.email,
+      address: body.address,
+      userId: body.userId,  // Ensure user ID exists in the User model
+    },
+  });
+
+  return NextResponse.json(updatedApartment);
 }
 
-// DELETE: Delete an apartment
-export async function DELETE(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get('id');
+// DELETE: Delete an apartment by ID
+export async function DELETE(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const id = pathname.split('/').pop(); // Extract the apartment ID from the URL
 
-  try {
-    const apartmentExists = await prisma.apartment.findUnique({
-      where: { id: String(id) },
-    });
-
-    if (!apartmentExists) {
-      return NextResponse.json({ message: 'Apartment not found' }, { status: 404 });
-    }
-
-    await prisma.apartment.delete({
-      where: { id: String(id) },
-    });
-
-    return NextResponse.json({ message: 'Apartment deleted successfully' }, { status: 200 });
-  } catch (error) {
-    console.error('Error deleting apartment:', error);
-    return NextResponse.json({ message: 'Error deleting apartment' }, { status: 500 });
+  if (!id) {
+    return new NextResponse(
+      JSON.stringify({ message: 'ID is required' }),
+      { status: 400 }
+    );
   }
+
+  await prisma.apartment.delete({
+    where: { id: String(id) },
+  });
+
+  return new NextResponse(null, { status: 204 });
 }

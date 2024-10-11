@@ -1,5 +1,5 @@
-// ApartmentCard component
-"use client"
+// ApartmentCard.tsx
+"use client";
 import { useState, useEffect } from 'react';
 import EmailModal from "../emailModal/page";
 import Image from 'next/image';
@@ -7,35 +7,37 @@ import { FaStar, FaMapMarkerAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import apartmentsData from '../../../../apartment/public/data.json';
 
-
 interface Apartment {
     id: number;           // Unique identifier for the apartment
-    title: string;          // Title of the apartment
-    images: string[];       // Array of image URLs
-    rating: number;         // Rating of the apartment
-    location: string;       // Address or location
+    title: string;       // Title of the apartment
+    images: string[];    // Array of image URLs
+    rating: number;      // Rating of the apartment
+    location: string;    // Address or location
     availableRooms: number; // Number of available rooms
-    rentalType: string;     // Type of rental (e.g., Condo)
-    description: string;    // Description of the apartment
-    price: number;          // Current price for rental
-    minPrice: number;       // Minimum price for rental
-    phoneNumber: string;    // Contact phone number
-    email: string;          // Contact email address
-  }
+    rentalType: string;  // Type of rental (e.g., Condo)
+    description: string; // Description of the apartment
+    price: number;       // Current price for rental
+    minPrice: number;    // Minimum price for rental
+    phoneNumber: string; // Contact phone number
+    email: string;       // Contact email address
+}
 
-// ApartmentCard component
-const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
+interface ApartmentCardProps {
+    apartment: Apartment;
+}
+
+const ApartmentCard: React.FC<ApartmentCardProps> = ({ apartment }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
-    const router = useRouter(); // Initialize the router
+    const router = useRouter();
 
     useEffect(() => {
         const intervalId = setInterval(() => {
             setCurrentIndex((prevIndex) => (prevIndex + 1) % apartment.images.length);
-        }, 3000); // Change image every 3 seconds
+        }, 3000);
 
-        return () => clearInterval(intervalId); // Cleanup on unmount
+        return () => clearInterval(intervalId);
     }, [apartment.images.length]);
 
     const handleEmailClick = () => {
@@ -57,16 +59,16 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
     };
 
     const handleCallClick = () => {
-        window.location.href = `tel:${process.env.NEXT_PUBLIC_PHONE_NUMBER}`;
+        window.location.href = `tel:${apartment.phoneNumber}`;
     };
 
     const handleImageClick = () => {
-        router.push(`/homepage/${apartment.id}`); // Navigate to the apartment detail page
+        router.push(`/homepage/${apartment.id}`);
     };
 
     return (
-        <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow -z-100  duration-300">
-            <div className="relative cursor-pointer" onClick={handleImageClick}> {/* Make the image clickable */}
+        <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            <div className="relative cursor-pointer" onClick={handleImageClick}>
                 <div className="flex justify-center">
                     <Image
                         className="w-full h-56 object-cover rounded-t-lg"
@@ -119,13 +121,13 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
 };
 
 // ApartmentList component with pagination
-const ApartmentList = () => {
+const ApartmentList: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [apartments, setApartments] = useState<Apartment[]>([]);
-    const itemsPerPage = 5; // Number of items per page
+    const itemsPerPage = 5;
 
     useEffect(() => {
-        setApartments(apartmentsData); // Assuming apartmentsData is fetched from a JSON file
+        setApartments(apartmentsData);
     }, []);
 
     const totalPages = Math.ceil(apartments.length / itemsPerPage);
@@ -139,8 +141,8 @@ const ApartmentList = () => {
     return (
         <div>
             <div className="grid grid-cols-1 gap-4">
-                {displayedApartments.map((apartment, index) => (
-                    <ApartmentCard key={index} apartment={apartment} />
+                {displayedApartments.map((apartment) => (
+                    <ApartmentCard key={apartment.id} apartment={apartment} />
                 ))}
             </div>
             <div className="flex justify-center mt-4">
