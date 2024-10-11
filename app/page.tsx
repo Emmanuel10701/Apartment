@@ -84,17 +84,42 @@ const MyPage: React.FC = () => {
             </p>
 
             <div className="flex justify-center gap-4">
-              <Link href="/post-listing">
+              <Link href="/dashboard">
                 <button className="px-8 py-3 font-medium text-white bg-purple-600 rounded-full hover:bg-purple-700 transition duration-300">
                   Post a Listing
                 </button>
               </Link>
-              <Link href="/find-home">
+              <Link href="/homepage">
                 <button className="px-8 py-3 font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-300">
                   Find a Home
                 </button>
               </Link>
             </div>
+            {/* Statistics Section */}
+<div className="max-w-7xl mx-auto w-full mt-16">
+    <h2 className="text-3xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
+        Our Statistics
+    </h2>
+    <div className="flex bg-white flex-wrap justify-center">
+        <div className="flex-1 p-3 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
+            <h3 className="text-3xl font-bold text-purple-600">150k</h3>
+            <p className="text-slate-700 font-bold">Happy Tenants</p>
+        </div>
+        <div className="flex-1 p-3 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
+            <h3 className="text-3xl font-bold text-green-600">75M+</h3>
+            <p className="text-slate-700 font-bold">Rental Transactions</p>
+        </div>
+        <div className="flex-1 p-3 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
+            <h3 className="text-3xl font-bold text-blue-600">50k</h3>
+            <p className="text-slate-700 font-bold">Student Accommodations</p>
+        </div>
+        <div className="flex-1 p-3 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
+            <h3 className="text-3xl font-bold text-red-600">300k</h3>
+            <p className="text-slate-700 font-bold">Listings Available</p>
+        </div>
+    </div>
+</div>
+
           </div>
 
           <div className="md:w-1/2">

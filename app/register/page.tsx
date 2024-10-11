@@ -126,26 +126,6 @@ const RegisterPage: React.FC = () => {
                 "Sign Up"
               )}
             </button>
-
-            <div className="mt-8 text-center">
-              <p className="text-lg font-semibold mb-4">Or sign up with</p>
-              <div className="flex justify-center space-x-8">
-                <div className="flex flex-col items-center">
-                  <FaGithub
-                    onClick={() => handleSocialLogin('GitHub')}
-                    className="text-gray-800 text-2xl cursor-pointer hover:text-gray-600"
-                  />
-                  <span className="text-gray-600 mt-2">GitHub</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <FaGoogle
-                    onClick={() => handleSocialLogin('Google')}
-                    className="text-red-600 text-2xl cursor-pointer hover:text-red-400"
-                  />
-                  <span className="text-red-600 mt-2">Google</span>
-                </div>
-              </div>
-            </div>
             
             <div className="text-center mt-4">
               Already have an account?

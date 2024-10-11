@@ -3,8 +3,6 @@ import React, { useState, useEffect } from "react";
 import {
   FaEnvelope,
   FaLock,
-  FaGithub,
-  FaGoogle,
   FaEye,
   FaEyeSlash,
 } from "react-icons/fa";
@@ -14,11 +12,6 @@ import { toast, ToastContainer } from "react-toastify";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import "react-toastify/dist/ReactToastify.css";
-
-const providers = [
-  { name: "GitHub", icon: <FaGithub />, id: "github" },
-  { name: "Google", icon: <FaGoogle />, id: "google" },
-];
 
 const LoginPage: React.FC = () => {
   const { data: session } = useSession();
@@ -79,7 +72,7 @@ const LoginPage: React.FC = () => {
         <div className="w-full max-w-xl p-12 bg-white shadow-lg rounded-lg mb-8">
           <h2 className="text-4xl font-extrabold text-center mb-6 text-slate-600">
             🔒 Login
-          </h2>         
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">
@@ -132,31 +125,14 @@ const LoginPage: React.FC = () => {
                 "Sign In"
               )}
             </button>
-
-            <div className="mt-8 text-center">
-              <p className="text-lg font-semibold mb-4">Or log in with</p>
-              <div className="flex justify-center space-x-8">
-                {providers.map(({ name, icon, id }) => (
-                  <div key={id} className="flex flex-col items-center">
-                    <div
-                      onClick={() => handleSocialLogin(id)}
-                      className="text-2xl cursor-pointer hover:text-gray-600"
-                    >
-                      {icon}
-                    </div>
-                    <span className="text-gray-600 mt-2">{name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="text-center mt-4">
-              Don&apos;t have an account?
-              <Link href="/register">
-                <span className="text-blue-500 hover:underline"> Register</span>
-              </Link>
-            </div>
           </form>
+
+          <div className="text-center mt-4">
+            Don&apos;t have an account?
+            <Link href="/register">
+              <span className="text-blue-500 hover:underline"> Register</span>
+            </Link>
+          </div>
 
           <ToastContainer />
         </div>

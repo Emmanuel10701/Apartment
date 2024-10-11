@@ -170,10 +170,10 @@ const ApartmentDetail = () => {
                                     height={100}
                                     className="rounded-lg"
                                 />
-                                            <h3 className="font-bold text-2xl mt-2 bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">
+                              <h3 className="font-bold text-lg mt-2 bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">
                     {relatedApartment.title}
                     </h3>
-                    <p className="font-bold text-xl text-gray-800">${relatedApartment.price}/month</p>
+                    <p className="font-bold text-md text-gray-800">${relatedApartment.price}/month</p>
                </div>
                         </Link>
                     );
