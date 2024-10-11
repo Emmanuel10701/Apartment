@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
-import { Autocomplete } from '@react-google-maps/api';
 
 interface Apartment {
   title: string;
@@ -25,7 +24,6 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
   const [message, setMessage] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   // Reset form when modal is closed
   useEffect(() => {
@@ -37,7 +35,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
       setOccupation("");
       setUserLocation("");
       setMessage("");
-      setSuccessMessage(null); // Reset success message
+      setSuccessMessage(null);
     }
   }, [isOpen]);
 
@@ -76,12 +74,11 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
       const data = await response.json();
 
       if (response.ok) {
-        setSuccessMessage("Email sent successfully!"); // Set success message
-        // Reset form
+        setSuccessMessage("Email sent successfully!");
         setTimeout(() => {
-          onClose(); // Close modal after displaying message
-          setSuccessMessage(null); // Clear success message after closing
-        }, 2000); // Close modal after 2 seconds
+          onClose();
+          setSuccessMessage(null);
+        }, 2000);
       } else {
         throw new Error(data.error || "Failed to send email.");
       }
@@ -103,10 +100,9 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
       ></div>
       <div className="fixed inset-0 flex items-center justify-center z-50">
         <div
-          className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative overflow-y-auto max-h-[90vh]"
+          className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl relative overflow-y-auto max-h-[90vh]"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close Button */}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 focus:outline-none"
@@ -123,7 +119,6 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
           )}
 
           <form onSubmit={handleSendEmail} className="space-y-4">
-            {/* Name Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Your Name
@@ -133,12 +128,11 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your name"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200 shadow-md hover:shadow-lg"
                 required
               />
             </div>
 
-            {/* Email Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Your Email
@@ -148,12 +142,11 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200 shadow-md hover:shadow-lg"
                 required
               />
             </div>
 
-            {/* House Type Selector */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 House Type
@@ -161,7 +154,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
               <select
                 value={houseType}
                 onChange={(e) => setHouseType(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200 shadow-md hover:shadow-lg"
                 required
               >
                 <option value="">Select House Type</option>
@@ -173,7 +166,6 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
               </select>
             </div>
 
-            {/* Star Rating Selector */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Star Rating
@@ -181,7 +173,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
               <select
                 value={starRating}
                 onChange={(e) => setStarRating(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200 shadow-md hover:shadow-lg"
                 required
               >
                 <option value={0}>Select Star Rating</option>
@@ -193,7 +185,6 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
               </select>
             </div>
 
-            {/* Occupation Selector */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Occupation
@@ -201,7 +192,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
               <select
                 value={occupation}
                 onChange={(e) => setOccupation(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200 shadow-md hover:shadow-lg"
                 required
               >
                 <option value="">Select Occupation</option>
@@ -211,24 +202,20 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
               </select>
             </div>
 
-            {/* User Location Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Your Location
               </label>
-              <Autocomplete>
-                <input
-                  type="text"
-                  value={userLocation}
-                  onChange={(e) => setUserLocation(e.target.value)}
-                  placeholder="Enter your location"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  required
-                />
-              </Autocomplete>
+              <input
+                type="text"
+                value={userLocation}
+                onChange={(e) => setUserLocation(e.target.value)}
+                placeholder="Enter your location"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200 shadow-md hover:shadow-lg"
+                required
+              />
             </div>
 
-            {/* Message Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Message
@@ -238,12 +225,11 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) =
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Enter your message"
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200 shadow-md hover:shadow-lg"
                 required
               ></textarea>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex justify-end space-x-2">
               <button
                 type="button"
