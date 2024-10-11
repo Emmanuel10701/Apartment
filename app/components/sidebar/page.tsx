@@ -12,7 +12,6 @@ export interface LinkItem {
 
 const LINKS: LinkItem[] = [
   { name: 'Home', href: '/', icon: <FaHome className="text-blue-500" /> },
-  { name: 'About Us', href: '/about', icon: <FaInfoCircle className="text-yellow-500" /> },
   { name: 'Contact', href: '/contact', icon: <FaPhone className="text-red-500" /> },
   { name: 'Dashboard', href: '/dashboard', icon: <FaTachometerAlt className="text-purple-500" /> },
 ];

@@ -65,7 +65,7 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
     };
 
     return (
-        <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+        <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow -z-100  duration-300">
             <div className="relative cursor-pointer" onClick={handleImageClick}> {/* Make the image clickable */}
                 <div className="flex justify-center">
                     <Image
@@ -122,7 +122,7 @@ const ApartmentCard = ({ apartment }: { apartment: Apartment }) => {
 const ApartmentList = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [apartments, setApartments] = useState<Apartment[]>([]);
-    const itemsPerPage = 10; // Number of items per page
+    const itemsPerPage = 5; // Number of items per page
 
     useEffect(() => {
         setApartments(apartmentsData); // Assuming apartmentsData is fetched from a JSON file
