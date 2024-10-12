@@ -49,11 +49,14 @@ export async function PUT(req: NextRequest) {
       rentalType: body.rentalType,
       starRating: body.starRating,
       propertyType: body.propertyType,
-      images: body.images,
+      kitchenImage: body.kitchenImage, // Separate fields for each image
+      livingRoomImage: body.livingRoomImage,
+      bedroomImage: body.bedroomImage,
+      apartmentImage: body.apartmentImage,
       phoneNumber: body.phoneNumber,
       email: body.email,
       address: body.address,
-      userId: body.userId,  // Ensure user ID exists in the User model
+      userId: body.userId, // Ensure user ID exists in the User model
     },
   });
 

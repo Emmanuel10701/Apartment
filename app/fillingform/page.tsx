@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import axios from 'axios';
 import { CircularProgress } from '@mui/material';
 import Modal from '../components/modal2/page'; // Create a Modal component for login/register
 
@@ -15,7 +16,10 @@ interface PropertyFormValues {
   email: string;
   address: string;
   userId: string; 
-  images: File[]; // Changed to an array
+  kitchenImage?: File | null; // Separate fields for each image
+  livingRoomImage?: File | null;
+  bedroomImage?: File | null;
+  apartmentImage?: File | null;
 }
 
 declare module 'next-auth' {
@@ -42,7 +46,10 @@ const PropertyForm: React.FC = () => {
     email: '',
     address: '',
     userId: session?.user?.id || '',
-    images: [], // Initialize as empty array
+    kitchenImage: null,
+    livingRoomImage: null,
+    bedroomImage: null,
+    apartmentImage: null,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,13 +60,11 @@ const PropertyForm: React.FC = () => {
     const { name, value, type } = e.target;
 
     if (type === 'file') {
-      const files = (e.target as HTMLInputElement).files;
-      if (files) {
-        setFormValues((prev) => ({
-          ...prev,
-          images: [...prev.images, ...Array.from(files)], // Add selected files to array
-        }));
-      }
+      const file = (e.target as HTMLInputElement).files?.[0] || null; // Get the first file
+      setFormValues((prev) => ({
+        ...prev,
+        [name]: file, // Set the specific image field
+      }));
     } else {
       setFormValues((prev) => ({
         ...prev,
@@ -76,10 +81,10 @@ const PropertyForm: React.FC = () => {
       setIsModalOpen(true);
       return;
     }
-
+  
     setIsSubmitting(true);
     setFeedbackMessage('');
-
+  
     const formData = new FormData();
     formData.append('name', formValues.name);
     formData.append('minPrice', formValues.minPrice.toString());
@@ -91,25 +96,28 @@ const PropertyForm: React.FC = () => {
     formData.append('email', formValues.email);
     formData.append('address', formValues.address);
     formData.append('userId', session.user.id);
-    
-    // Append images as an array
-    formValues.images.forEach((image) => {
-      formData.append('images', image);
-    });
-
+  
+    // Append each image separately
+    if (formValues.kitchenImage) formData.append('kitchenImage', formValues.kitchenImage);
+    if (formValues.livingRoomImage) formData.append('livingRoomImage', formValues.livingRoomImage);
+    if (formValues.bedroomImage) formData.append('bedroomImage', formValues.bedroomImage);
+    if (formValues.apartmentImage) formData.append('apartmentImage', formValues.apartmentImage);
+  
     try {
-      const response = await fetch('/api/Apartment', {
-        method: 'POST',
-        body: formData,
+      // Using Axios to send the request
+      const response = await axios.post('/api/Apartment', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Set the appropriate header
+        },
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to submit property');
+  
+      // Check if the response is successful
+      if (response.status === 200) {
+        setFeedbackMessage('Property submitted successfully!');
+        handleCancel(); // Reset the form
+      } else {
+        throw new Error('Failed to submit property');
       }
-
-      setFeedbackMessage('Property submitted successfully!');
-      handleCancel(); // Reset the form
     } catch (error) {
       console.error('Error submitting form:', error);
       setFeedbackMessage('Error submitting property: ' + (error instanceof Error ? error.message : 'Unknown error'));
@@ -130,7 +138,10 @@ const PropertyForm: React.FC = () => {
       email: '',
       address: '',
       userId: session?.user?.id || '',
-      images: [], // Reset images
+      kitchenImage: null, // Reset images to null
+      livingRoomImage: null,
+      bedroomImage: null,
+      apartmentImage: null,
     });
   };
 
@@ -229,16 +240,13 @@ const PropertyForm: React.FC = () => {
             className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
           >
             <option value="">Select Property Type</option>
-            <option value="Apartment">Apartment</option>
             <option value="House">House</option>
+            <option value="Apartment">Apartment</option>
             <option value="Condo">Condo</option>
-            <option value="Loft">Loft</option>
           </select>
         </div>
 
         {/* Contact Information */}
-        <h2 className="text-2xl mb-4">Contact Information</h2>
-
         <div className="mb-6">
           <label className="block mb-1 focus-within:text-blue-600" htmlFor="phoneNumber">Phone Number</label>
           <input
@@ -278,52 +286,75 @@ const PropertyForm: React.FC = () => {
           />
         </div>
 
-        {/* Image Uploads Section */}
-        <h2 className="text-2xl mb-4">Upload Images</h2>
-
-        {['kitchenImage', 'livingRoomImage', 'bedroomImage', 'apartmentImage'].map((imageField) => (
-          <div className="mb-6" key={imageField}>
-            <label className="block mb-1 focus-within:text-blue-600" htmlFor={imageField}>
-              {imageField.replace('Image', ' Image').replace(/([A-Z])/g, ' $1').trim()}
-            </label>
-            <input
-              type="file"
-              id={imageField}
-              name={imageField}
-              accept="image/*"
-              onChange={handleChange}
-              multiple // Allow multiple file uploads
-              className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-            />
-          </div>
-        ))}
-
-        <div className="flex justify-between mt-4">
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="w-1/3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition duration-200"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="relative w-1/3 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <CircularProgress size={24} className="absolute left-1/2 transform -translate-x-1/2" />
-            ) : (
-              'Submit'
-            )}
-          </button>
+        {/* Image Uploads */}
+        <div className="mb-6">
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="kitchenImage">Kitchen Image</label>
+          <input
+            type="file"
+            id="kitchenImage"
+            name="kitchenImage"
+            onChange={handleChange}
+            accept="image/*"
+            required
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+          />
         </div>
+
+        <div className="mb-6">
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="livingRoomImage">Living Room Image</label>
+          <input
+            type="file"
+            id="livingRoomImage"
+            name="livingRoomImage"
+            onChange={handleChange}
+            accept="image/*"
+            required
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+          />
+        </div>
+
+        <div className="mb-6">
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="bedroomImage">Bedroom Image</label>
+          <input
+            type="file"
+            id="bedroomImage"
+            name="bedroomImage"
+            onChange={handleChange}
+            accept="image/*"
+            required
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+          />
+        </div>
+
+        <div className="mb-6">
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="apartmentImage">Apartment Image</label>
+          <input
+            type="file"
+            id="apartmentImage"
+            name="apartmentImage"
+            onChange={handleChange}
+            accept="image/*"
+            required
+            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+          />
+        </div>
+
+        {/* Feedback Message */}
+        {feedbackMessage && (
+          <div className="mb-4 text-green-600">{feedbackMessage}</div>
+        )}
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full p-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200"
+        >
+          {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Property'}
+        </button>
       </form>
 
-      {/* Feedback Message */}
-      {feedbackMessage && <div className="mt-4 text-red-600">{feedbackMessage}</div>}
-
-      {/* Modal for login/register */}
+      {/* Modal for Login/Register */}
       {isModalOpen && <Modal onClose={() => setIsModalOpen(false)} />}
     </div>
   );

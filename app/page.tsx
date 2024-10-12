@@ -85,12 +85,12 @@ const MyPage: React.FC = () => {
 
             <div className="flex justify-center gap-4">
               <Link href="/dashboard">
-                <button className="px-8 py-3 font-medium text-white bg-purple-600 rounded-full hover:bg-purple-700 transition duration-300">
+                <button className="px-5 py-2 font-medium text-white bg-purple-600 rounded-full hover:bg-purple-700 transition duration-300">
                   Post a Listing
                 </button>
               </Link>
               <Link href="/homepage">
-                <button className="px-8 py-3 font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-300">
+                <button className="px-5 py-2 font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-300">
                   Find a Home
                 </button>
               </Link>
@@ -101,23 +101,24 @@ const MyPage: React.FC = () => {
         Our Statistics
     </h2>
     <div className="flex bg-white flex-wrap justify-center">
-        <div className="flex-1 p-3 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
-            <h3 className="text-3xl font-bold text-purple-600">150k</h3>
-            <p className="text-slate-700 font-bold">Happy Tenants</p>
-        </div>
-        <div className="flex-1 p-3 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
-            <h3 className="text-3xl font-bold text-green-600">75M+</h3>
-            <p className="text-slate-700 font-bold">Rental Transactions</p>
-        </div>
-        <div className="flex-1 p-3 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
-            <h3 className="text-3xl font-bold text-blue-600">50k</h3>
-            <p className="text-slate-700 font-bold">Student Accommodations</p>
-        </div>
-        <div className="flex-1 p-3 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
-            <h3 className="text-3xl font-bold text-red-600">300k</h3>
-            <p className="text-slate-700 font-bold">Listings Available</p>
-        </div>
+    <div className="flex-1 p-2 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
+        <h3 className="text-2xl font-bold text-purple-600">150k</h3>
+        <p className="text-slate-700 font-bold text-sm">Happy Tenants</p>
     </div>
+    <div className="flex-1 p-2 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
+        <h3 className="text-2xl font-bold text-green-600">75M+</h3>
+        <p className="text-slate-700 font-bold text-sm">Rental Transactions</p>
+    </div>
+    <div className="flex-1 p-2 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
+        <h3 className="text-2xl font-bold text-blue-600">50k</h3>
+        <p className="text-slate-700 font-bold text-sm">Student Accommodations</p>
+    </div>
+    <div className="flex-1 p-2 max-w-xs m-2 bg-white shadow-sm rounded-lg text-center">
+        <h3 className="text-2xl font-bold text-red-600">300k</h3>
+        <p className="text-slate-700 font-bold text-sm">Listings Available</p>
+    </div>
+</div>
+
 </div>
 
           </div>

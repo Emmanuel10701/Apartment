@@ -4,8 +4,29 @@ import prisma from '../../../libs/prisma'; // Adjust the path to your Prisma ins
 // GET: Fetch apartments
 export async function GET() {
   try {
-    const apartments = await prisma.apartment.findMany(); // Fetch all apartments
-    return NextResponse.json(apartments, { status: 200 });
+    const apartments = await prisma.apartment.findMany();
+    
+    // Transform the apartments to separate image fields
+    const transformedApartments = apartments.map(apartment => ({
+      id: apartment.id,
+      name: apartment.name,
+      minPrice: apartment.minPrice,
+      maxPrice: apartment.maxPrice,
+      rentalType: apartment.rentalType,
+      starRating: apartment.starRating,
+      propertyType: apartment.propertyType,
+      kitchenImage: apartment.kitchenImage,
+      livingRoomImage: apartment.livingRoomImage,
+      bedroomImage: apartment.bedroomImage,
+      apartmentImage: apartment.apartmentImage,
+      phoneNumber: apartment.phoneNumber,
+      email: apartment.email,
+      address: apartment.address,
+      createdAt: apartment.createdAt,
+      updatedAt: apartment.updatedAt,
+    }));
+
+    return NextResponse.json(transformedApartments, { status: 200 });
   } catch (error) {
     console.error('Error fetching apartments:', error);
     return NextResponse.json({ message: 'Error fetching apartments' }, { status: 500 });
@@ -23,11 +44,14 @@ export async function POST(req: Request) {
       rentalType,
       starRating,
       propertyType,
-      images,       // Should ideally handle image uploading via another method
+      kitchenImage,
+      livingRoomImage,
+      bedroomImage,
+      apartmentImage,
       phoneNumber,
       email,
       address,
-      userId        // Ensure the user ID exists in the User model
+      userId
     } = data;
 
     // Validation for required fields
@@ -53,11 +77,14 @@ export async function POST(req: Request) {
         rentalType,
         starRating,
         propertyType,
-        images,       // Ensure proper handling of image uploads
+        kitchenImage,      // Separate fields for each image
+        livingRoomImage,
+        bedroomImage,
+        apartmentImage,
         phoneNumber,
         email,
         address,
-        userId,       // Foreign key to User
+        userId,
       },
     });
 

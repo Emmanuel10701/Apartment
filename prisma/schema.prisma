@@ -1,3 +1,5 @@
+// schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -35,7 +37,10 @@ model Apartment {
   rentalType           String
   starRating           Int
   propertyType         String
-  images               String[]
+  kitchenImage         String?   // Separate image for kitchen
+  livingRoomImage      String?   // Separate image for living room
+  bedroomImage         String?   // Separate image for bedroom
+  apartmentImage       String?   // General apartment image
   phoneNumber          String
   email                String
   address              String
