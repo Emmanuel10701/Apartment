@@ -1,42 +1,13 @@
 import { NextResponse } from 'next/server';
-import prisma from '../../../libs/prisma'; // Adjust the path to your Prisma instance
+import prisma from '../../../libs/prisma'; // Adjust the path as needed
+import path from 'path';
+import fs from 'fs';
 
-// GET: Fetch apartments
-export async function GET() {
+// POST request handler to create a new apartment
+export async function POST(request: Request) {
   try {
-    const apartments = await prisma.apartment.findMany();
-    
-    // Transform the apartments to separate image fields
-    const transformedApartments = apartments.map(apartment => ({
-      id: apartment.id,
-      name: apartment.name,
-      minPrice: apartment.minPrice,
-      maxPrice: apartment.maxPrice,
-      rentalType: apartment.rentalType,
-      starRating: apartment.starRating,
-      propertyType: apartment.propertyType,
-      kitchenImage: apartment.kitchenImage,
-      livingRoomImage: apartment.livingRoomImage,
-      bedroomImage: apartment.bedroomImage,
-      apartmentImage: apartment.apartmentImage,
-      phoneNumber: apartment.phoneNumber,
-      email: apartment.email,
-      address: apartment.address,
-      createdAt: apartment.createdAt,
-      updatedAt: apartment.updatedAt,
-    }));
+    const body = await request.json(); // Read JSON body
 
-    return NextResponse.json(transformedApartments, { status: 200 });
-  } catch (error) {
-    console.error('Error fetching apartments:', error);
-    return NextResponse.json({ message: 'Error fetching apartments' }, { status: 500 });
-  }
-}
-
-// POST: Create a new apartment
-export async function POST(req: Request) {
-  try {
-    const data = await req.json();
     const {
       name,
       minPrice,
@@ -44,53 +15,87 @@ export async function POST(req: Request) {
       rentalType,
       starRating,
       propertyType,
-      kitchenImage,
-      livingRoomImage,
-      bedroomImage,
-      apartmentImage,
       phoneNumber,
       email,
       address,
-      userId
-    } = data;
+      userId,
+      kitchenImageFile,
+      livingRoomImageFile,
+      bedroomImageFile,
+      apartmentImageFile,
+    } = body;
 
-    // Validation for required fields
+    // Validate required fields
     if (!name || !minPrice || !maxPrice || !rentalType || !propertyType || !email) {
-      return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Check if user exists
-    const userExists = await prisma.user.findUnique({
-      where: { id: userId },
-    });
+    // Function to handle file uploads
+    const handleFileUpload = async (imageFile: File): Promise<string | null> => {
+      if (!imageFile) return null;
 
-    if (!userExists) {
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
-    }
+      try {
+        const uploadDir = path.join(process.cwd(), 'public/uploads');
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        const filePath = path.join(uploadDir, imageFile.name);
+        const buffer = Buffer.from(await imageFile.arrayBuffer());
+
+        fs.writeFileSync(filePath, buffer);
+        return `/uploads/${imageFile.name}`; // Return the URL to access the image
+      } catch (fileError: any) {
+        console.error('File upload error:', fileError.message);
+        throw new Error('File upload failed');
+      }
+    };
+
+    // Upload images
+    const kitchenImageUrl = await handleFileUpload(kitchenImageFile);
+    const livingRoomImageUrl = await handleFileUpload(livingRoomImageFile);
+    const bedroomImageUrl = await handleFileUpload(bedroomImageFile);
+    const apartmentImageUrl = await handleFileUpload(apartmentImageFile);
 
     // Create the new apartment in the database
     const newApartment = await prisma.apartment.create({
       data: {
         name,
-        minPrice,
-        maxPrice,
+        minPrice: parseFloat(minPrice),
+        maxPrice: parseFloat(maxPrice),
         rentalType,
-        starRating,
+        starRating: starRating ? parseInt(starRating) : 0,
         propertyType,
-        kitchenImage,      // Separate fields for each image
-        livingRoomImage,
-        bedroomImage,
-        apartmentImage,
         phoneNumber,
         email,
         address,
         userId,
+        kitchenImage: kitchenImageUrl,
+        livingRoomImage: livingRoomImageUrl,
+        bedroomImage: bedroomImageUrl,
+        apartmentImage: apartmentImageUrl,
       },
     });
 
     return NextResponse.json(newApartment, { status: 201 });
-  } catch (error) {
-    console.error('Error creating apartment:', error);
-    return NextResponse.json({ message: 'Error creating apartment' }, { status: 500 });
+  } catch (error: any) {
+    console.error('Unexpected error:', error.message);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+// GET request handler to fetch all apartments
+export async function GET() {
+  try {
+    const apartments = await prisma.apartment.findMany({
+      orderBy: {
+        createdAt: 'desc', // Order apartments by `createdAt` field in descending order
+      },
+    });
+
+    return NextResponse.json(apartments);
+  } catch (dbError: any) {
+    console.error('Database operation error:', dbError.message);
+    return NextResponse.json({ error: 'Database operation failed' }, { status: 500 });
   }
 }

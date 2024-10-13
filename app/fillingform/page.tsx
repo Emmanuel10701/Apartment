@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react';
 import axios from 'axios';
 import { CircularProgress } from '@mui/material';
 import Modal from '../components/modal2/page'; // Create a Modal component for login/register
-
 interface PropertyFormValues {
   name: string;
   minPrice: number;
@@ -16,7 +15,7 @@ interface PropertyFormValues {
   email: string;
   address: string;
   userId: string; 
-  kitchenImage?: File | null; // Separate fields for each image
+  kitchenImage?: File | null;
   livingRoomImage?: File | null;
   bedroomImage?: File | null;
   apartmentImage?: File | null;
@@ -37,8 +36,8 @@ const PropertyForm: React.FC = () => {
   const { data: session } = useSession();
   const [formValues, setFormValues] = useState<PropertyFormValues>({
     name: '',
-    minPrice: 67,
-    maxPrice: 776,
+    minPrice: 0, // Set initial values to something meaningful
+    maxPrice: 0,
     rentalType: '',
     starRating: 0,
     propertyType: '',
@@ -60,17 +59,15 @@ const PropertyForm: React.FC = () => {
     const { name, value, type } = e.target;
 
     if (type === 'file') {
-      const file = (e.target as HTMLInputElement).files?.[0] || null; // Get the first file
+      const file = (e.target as HTMLInputElement).files?.[0] || null;
       setFormValues((prev) => ({
         ...prev,
-        [name]: file, // Set the specific image field
+        [name]: file,
       }));
     } else {
       setFormValues((prev) => ({
         ...prev,
-        [name]: name === 'minPrice' || name === 'maxPrice' || name === 'starRating'
-          ? Number(value)
-          : value,
+        [name]: type === 'number' ? Number(value) : value, // Convert numbers correctly
       }));
     }
   };
@@ -81,10 +78,10 @@ const PropertyForm: React.FC = () => {
       setIsModalOpen(true);
       return;
     }
-  
+
     setIsSubmitting(true);
     setFeedbackMessage('');
-  
+
     const formData = new FormData();
     formData.append('name', formValues.name);
     formData.append('minPrice', formValues.minPrice.toString());
@@ -96,33 +93,30 @@ const PropertyForm: React.FC = () => {
     formData.append('email', formValues.email);
     formData.append('address', formValues.address);
     formData.append('userId', session.user.id);
-  
-    // Append each image separately
+
+    // Append images if they exist
     if (formValues.kitchenImage) formData.append('kitchenImage', formValues.kitchenImage);
     if (formValues.livingRoomImage) formData.append('livingRoomImage', formValues.livingRoomImage);
     if (formValues.bedroomImage) formData.append('bedroomImage', formValues.bedroomImage);
     if (formValues.apartmentImage) formData.append('apartmentImage', formValues.apartmentImage);
-    console.log('Form Data:', Object.fromEntries(formData.entries()));
 
-  
     try {
-      // Using Axios to send the request
       const response = await axios.post('/api/Apartment', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data', // Set the appropriate header
+          'Content-Type': 'multipart/form-data',
         },
       });
-  
-      // Check if the response is successful
-      if (response.status === 200) {
+
+      if (response.status === 201) {
         setFeedbackMessage('Property submitted successfully!');
         handleCancel(); // Reset the form
       } else {
         throw new Error('Failed to submit property');
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error submitting form:', error);
-      setFeedbackMessage('Error submitting property: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      const errorMessage = error.response?.data?.error || 'Error submitting property';
+      setFeedbackMessage(errorMessage); // Show API error if available
     } finally {
       setIsSubmitting(false);
     }
@@ -131,8 +125,8 @@ const PropertyForm: React.FC = () => {
   const handleCancel = () => {
     setFormValues({
       name: '',
-      minPrice: 67,
-      maxPrice: 776,
+      minPrice: 0,
+      maxPrice: 0,
       rentalType: '',
       starRating: 0,
       propertyType: '',
@@ -140,12 +134,12 @@ const PropertyForm: React.FC = () => {
       email: '',
       address: '',
       userId: session?.user?.id || '',
-      kitchenImage: null, // Reset images to null
+      kitchenImage: null,
       livingRoomImage: null,
       bedroomImage: null,
       apartmentImage: null,
     });
-  };
+  };;
 
   return (
     <div className="max-w-4xl mx-auto p-4 border border-gray-300 rounded-md bg-white shadow-md">
