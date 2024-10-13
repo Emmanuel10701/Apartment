@@ -102,6 +102,8 @@ const PropertyForm: React.FC = () => {
     if (formValues.livingRoomImage) formData.append('livingRoomImage', formValues.livingRoomImage);
     if (formValues.bedroomImage) formData.append('bedroomImage', formValues.bedroomImage);
     if (formValues.apartmentImage) formData.append('apartmentImage', formValues.apartmentImage);
+    console.log('Form Data:', Object.fromEntries(formData.entries()));
+
   
     try {
       // Using Axios to send the request
