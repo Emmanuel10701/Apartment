@@ -1,5 +1,6 @@
-"use client";
 
+
+"use client";
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
@@ -17,10 +18,10 @@ interface PropertyFormValues {
   email: string;
   address: string;
   userId: string;
-  kitchenImage?: File | null;
-  livingRoomImage?: File | null;
-  bedroomImage?: File | null;
-  apartmentImage?: File | null;
+  kitchenImage?: string | null;
+  livingRoomImage?: string | null;
+  bedroomImage?: string | null;
+  apartmentImage?: string | null;
 }
 
 declare module 'next-auth' {
@@ -60,64 +61,59 @@ const PropertyForm: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
 
-    if (type === 'file') {
-      const file = e.target.files?.[0] || null;
-      setFormValues((prev) => ({
-        ...prev,
-        [name]: file,
-      }));
-    } else {
-      setFormValues((prev) => ({
-        ...prev,
-        [name]: type === 'number' ? Number(value) : value,
-      }));
-    }
+    setFormValues((prev) => ({
+      ...prev,
+      [name as keyof PropertyFormValues]: type === 'number' ? Number(value) : value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (!session) {
       setIsModalOpen(true);
       return;
     }
-
+  
     if (formValues.minPrice >= formValues.maxPrice) {
       setFeedbackMessage('Minimum price must be less than maximum price.');
       return;
     }
-
+  
     setIsSubmitting(true);
     setFeedbackMessage('');
-
-    const formData = new FormData();
-    Object.entries(formValues).forEach(([key, value]) => {
-      if (value !== undefined) {
-        formData.append(key, value instanceof File ? value : value.toString());
-      }
-    });
-
+  
+    const formData = {
+      ...formValues,
+      userId: session.user.id,
+    };
+  
     try {
-      const response = await axios.post('/api/Apartment', formData, {
+      console.log('Submitting form data:', formData);
+  
+      const response = await axios.post('/api/Apartment', JSON.stringify(formData), {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
       });
-
+  
+      console.log('Response:', response);
+  
       if (response.status === 201) {
         setFeedbackMessage('Property submitted successfully!');
-        handleCancel(); // Reset the form
+        handleCancel();
       } else {
         throw new Error('Failed to submit property');
       }
     } catch (error: any) {
-      console.error('Error submitting form:', error);
+      console.error('Error submitting form:', error.response ? error.response.data : error.message);
       const errorMessage = error.response?.data?.error || error.message || 'Error submitting property';
       setFeedbackMessage(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
+  
 
   const handleCancel = () => {
     setFormValues({
@@ -280,19 +276,18 @@ const PropertyForm: React.FC = () => {
           />
         </div>
 
-        {/* Image Uploads */}
+        {/* Image URLs */}
         {['kitchenImage', 'livingRoomImage', 'bedroomImage', 'apartmentImage'].map((imageKey) => (
           <div className="mb-6" key={imageKey}>
             <label className="block mb-1 focus-within:text-blue-600" htmlFor={imageKey}>
-              {imageKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Image
+              {imageKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Image URL
             </label>
             <input
-              type="file"
+              type="text"
               id={imageKey}
               name={imageKey}
+              value={formValues[imageKey as keyof PropertyFormValues] || ''}
               onChange={handleChange}
-              accept="image/*"
-              required
               className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
             />
           </div>
@@ -300,7 +295,9 @@ const PropertyForm: React.FC = () => {
 
         {/* Feedback Message */}
         {feedbackMessage && (
-          <div className="mb-4 text-green-600">{feedbackMessage}</div>
+          <div className={`mb-4 ${feedbackMessage.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+            {feedbackMessage}
+          </div>
         )}
 
         {/* Submit Button */}

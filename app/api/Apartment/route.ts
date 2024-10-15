@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server';
-import prisma from '../../../libs/prisma'; // Adjust the path as needed
-import path from 'path';
-import fs from 'fs';
+import prisma from '../../../libs/prisma';
 
-// POST request handler to create a new apartment
 export async function POST(request: Request) {
   try {
-    const body = await request.json(); // Read JSON body
-
+    const body = await request.json();
     const {
       name,
       minPrice,
@@ -19,45 +15,28 @@ export async function POST(request: Request) {
       email,
       address,
       userId,
-      kitchenImageFile,
-      livingRoomImageFile,
-      bedroomImageFile,
-      apartmentImageFile,
+      kitchenImage,
+      livingRoomImage,
+      bedroomImage,
+      apartmentImage,
     } = body;
 
-    // Validate required fields
     if (!name || !minPrice || !maxPrice || !rentalType || !propertyType || !email) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Function to handle file uploads
-    const handleFileUpload = async (imageFile: File): Promise<string | null> => {
-      if (!imageFile) return null;
-
-      try {
-        const uploadDir = path.join(process.cwd(), 'public/uploads');
-        if (!fs.existsSync(uploadDir)) {
-          fs.mkdirSync(uploadDir, { recursive: true });
-        }
-
-        const filePath = path.join(uploadDir, imageFile.name);
-        const buffer = Buffer.from(await imageFile.arrayBuffer());
-
-        fs.writeFileSync(filePath, buffer);
-        return `/uploads/${imageFile.name}`; // Return the URL to access the image
-      } catch (fileError: any) {
-        console.error('File upload error:', fileError.message);
-        throw new Error('File upload failed');
-      }
+    const isValidURL = (url: string) => {
+      const pattern = /^(http|https):\/\/[^\s]+/;
+      return pattern.test(url);
     };
 
-    // Upload images
-    const kitchenImageUrl = await handleFileUpload(kitchenImageFile);
-    const livingRoomImageUrl = await handleFileUpload(livingRoomImageFile);
-    const bedroomImageUrl = await handleFileUpload(bedroomImageFile);
-    const apartmentImageUrl = await handleFileUpload(apartmentImageFile);
+    const imageUrls = [kitchenImage, livingRoomImage, bedroomImage, apartmentImage];
+    for (const url of imageUrls) {
+      if (url && !isValidURL(url)) {
+        return NextResponse.json({ error: `Invalid image URL: ${url}` }, { status: 400 });
+      }
+    }
 
-    // Create the new apartment in the database
     const newApartment = await prisma.apartment.create({
       data: {
         name,
@@ -70,10 +49,10 @@ export async function POST(request: Request) {
         email,
         address,
         userId,
-        kitchenImage: kitchenImageUrl,
-        livingRoomImage: livingRoomImageUrl,
-        bedroomImage: bedroomImageUrl,
-        apartmentImage: apartmentImageUrl,
+        kitchenImage,
+        livingRoomImage,
+        bedroomImage,
+        apartmentImage,
       },
     });
 
@@ -84,12 +63,11 @@ export async function POST(request: Request) {
   }
 }
 
-// GET request handler to fetch all apartments
 export async function GET() {
   try {
     const apartments = await prisma.apartment.findMany({
       orderBy: {
-        createdAt: 'desc', // Order apartments by `createdAt` field in descending order
+        createdAt: 'desc',
       },
     });
 

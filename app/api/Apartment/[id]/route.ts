@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '../../../../libs/prisma'; // Adjust this path to your Prisma instance
+import prisma from '../../../../libs/prisma';
 
-// GET: Retrieve a single apartment by ID
 export async function GET(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const id = pathname.split('/').pop(); // Extract the apartment ID from the URL
+  const id = pathname.split('/').pop();
 
   if (!id) {
     return new NextResponse(
@@ -27,10 +26,9 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(apartment);
 }
 
-// PUT: Update an apartment by ID
 export async function PUT(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const id = pathname.split('/').pop(); // Extract the apartment ID from the URL
+  const id = pathname.split('/').pop();
   const body = await req.json();
 
   if (!id) {
@@ -49,24 +47,23 @@ export async function PUT(req: NextRequest) {
       rentalType: body.rentalType,
       starRating: body.starRating,
       propertyType: body.propertyType,
-      kitchenImage: body.kitchenImage, // Separate fields for each image
+      kitchenImage: body.kitchenImage,
       livingRoomImage: body.livingRoomImage,
       bedroomImage: body.bedroomImage,
       apartmentImage: body.apartmentImage,
       phoneNumber: body.phoneNumber,
       email: body.email,
       address: body.address,
-      userId: body.userId, // Ensure user ID exists in the User model
+      userId: body.userId,
     },
   });
 
   return NextResponse.json(updatedApartment);
 }
 
-// DELETE: Delete an apartment by ID
 export async function DELETE(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const id = pathname.split('/').pop(); // Extract the apartment ID from the URL
+  const id = pathname.split('/').pop();
 
   if (!id) {
     return new NextResponse(
