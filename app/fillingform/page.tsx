@@ -1,9 +1,11 @@
 "use client";
+
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
 import { CircularProgress } from '@mui/material';
-import Modal from '../components/modal2/page'; // Create a Modal component for login/register
+import Modal from '../components/modal2/page'; // Modal component for login/register
+
 interface PropertyFormValues {
   name: string;
   minPrice: number;
@@ -14,7 +16,7 @@ interface PropertyFormValues {
   phoneNumber: string;
   email: string;
   address: string;
-  userId: string; 
+  userId: string;
   kitchenImage?: File | null;
   livingRoomImage?: File | null;
   bedroomImage?: File | null;
@@ -24,7 +26,7 @@ interface PropertyFormValues {
 declare module 'next-auth' {
   interface Session {
     user: {
-      id: string; 
+      id: string;
       name?: string | null;
       email?: string | null;
       image?: string | null;
@@ -36,7 +38,7 @@ const PropertyForm: React.FC = () => {
   const { data: session } = useSession();
   const [formValues, setFormValues] = useState<PropertyFormValues>({
     name: '',
-    minPrice: 0, // Set initial values to something meaningful
+    minPrice: 0,
     maxPrice: 0,
     rentalType: '',
     starRating: 0,
@@ -59,7 +61,7 @@ const PropertyForm: React.FC = () => {
     const { name, value, type } = e.target;
 
     if (type === 'file') {
-      const file = (e.target as HTMLInputElement).files?.[0] || null;
+      const file = e.target.files?.[0] || null;
       setFormValues((prev) => ({
         ...prev,
         [name]: file,
@@ -67,15 +69,21 @@ const PropertyForm: React.FC = () => {
     } else {
       setFormValues((prev) => ({
         ...prev,
-        [name]: type === 'number' ? Number(value) : value, // Convert numbers correctly
+        [name]: type === 'number' ? Number(value) : value,
       }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!session) {
       setIsModalOpen(true);
+      return;
+    }
+
+    if (formValues.minPrice >= formValues.maxPrice) {
+      setFeedbackMessage('Minimum price must be less than maximum price.');
       return;
     }
 
@@ -83,22 +91,11 @@ const PropertyForm: React.FC = () => {
     setFeedbackMessage('');
 
     const formData = new FormData();
-    formData.append('name', formValues.name);
-    formData.append('minPrice', formValues.minPrice.toString());
-    formData.append('maxPrice', formValues.maxPrice.toString());
-    formData.append('rentalType', formValues.rentalType);
-    formData.append('starRating', formValues.starRating.toString());
-    formData.append('propertyType', formValues.propertyType);
-    formData.append('phoneNumber', formValues.phoneNumber);
-    formData.append('email', formValues.email);
-    formData.append('address', formValues.address);
-    formData.append('userId', session.user.id);
-
-    // Append images if they exist
-    if (formValues.kitchenImage) formData.append('kitchenImage', formValues.kitchenImage);
-    if (formValues.livingRoomImage) formData.append('livingRoomImage', formValues.livingRoomImage);
-    if (formValues.bedroomImage) formData.append('bedroomImage', formValues.bedroomImage);
-    if (formValues.apartmentImage) formData.append('apartmentImage', formValues.apartmentImage);
+    Object.entries(formValues).forEach(([key, value]) => {
+      if (value !== undefined) {
+        formData.append(key, value instanceof File ? value : value.toString());
+      }
+    });
 
     try {
       const response = await axios.post('/api/Apartment', formData, {
@@ -113,10 +110,10 @@ const PropertyForm: React.FC = () => {
       } else {
         throw new Error('Failed to submit property');
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error('Error submitting form:', error);
-      const errorMessage = error.response?.data?.error || 'Error submitting property';
-      setFeedbackMessage(errorMessage); // Show API error if available
+      const errorMessage = error.response?.data?.error || error.message || 'Error submitting property';
+      setFeedbackMessage(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -139,7 +136,8 @@ const PropertyForm: React.FC = () => {
       bedroomImage: null,
       apartmentImage: null,
     });
-  };;
+    setIsModalOpen(false); // Reset modal state if needed
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-4 border border-gray-300 rounded-md bg-white shadow-md">
@@ -283,57 +281,22 @@ const PropertyForm: React.FC = () => {
         </div>
 
         {/* Image Uploads */}
-        <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="kitchenImage">Kitchen Image</label>
-          <input
-            type="file"
-            id="kitchenImage"
-            name="kitchenImage"
-            onChange={handleChange}
-            accept="image/*"
-            required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="livingRoomImage">Living Room Image</label>
-          <input
-            type="file"
-            id="livingRoomImage"
-            name="livingRoomImage"
-            onChange={handleChange}
-            accept="image/*"
-            required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="bedroomImage">Bedroom Image</label>
-          <input
-            type="file"
-            id="bedroomImage"
-            name="bedroomImage"
-            onChange={handleChange}
-            accept="image/*"
-            required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="apartmentImage">Apartment Image</label>
-          <input
-            type="file"
-            id="apartmentImage"
-            name="apartmentImage"
-            onChange={handleChange}
-            accept="image/*"
-            required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-        </div>
+        {['kitchenImage', 'livingRoomImage', 'bedroomImage', 'apartmentImage'].map((imageKey) => (
+          <div className="mb-6" key={imageKey}>
+            <label className="block mb-1 focus-within:text-blue-600" htmlFor={imageKey}>
+              {imageKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Image
+            </label>
+            <input
+              type="file"
+              id={imageKey}
+              name={imageKey}
+              onChange={handleChange}
+              accept="image/*"
+              required
+              className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+            />
+          </div>
+        ))}
 
         {/* Feedback Message */}
         {feedbackMessage && (
