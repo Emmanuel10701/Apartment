@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       starRating,
       propertyType,
       phoneNumber,
-      email, // This is used to find the user but not saved to the apartment
+      email, // Used to find the user but not saved to the apartment
       address,
       availableRooms, // Use lowercase
       kitchenImage,
@@ -23,7 +23,8 @@ export async function POST(request: Request) {
     } = body;
 
     // Check for required fields
-    if (!name || !minPrice || !maxPrice || !availableRooms || !rentalType || !propertyType || !email) {
+    const requiredFields = [name, minPrice, maxPrice, availableRooms, rentalType, propertyType, email];
+    if (requiredFields.some(field => !field)) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
         propertyType,
         phoneNumber,
         address,
-        availableRooms: parseInt(availableRooms), // Use lowercase
+        availableRooms: parseInt(availableRooms), // Ensure this is parsed as an integer
         user: {
           connect: { id: user.id }, // Connect the apartment to the user
         },

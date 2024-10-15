@@ -16,9 +16,9 @@ const PropertyForm: React.FC = () => {
     starRating: '0',
     propertyType: '',
     phoneNumber: '',
-    email: '', 
+    email: '',
     address: '',
-    AvailableRooms: '',
+    availableRooms: '',
     kitchenImage: '',
     livingRoomImage: '',
     bedroomImage: '',
@@ -44,13 +44,11 @@ const PropertyForm: React.FC = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Check if user is logged in
     if (!session) {
       toast.error('You must be logged in to submit this form.');
       return;
     }
 
-    // Validate min and max price
     if (Number(formData.minPrice) >= Number(formData.maxPrice)) {
       toast.error('Minimum price must be less than maximum price.');
       return;
@@ -72,8 +70,6 @@ const PropertyForm: React.FC = () => {
         throw new Error(data.error);
       }
 
-      console.log('Apartment created:', data);
-
       // Reset form
       setFormData({
         name: '',
@@ -85,7 +81,7 @@ const PropertyForm: React.FC = () => {
         phoneNumber: '',
         email: session.user?.email || '',
         address: '',
-        AvailableRooms: '',
+        availableRooms: '',
         kitchenImage: '',
         livingRoomImage: '',
         bedroomImage: '',
@@ -99,7 +95,6 @@ const PropertyForm: React.FC = () => {
     }
   };
 
-  // Display loading state if the session is still being fetched
   if (status === 'loading') {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -117,9 +112,9 @@ const PropertyForm: React.FC = () => {
       )}
       <h1 className="text-4xl my-10 font-bold mb-4 text-slate-400">Create New Apartment</h1>
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="name">Apartment Name</label>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block mb-1" htmlFor="name">Apartment Name</label>
           <input
             type="text"
             name="name"
@@ -127,21 +122,20 @@ const PropertyForm: React.FC = () => {
             value={formData.name}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Price Selection */}
-        <div className="mb-4 flex gap-4">
+        <div className="flex gap-4">
           <div className="flex-1">
-            <label className="block mb-1 focus-within:text-blue-600" htmlFor="minPrice">Min Price</label>
+            <label className="block mb-1" htmlFor="minPrice">Min Price</label>
             <select
               id="minPrice"
               name="minPrice"
               value={formData.minPrice}
               onChange={handleChange}
               required
-              className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+              className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {Array.from({ length: 11 }, (_, index) => (500 + index * 50)).map((price) => (
                 <option key={price} value={price}>{price}</option>
@@ -149,14 +143,14 @@ const PropertyForm: React.FC = () => {
             </select>
           </div>
           <div className="flex-1">
-            <label className="block mb-1 focus-within:text-blue-600" htmlFor="maxPrice">Max Price</label>
+            <label className="block mb-1" htmlFor="maxPrice">Max Price</label>
             <select
               id="maxPrice"
               name="maxPrice"
               value={formData.maxPrice}
               onChange={handleChange}
               required
-              className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+              className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {Array.from({ length: 11 }, (_, index) => (1000 + index * 50)).map((price) => (
                 <option key={price} value={price}>{price}</option>
@@ -165,16 +159,15 @@ const PropertyForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Rental Type Dropdown */}
-        <div className="mb-4">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="rentalType">Rental Type</label>
+        <div>
+          <label className="block mb-1" htmlFor="rentalType">Rental Type</label>
           <select
             id="rentalType"
             name="rentalType"
             value={formData.rentalType}
             onChange={handleChange}
             required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select rental type</option>
             <option value="Studio">Studio</option>
@@ -185,16 +178,15 @@ const PropertyForm: React.FC = () => {
           </select>
         </div>
 
-        {/* Star Rating Dropdown */}
-        <div className="mb-4">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="starRating">Star Rating</label>
+        <div>
+          <label className="block mb-1" htmlFor="starRating">Star Rating</label>
           <select
             id="starRating"
             name="starRating"
             value={formData.starRating}
             onChange={handleChange}
             required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="0">Select Star Rating</option>
             {[1, 2, 3, 4, 5].map((rating) => (
@@ -203,16 +195,15 @@ const PropertyForm: React.FC = () => {
           </select>
         </div>
 
-        {/* Property Type Dropdown */}
-        <div className="mb-4">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="propertyType">Property Type</label>
+        <div>
+          <label className="block mb-1" htmlFor="propertyType">Property Type</label>
           <select
             id="propertyType"
             name="propertyType"
             value={formData.propertyType}
             onChange={handleChange}
             required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select Property Type</option>
             <option value="House">House</option>
@@ -221,8 +212,8 @@ const PropertyForm: React.FC = () => {
           </select>
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700 font-semibold" htmlFor="phoneNumber">Phone Number</label>
+        <div>
+          <label className="block mb-1" htmlFor="phoneNumber">Phone Number</label>
           <input
             type="text"
             name="phoneNumber"
@@ -230,12 +221,12 @@ const PropertyForm: React.FC = () => {
             placeholder="Phone Number"
             value={formData.phoneNumber}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700 font-semibold" htmlFor="email">Email</label>
+        <div>
+          <label className="block mb-1" htmlFor="email">Email</label>
           <input
             type="email"
             name="email"
@@ -244,36 +235,88 @@ const PropertyForm: React.FC = () => {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700 font-semibold" htmlFor="address">Address</label>
+        <div>
+          <label className="block mb-1" htmlFor="address">Address</label>
           <input
             type="text"
             name="address"
             id="address"
-            placeholder="Enter the address"
+            placeholder="Enter Address"
             value={formData.address}
             onChange={handleChange}
             required
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Available Rooms Input */}
-        <div className="mb-4">
-          <label className="block mb-1 text-gray-700 font-semibold" htmlFor="AvailableRooms">Available Rooms</label>
+        <div>
+          <label className="block mb-1" htmlFor="availableRooms">Available Rooms</label>
           <input
             type="number"
-            name="AvailableRooms"
-            id="AvailableRooms"
-            placeholder="Enter number of available rooms"
-            value={formData.AvailableRooms}
+            name="availableRooms"
+            id="availableRooms"
+            placeholder="Available Rooms"
+            value={formData.availableRooms}
             onChange={handleChange}
             required
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Image URLs Input */}
+        <div>
+          <label className="block mb-1" htmlFor="kitchenImage">Kitchen Image URL</label>
+          <input
+            type="text"
+            name="kitchenImage"
+            id="kitchenImage"
+            placeholder="Enter Kitchen Image URL"
+            value={formData.kitchenImage}
+            onChange={handleChange}
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1" htmlFor="livingRoomImage">Living Room Image URL</label>
+          <input
+            type="text"
+            name="livingRoomImage"
+            id="livingRoomImage"
+            placeholder="Enter Living Room Image URL"
+            value={formData.livingRoomImage}
+            onChange={handleChange}
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1" htmlFor="bedroomImage">Bedroom Image URL</label>
+          <input
+            type="text"
+            name="bedroomImage"
+            id="bedroomImage"
+            placeholder="Enter Bedroom Image URL"
+            value={formData.bedroomImage}
+            onChange={handleChange}
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1" htmlFor="apartmentImage">Apartment Image URL</label>
+          <input
+            type="text"
+            name="apartmentImage"
+            id="apartmentImage"
+            placeholder="Enter Apartment Image URL"
+            value={formData.apartmentImage}
+            onChange={handleChange}
+            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -281,14 +324,14 @@ const PropertyForm: React.FC = () => {
         <div className='flex gap-6'>
           <button 
             type="submit" 
-            className="w-[60%] py-3 bg-transparent border-2 border-blue-600 text-blue-600 rounded-full transition duration-200 hover:bg-blue-600 hover:text-white hover:border-transparent focus:outline-none"
+            className="w-[60%] py-3 bg-blue-600 text-white rounded-full transition duration-200 hover:bg-blue-700 focus:outline-none"
           >
             Submit
           </button>
           
           <button 
             type="button" 
-            className="w-[60%] py-3 bg-transparent border-2 border-slate-600 text-slate-600 rounded-full transition duration-200 hover:bg-slate-600 hover:text-white hover:border-transparent focus:outline-none"
+            className="w-[60%] py-3 bg-gray-600 text-white rounded-full transition duration-200 hover:bg-gray-700 focus:outline-none"
           >
             Cancel
           </button>

@@ -225,12 +225,16 @@ const Dashboard: React.FC = () => {
 
       <div className={`flex-1 transition-all duration-300`}>
         <nav className="flex items-center justify-between p-4 bg-white shadow-md sticky top-0 z-20">
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center bg-slate-500 rounded-full text-slate-100 hover:text-blue-300 transition-colors duration-200">
+        <div className="flex items-center">
+          <Link 
+              href="/" 
+              className="flex items-center bg-slate-600 text-white rounded-full px-4 py-2 shadow-md hover:bg-slate-500 transition-colors duration-200 transform hover:scale-105"
+          >
               <FaArrowLeft className="text-2xl" />
-              <span className="ml-2 text-lg font-semibold">Back</span>
-            </Link>
-          </div>
+              <span className="ml-2 text-lg text-white font-semibold">Back</span>
+          </Link>
+      </div>
+
           <form
             className={`relative ${searchFormVisible ? 'block' : 'hidden'} md:block`}
             onSubmit={(e) => e.preventDefault()}
@@ -244,8 +248,8 @@ const Dashboard: React.FC = () => {
                 onClick={() => document.getElementById('profileImageInput')?.click()}
                 className="focus:outline-none"
               >
-                <Image src={userImage || '/public/default.png'} alt="Profile" className="w-9 h-9 rounded-full" />
-              </button>
+        <Image src="/default.png" alt="Profile"  width={20} height={20} className="w-12 p-1 h-12 bg-slate-300 rounded-full" />
+        </button>
               <input
                 type="file"
                 id="profileImageInput"
@@ -273,10 +277,11 @@ const Dashboard: React.FC = () => {
                 </li>
               </ul>
               <button 
-                onClick={handleAddProperty}
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                Add Property
-              </button>
+            onClick={handleAddProperty}
+            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:text-base md:text-lg px-4 sm:px-5 py-2.5 text-center transition duration-200 ease-in-out">
+            Add Property
+        </button>
+
             </div>
             <h1 className="bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent text-2xl bg-clip-text">
               Welcome back <span className='text-3xl font-extrabold'>{user?.name}</span>

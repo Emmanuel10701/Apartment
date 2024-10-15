@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { FaStar, FaMapMarkerAlt, FaPhone, FaEnvelope, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaStar, FaMapMarkerAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import CircularProgress from "@mui/material/CircularProgress";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,16 +19,13 @@ interface Apartment {
     description: string;
     price: number;
     minPrice: number;
-    phoneNumber: string;
-    email: string;
 }
 
 const ApartmentList = () => {
     const { data: session } = useSession();
     const [apartments, setApartments] = useState<Apartment[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 1;
-    const totalPages = Math.ceil(apartments.length / itemsPerPage);
+    const itemsPerPage = 1; // Set this to your desired number of items per page
     const [loading, setLoading] = useState(true);
     const [editingApartment, setEditingApartment] = useState<Apartment | null>(null);
     const [formData, setFormData] = useState<Apartment | null>(null);
@@ -37,7 +34,7 @@ const ApartmentList = () => {
     useEffect(() => {
         const fetchApartments = async () => {
             if (session?.user?.email) {
-                const response = await fetch(`/api/apartments?email=${session.user.email}`);
+                const response = await fetch(`/api/Apartment?email=${session.user.email}`);
                 const data = await response.json();
                 setApartments(data);
             }
@@ -47,8 +44,12 @@ const ApartmentList = () => {
         fetchApartments();
     }, [session]);
 
+    const totalPages = Math.ceil(apartments.length / itemsPerPage);
+
     const handlePageChange = (page: number) => {
-        setCurrentPage(page);
+        if (page >= 0 && page < totalPages) {
+            setCurrentPage(page);
+        }
     };
 
     const displayedApartments = apartments.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
@@ -67,7 +68,7 @@ const ApartmentList = () => {
 
     const handleUpdateApartment = async () => {
         if (formData) {
-            const response = await fetch(`/api/apartments/${formData.id}`, {
+            const response = await fetch(`/api/Apartment/${formData.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -88,7 +89,7 @@ const ApartmentList = () => {
     };
 
     const handleDeleteApartment = async (apartmentId: number) => {
-        const response = await fetch(`/api/apartments/${apartmentId}`, {
+        const response = await fetch(`/api/Apartment/${apartmentId}`, {
             method: 'DELETE',
         });
 
@@ -195,14 +196,6 @@ const ApartmentList = () => {
                                         </button>
                                     </div>
                                 )}
-                            </div>
-                            <div className="flex items-center justify-center p-4 bg-gray-50">
-                                <button onClick={() => window.location.href = `tel:${apartment.phoneNumber}`} className="bg-indigo-600 text-white rounded-full px-4 py-2 mr-2">
-                                    <FaPhone className="inline" /> Call
-                                </button>
-                                <button onClick={() => {/* Handle email modal */}} className="bg-green-600 text-white rounded-full px-4 py-2">
-                                    <FaEnvelope className="inline" /> Email
-                                </button>
                             </div>
                         </div>
                     ))}
