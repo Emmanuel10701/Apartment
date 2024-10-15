@@ -129,11 +129,11 @@ const MainComponent: React.FC = () => {
 </div>
 
             <SearchNavbar onSearch={handleSearch} />
-            <div className="flex flex-col">
-            <h1 className="text-6xl font-bold my-[5%] text-center bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent">
+            <div className="flex items-center flex-col">
+            <h1 className="text-6xl font-bold mt-[5%] text-center bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent">
                     Available Apartments
                 </h1>
-                  <p className="text-center text-slate-500 text-md">
+                  <p className="text-center mt-6 mb-20 w-[70%] text-slate-500 text-md">
                     Browse our collection of apartments and find your ideal home. 
                     Whether you're looking for a cozy studio or a spacious multi-bedroom, 
                     we offer a variety of options to suit every lifestyle and budget.
@@ -155,33 +155,34 @@ const MainComponent: React.FC = () => {
                         )}
                     </div>
                 )}
-                {totalPages > 1 && (
-                    <div className="flex justify-center mt-4 space-x-2">
-                        <button
-                            onClick={() => handlePageChange(currentPage > 0 ? currentPage - 1 : 0)}
-                            disabled={currentPage === 0}
-                            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            Previous
-                        </button>
-                        {Array.from({ length: totalPages }, (_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handlePageChange(index)}
-                                className={`px-4 py-2 rounded ${currentPage === index ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400'}`}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => handlePageChange(currentPage < totalPages - 1 ? currentPage + 1 : totalPages - 1)}
-                            disabled={currentPage >= totalPages - 1}
-                            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            Next
-                        </button>
-                    </div>
-                )}
+             {totalPages > 1 && (
+    <div className="flex justify-center mb-20 mt-4 space-x-2">
+        <button
+            onClick={() => handlePageChange(currentPage > 0 ? currentPage - 1 : 0)}
+            disabled={currentPage === 0}
+            className={`px-4 py-2 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition duration-300 ${currentPage === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+            Previous
+        </button>
+        {Array.from({ length: totalPages }, (_, index) => (
+            <button
+                key={index}
+                onClick={() => handlePageChange(index)}
+                className={`px-4 py-2 rounded-full border border-gray-300 transition duration-300 ${currentPage === index ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}
+            >
+                {index + 1}
+            </button>
+        ))}
+        <button
+            onClick={() => handlePageChange(currentPage < totalPages - 1 ? currentPage + 1 : totalPages - 1)}
+            disabled={currentPage >= totalPages - 1}
+            className={`px-4 py-2 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition duration-300 ${currentPage >= totalPages - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+            Next
+        </button>
+    </div>
+)}
+
             </div>
             <Footer />
         </div>

@@ -135,9 +135,9 @@ const ApartmentDetail = () => {
                     <p>
                         <span className=" text-blue-800 text-md font-semibold px-2.5 py-0.5 ml-3">{apartment.description}</span>
                         <p>
-<p>Modern Accommodation for Students and Young Professionals
-</p>
-Welcome to your new home—a vibrant and stylish accommodation designed to meet the needs of students and young professionals alike. Our space offers a unique blend of comfort and community, providing an ideal environment for study, work, and socializing.</p>
+                            <p>Modern Accommodation for Students and Young Professionals
+                            </p>
+                            Welcome to your new home—a vibrant and stylish accommodation designed to meet the needs of students and young professionals alike. Our space offers a unique blend of comfort and community, providing an ideal environment for study, work, and socializing.</p>
                     </p>
 
                     <div className="flex items-center justify-between mt-4">
