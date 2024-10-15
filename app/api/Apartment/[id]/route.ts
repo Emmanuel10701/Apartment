@@ -48,8 +48,8 @@ export async function PUT(req: NextRequest) {
     starRating,
     propertyType,
     phoneNumber,
-    email,
     address,
+    availableRooms, // Changed to lowercase
     kitchenImage,
     livingRoomImage,
     bedroomImage,
@@ -74,8 +74,8 @@ export async function PUT(req: NextRequest) {
         starRating: starRating ? parseInt(starRating) : 0,
         propertyType,
         phoneNumber,
-        email,
         address,
+        availableRooms: parseInt(availableRooms), // Use lowercase
         kitchenImage,
         livingRoomImage,
         bedroomImage,

@@ -33,6 +33,7 @@ model Apartment {
   minPrice             Float
   maxPrice             Float
   rentalType           String
+  availableRooms Int
   starRating           Int
   propertyType         String
   kitchenImage         String?   // Separate image for kitchen

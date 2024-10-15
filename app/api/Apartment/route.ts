@@ -13,8 +13,9 @@ export async function POST(request: Request) {
       starRating,
       propertyType,
       phoneNumber,
-      email,
+      email, // This is used to find the user but not saved to the apartment
       address,
+      availableRooms, // Use lowercase
       kitchenImage,
       livingRoomImage,
       bedroomImage,
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
     } = body;
 
     // Check for required fields
-    if (!name || !minPrice || !maxPrice || !rentalType || !propertyType || !email) {
+    if (!name || !minPrice || !maxPrice || !availableRooms || !rentalType || !propertyType || !email) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -58,8 +59,8 @@ export async function POST(request: Request) {
         starRating: starRating ? parseInt(starRating) : 0,
         propertyType,
         phoneNumber,
-        email,
         address,
+        availableRooms: parseInt(availableRooms), // Use lowercase
         user: {
           connect: { id: user.id }, // Connect the apartment to the user
         },
@@ -77,18 +78,17 @@ export async function POST(request: Request) {
   }
 }
 
-// GET method to retrieve apartmentsexport async function GET() {
-  export async function GET() {
-    try {
-      const apartments = await prisma.apartment.findMany({
-        orderBy: {
-          createdAt: 'desc', // Sort by the createdAt field in descending order
-        },
-      });
-      return NextResponse.json(apartments, { status: 200 });
-    } catch (error: any) {
-      console.error('Error fetching apartments:', error.message);
-      return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-    }
+// GET method to retrieve apartments
+export async function GET() {
+  try {
+    const apartments = await prisma.apartment.findMany({
+      orderBy: {
+        createdAt: 'desc', // Sort by the createdAt field in descending order
+      },
+    });
+    return NextResponse.json(apartments, { status: 200 });
+  } catch (error: any) {
+    console.error('Error fetching apartments:', error.message);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-  
+}

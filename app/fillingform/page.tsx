@@ -6,7 +6,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CircularProgress from '@mui/material/CircularProgress';
 
-
 const PropertyForm: React.FC = () => {
   const { data: session, status } = useSession();
   const [formData, setFormData] = useState({
@@ -19,8 +18,8 @@ const PropertyForm: React.FC = () => {
     phoneNumber: '',
     email: '', 
     address: '',
-    AvailableRooms:'',
-      kitchenImage: '',
+    AvailableRooms: '',
+    kitchenImage: '',
     livingRoomImage: '',
     bedroomImage: '',
     apartmentImage: '',
@@ -44,21 +43,21 @@ const PropertyForm: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     // Check if user is logged in
     if (!session) {
       toast.error('You must be logged in to submit this form.');
       return;
     }
-  
+
     // Validate min and max price
     if (Number(formData.minPrice) >= Number(formData.maxPrice)) {
       toast.error('Minimum price must be less than maximum price.');
       return;
     }
-  
+
     const dataToSubmit = { ...formData };
-  
+
     try {
       const response = await fetch('/api/Apartment', {
         method: 'POST',
@@ -67,14 +66,14 @@ const PropertyForm: React.FC = () => {
         },
         body: JSON.stringify(dataToSubmit),
       });
-  
+
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.error);
       }
-  
+
       console.log('Apartment created:', data);
-  
+
       // Reset form
       setFormData({
         name: '',
@@ -86,43 +85,41 @@ const PropertyForm: React.FC = () => {
         phoneNumber: '',
         email: session.user?.email || '',
         address: '',
-        AvailableRooms:'',
-         kitchenImage: '',
+        AvailableRooms: '',
+        kitchenImage: '',
         livingRoomImage: '',
         bedroomImage: '',
         apartmentImage: '',
       });
-  
+
       toast.success('Apartment created successfully!');
     } catch (error) {
       console.error('Error submitting form:', error);
       toast.error('Failed to create apartment. Please try again.');
     }
   };
-  
 
-// Display loading state if the session is still being fetched
-if (status === 'loading') {
-  return (
-    <div className="flex items-center justify-center h-screen">
-      <CircularProgress />
-    </div>
-  );
-}
+  // Display loading state if the session is still being fetched
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return (
-    <div className="md:w-[70%] w-full mx-auto p-4 md:p-14 shadow-lg  border rounded hover:shadow-xl">
+    <div className="md:w-[70%] w-full mx-auto p-4 md:p-14 shadow-lg border rounded hover:shadow-xl">
       {session && (
         <h2 className="text-purple-700 text-center font-semibold mb-4">
           Hi, {session.user?.name}
         </h2>
       )}
-      <h1 className="text-4xl  my-10 font-bold mb-4 text-slate-400">Create New Apartment</h1>
+      <h1 className="text-4xl my-10 font-bold mb-4 text-slate-400">Create New Apartment</h1>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-        <label className="block mb-1 focus-within:text-blue-600 " htmlFor="Name">Apartment Name</label>
-
+          <label className="block mb-1 focus-within:text-blue-600" htmlFor="name">Apartment Name</label>
           <input
             type="text"
             name="name"
@@ -225,125 +222,79 @@ if (status === 'loading') {
         </div>
 
         <div className="mb-4">
+          <label className="block mb-1 text-gray-700 font-semibold" htmlFor="phoneNumber">Phone Number</label>
           <input
             type="text"
             name="phoneNumber"
+            id="phoneNumber"
             placeholder="Phone Number"
             value={formData.phoneNumber}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           />
         </div>
+
         <div className="mb-4">
-  <label className="block mb-1 text-gray-700 font-semibold" htmlFor="email">Email</label>
-  <input
-    type="email"
-    name="email"
-    id="email"
-    placeholder="Enter your email"
-    value={formData.email}
-    onChange={handleChange}
-    required
-    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-  />
-</div>
+          <label className="block mb-1 text-gray-700 font-semibold" htmlFor="email">Email</label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Enter your email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+          />
+        </div>
 
-<div className="mb-4">
-  <label className="block mb-1 text-gray-700 font-semibold" htmlFor="address">Address</label>
-  <input
-    type="text"
-    name="address"
-    id="address"
-    placeholder="Enter your address"
-    value={formData.address}
-    onChange={handleChange}
-    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-  />
-</div>
-<div className="mb-4">
-  <label className="block mb-1 text-gray-700 font-semibold" htmlFor="Available rooms">Rooms Available</label>
-  <input
-    type="number"
-    name="roomsAvailable"
-    id="roomsAvailable"
-    placeholder="Enter your rooms Available"
-    value={formData.AvailableRooms}
-    onChange={handleChange}
-    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-  />
-</div>
+        <div className="mb-4">
+          <label className="block mb-1 text-gray-700 font-semibold" htmlFor="address">Address</label>
+          <input
+            type="text"
+            name="address"
+            id="address"
+            placeholder="Enter the address"
+            value={formData.address}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+          />
+        </div>
 
-<div className="mb-4">
-  <label className="block mb-1 text-gray-700 font-semibold" htmlFor="kitchenImage">Kitchen Image URL</label>
-  <input
-    type="url"
-    name="kitchenImage"
-    id="kitchenImage"
-    placeholder="Enter Kitchen Image URL"
-    value={formData.kitchenImage}
-    onChange={handleChange}
-    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-  />
-</div>
+        {/* Available Rooms Input */}
+        <div className="mb-4">
+          <label className="block mb-1 text-gray-700 font-semibold" htmlFor="AvailableRooms">Available Rooms</label>
+          <input
+            type="number"
+            name="AvailableRooms"
+            id="AvailableRooms"
+            placeholder="Enter number of available rooms"
+            value={formData.AvailableRooms}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+          />
+        </div>
 
-<div className="mb-4">
-  <label className="block mb-1 text-gray-700 font-semibold" htmlFor="livingRoomImage">Living Room Image URL</label>
-  <input
-    type="url"
-    name="livingRoomImage"
-    id="livingRoomImage"
-    placeholder="Enter Living Room Image URL"
-    value={formData.livingRoomImage}
-    onChange={handleChange}
-    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-  />
-</div>
-
-<div className="mb-4">
-  <label className="block mb-1 text-gray-700 font-semibold" htmlFor="bedroomImage">Bedroom Image URL</label>
-  <input
-    type="url"
-    name="bedroomImage"
-    id="bedroomImage"
-    placeholder="Enter Bedroom Image URL"
-    value={formData.bedroomImage}
-    onChange={handleChange}
-    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-  />
-</div>
-
-<div className="mb-4">
-  <label className="block mb-1 text-gray-700 font-semibold" htmlFor="apartmentImage">Apartment Image URL</label>
-  <input
-    type="url"
-    name="apartmentImage"
-    id="apartmentImage"
-    placeholder="Enter Apartment Image URL"
-    value={formData.apartmentImage}
-    onChange={handleChange}
-    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-  />
-</div>
-
-
-<div className='flex gap-6'>
-  <button 
-    type="submit" 
-    className="w-[60%] py-3 bg-transparent border-2 border-blue-600 text-blue-600 rounded-full transition duration-200 hover:bg-blue-600 hover:text-white hover:border-transparent focus:outline-none"
-  >
-    Submit
-  </button>
-  
-  <button 
-    type="button" 
-    className="w-[60%] py-3 bg-transparent border-2 border-slate-600 text-slate-600 rounded-full transition duration-200 hover:bg-slate-600 hover:text-white hover:border-transparent focus:outline-none"
-  >
-    Cancel
-  </button>
-</div>
-       </form>
-       <ToastContainer />
-
+        {/* Submit and Cancel buttons */}
+        <div className='flex gap-6'>
+          <button 
+            type="submit" 
+            className="w-[60%] py-3 bg-transparent border-2 border-blue-600 text-blue-600 rounded-full transition duration-200 hover:bg-blue-600 hover:text-white hover:border-transparent focus:outline-none"
+          >
+            Submit
+          </button>
+          
+          <button 
+            type="button" 
+            className="w-[60%] py-3 bg-transparent border-2 border-slate-600 text-slate-600 rounded-full transition duration-200 hover:bg-slate-600 hover:text-white hover:border-transparent focus:outline-none"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+      <ToastContainer />
     </div>
   );
 };
