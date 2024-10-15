@@ -53,8 +53,7 @@ export async function PUT(req: NextRequest) {
     kitchenImage,
     livingRoomImage,
     bedroomImage,
-    apartmentImage,
-  } = body;
+    apartmentImage,  } = body;
 
   if (!id) {
     return new NextResponse(

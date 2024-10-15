@@ -33,20 +33,19 @@ model Apartment {
   minPrice             Float
   maxPrice             Float
   rentalType           String
-  availableRooms Int
+  availableRooms       Int
   starRating           Int
   propertyType         String
-  kitchenImage         String?   // Separate image for kitchen
-  livingRoomImage      String?   // Separate image for living room
-  bedroomImage         String?   // Separate image for bedroom
-  apartmentImage       String?   // General apartment image
+  kitchenImage         String?
+  livingRoomImage      String?
+  bedroomImage         String?
+  apartmentImage       String?
   phoneNumber          String
   email                String    // Link to the user's email
   address              String
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
-  // Specify fields and references here
   user                 User      @relation("UserApartments", fields: [email], references: [email])
 }
 

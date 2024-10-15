@@ -20,7 +20,9 @@ const PropertyForm: React.FC = () => {
     address: '',
     availableRooms: '',
     kitchenImage: '',
-    livingRoomImage: '',
+    livingRoomImage: '',  
+    description: '', // Add this line
+
     bedroomImage: '',
     apartmentImage: '',
   });
@@ -36,7 +38,7 @@ const PropertyForm: React.FC = () => {
     }
   }, [session]);
 
-  const handleChange = (e: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLSelectElement |HTMLTextAreaElement| HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -84,6 +86,7 @@ const PropertyForm: React.FC = () => {
         availableRooms: '',
         kitchenImage: '',
         livingRoomImage: '',
+        description: '', // Add this line
         bedroomImage: '',
         apartmentImage: '',
       });
@@ -266,6 +269,19 @@ const PropertyForm: React.FC = () => {
             className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        <div>
+      <label className="block mb-1" htmlFor="description">Description</label>
+      <textarea
+        name="description"
+        id="description"
+        placeholder="Enter a brief description of the apartment"
+        value={formData.description}
+        onChange={handleChange}
+        required
+        className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
 
         {/* Image URLs Input */}
         <div>

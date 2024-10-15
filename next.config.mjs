@@ -1,10 +1,17 @@
-// next.config.mjs
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-      domains: ['https://images.pexels.com'],
-    },
-  };
-  
-  export default nextConfig;
-  
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**', // Allows all subdomains and domains
+      },
+      {
+        protocol: 'http',
+        hostname: '**', // Allows all subdomains and domains
+      },
+    ],
+  },
+};
+
+export default nextConfig;
