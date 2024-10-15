@@ -1,4 +1,5 @@
 "use client";
+
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -133,6 +134,10 @@ const ApartmentDetail = () => {
 
                     <p>
                         <span className=" text-blue-800 text-md font-semibold px-2.5 py-0.5 ml-3">{apartment.description}</span>
+                        <p>
+<p>Modern Accommodation for Students and Young Professionals
+</p>
+Welcome to your new home—a vibrant and stylish accommodation designed to meet the needs of students and young professionals alike. Our space offers a unique blend of comfort and community, providing an ideal environment for study, work, and socializing.</p>
                     </p>
 
                     <div className="flex items-center justify-between mt-4">
@@ -164,24 +169,24 @@ const ApartmentDetail = () => {
             <h2 className="text-4xl text-center my-4 font-bold mt-6 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-400 text-transparent bg-clip-text">
                 Related Apartments
             </h2>
-            <div className="flex w-full md:w-2/3 flex-wrap gap-6 mx-auto">
+            <div className="flex w-full md:w-2/3 flex-row gap-6 mx-auto overflow-x-auto">
                 {(apartmentsData as Apartment[]).slice(0, 4).map((relatedApartment) => {
                     if (relatedApartment.id === apartment.id) return null;
 
                     return (
                         <Link href={`/homepage/${relatedApartment.id}`} key={relatedApartment.id}>
-                            <div className="bg-white rounded-lg shadow-md p-2 cursor-pointer hover:shadow-lg transition-shadow duration-300">
+                            <div className="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between h-72 cursor-pointer hover:shadow-lg transition-shadow duration-300">
                                 <Image
                                     src={relatedApartment.images[0] || ''} // Fallback in case of no images
                                     alt={relatedApartment.title}
-                                    width={100}
-                                    height={100}
-                                    className="rounded-lg"
+                                    width={400}
+                                    height={300}
+                                    className="rounded-lg h-40 object-cover"
                                 />
-                                <h3 className="font-bold text-lg mt-2 bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">
+                                <h3 className="font-bold text-md mt-2 bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">
                                     {relatedApartment.title}
                                 </h3>
-                                <p className="font-bold text-md text-gray-800">${relatedApartment.price}/month</p>
+                                <p className="font-bold text-lg text-gray-800">${relatedApartment.price}/month</p>
                             </div>
                         </Link>
                     );
