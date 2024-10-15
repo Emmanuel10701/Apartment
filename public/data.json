@@ -22,10 +22,10 @@
         "id": 2,
         "title": "Cozy Apartment in City Center",
         "images": [
-            "/images/ap11.webp",
-            "/images/bd1.jpg",
-            "/images/int3.jpeg",
-            "/images/kit1.webp"
+            "/uploads/chicago.avif",
+            "/uploads/bed11.jpeg",
+            "/uploads/kitchen1.jpeg",
+            "/uploads/sell1.jpeg"
         ],
         "rating": 4.0,
         "location": "123 Main St, Cityville",
@@ -41,10 +41,10 @@
         "id": 3,
         "title": "Modern Two-Bedroom Apartment",
         "images": [
-            "/images/ap3.jpg",
-            "/images/bed3.jpg",
-            "/images/int4.jpg",
-            "/images/kit3.webp"
+            "/uploads/sell1.jpeg",
+            "/uploads/bed12.jpeg",
+            "/uploads/ling.jpeg",
+            "/uploads/kitchen2.jpeg"
         ],
         "rating": 4.2,
         "location": "789 Oak St, Suburbia",
@@ -60,10 +60,10 @@
         "id": 4,
         "title": "Charming Cottage Style Apartment",
         "images": [
-            "/images/ap4.jpg",
-            "/images/bed4.jpg",
-            "/images/int5.jpg",
-            "/images/kit4.webp"
+            "/uploads/sell4.jpeg",
+            "/uploads/bed12.jpeg",
+            "/uploads/ling2.jpeg",
+            "/uploads/kitchen1.jpeg"
         ],
         "rating": 4.3,
         "location": "321 Maple Ave, Countryside",
@@ -79,10 +79,10 @@
         "id": 5,
         "title": "Elegant Penthouse Suite",
         "images": [
-            "/images/ap5.jpg",
-            "/images/bed5.jpg",
-            "/images/int6.jpg",
-            "/images/kit5.webp"
+            "/uploads/rent1.jpeg",
+            "/uploads/bed11.jpeg",
+            "/uploads/ling3.jpeg",
+            "/uploads/kitchen1.jpeg"
         ],
         "rating": 5.0,
         "location": "555 High St, Cityview",
@@ -98,10 +98,10 @@
         "id": 6,
         "title": "Sunny Beachfront Apartment",
         "images": [
-            "/images/ap6.jpg",
-            "/images/bed6.jpg",
-            "/images/int7.jpg",
-            "/images/kit6.webp"
+            "/uploads/rent4.jpeg",
+            "/uploads/bed12.jpeg",
+            "/uploads/ling.jpeg",
+            "/uploads/kitchen2.jpeg"
         ],
         "rating": 4.7,
         "location": "789 Ocean Dr, Beachside",
@@ -117,10 +117,10 @@
         "id": 7,
         "title": "Urban Loft Apartment",
         "images": [
-            "/images/ap7.jpg",
-            "/images/bed7.jpg",
-            "/images/int8.jpg",
-            "/images/kit7.webp"
+            "/uploads/sell6.jpeg",
+            "/uploads/bed11.jpeg",
+            "/uploads/rent6.jpeg",
+            "/uploads/kitchen1.jpeg"
         ],
         "rating": 4.6,
         "location": "101 Industrial St, Metropolis",

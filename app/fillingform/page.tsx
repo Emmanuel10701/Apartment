@@ -1,192 +1,167 @@
-
-
 "use client";
-import React, { useState } from 'react';
+
 import { useSession } from 'next-auth/react';
-import axios from 'axios';
-import { CircularProgress } from '@mui/material';
-import Modal from '../components/modal2/page'; // Modal component for login/register
-
-interface PropertyFormValues {
-  name: string;
-  minPrice: number;
-  maxPrice: number;
-  rentalType: string;
-  starRating: number;
-  propertyType: string;
-  phoneNumber: string;
-  email: string;
-  address: string;
-  userId: string;
-  kitchenImage?: string | null;
-  livingRoomImage?: string | null;
-  bedroomImage?: string | null;
-  apartmentImage?: string | null;
-}
-
-declare module 'next-auth' {
-  interface Session {
-    user: {
-      id: string;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-    };
-  }
-}
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 
 const PropertyForm: React.FC = () => {
-  const { data: session } = useSession();
-  const [formValues, setFormValues] = useState<PropertyFormValues>({
+  const { data: session, status } = useSession();
+  const [formData, setFormData] = useState({
     name: '',
-    minPrice: 0,
-    maxPrice: 0,
+    minPrice: '500',
+    maxPrice: '1000',
     rentalType: '',
-    starRating: 0,
+    starRating: '0',
     propertyType: '',
     phoneNumber: '',
-    email: '',
+    email: '', 
     address: '',
-    userId: session?.user?.id || '',
-    kitchenImage: null,
-    livingRoomImage: null,
-    bedroomImage: null,
-    apartmentImage: null,
+    kitchenImage: '',
+    livingRoomImage: '',
+    bedroomImage: '',
+    apartmentImage: '',
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [error, setError] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
+  useEffect(() => {
+    if (session) {
+      setFormData((prev) => ({
+        ...prev,
+        email: session.user?.email || '',
+      }));
+    }
+  }, [session]);
 
-    setFormValues((prev) => ({
-      ...prev,
-      [name as keyof PropertyFormValues]: type === 'number' ? Number(value) : value,
-    }));
+  const handleChange = (e: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
+    // Check if user is logged in
     if (!session) {
-      setIsModalOpen(true);
+      setError('You must be logged in to submit this form.');
       return;
     }
-  
-    if (formValues.minPrice >= formValues.maxPrice) {
-      setFeedbackMessage('Minimum price must be less than maximum price.');
+
+    // Validate min and max price
+    if (Number(formData.minPrice) >= Number(formData.maxPrice)) {
+      setError('Minimum price must be less than maximum price.');
       return;
     }
-  
-    setIsSubmitting(true);
-    setFeedbackMessage('');
-  
-    const formData = {
-      ...formValues,
-      userId: session.user.id,
-    };
-  
+
+    const dataToSubmit = { ...formData };
+
     try {
-      console.log('Submitting form data:', formData);
-  
-      const response = await axios.post('/api/Apartment', JSON.stringify(formData), {
+      const response = await fetch('/api/Apartment', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(dataToSubmit),
       });
-  
-      console.log('Response:', response);
-  
-      if (response.status === 201) {
-        setFeedbackMessage('Property submitted successfully!');
-        handleCancel();
-      } else {
-        throw new Error('Failed to submit property');
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error);
       }
-    } catch (error: any) {
-      console.error('Error submitting form:', error.response ? error.response.data : error.message);
-      const errorMessage = error.response?.data?.error || error.message || 'Error submitting property';
-      setFeedbackMessage(errorMessage);
-    } finally {
-      setIsSubmitting(false);
+      console.log('Apartment created:', data);
+
+      // Reset form
+      setFormData({
+        name: '',
+        minPrice: '500',
+        maxPrice: '1000',
+        rentalType: '',
+        starRating: '0',
+        propertyType: '',
+        phoneNumber: '',
+        email: session.user?.email || '',
+        address: '',
+        kitchenImage: '',
+        livingRoomImage: '',
+        bedroomImage: '',
+        apartmentImage: '',
+      });
+      setError(''); // Clear error message if submission is successful
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setError('Failed to create apartment. Please try again.');
     }
   };
-  
 
-  const handleCancel = () => {
-    setFormValues({
-      name: '',
-      minPrice: 0,
-      maxPrice: 0,
-      rentalType: '',
-      starRating: 0,
-      propertyType: '',
-      phoneNumber: '',
-      email: '',
-      address: '',
-      userId: session?.user?.id || '',
-      kitchenImage: null,
-      livingRoomImage: null,
-      bedroomImage: null,
-      apartmentImage: null,
-    });
-    setIsModalOpen(false); // Reset modal state if needed
-  };
+  // Display loading state if the session is still being fetched
+  if (status === 'loading') {
+    return <p className='text-center text-slate-600 '>Loading...</p>;
+  }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 border border-gray-300 rounded-md bg-white shadow-md">
-      <h2 className="text-2xl mb-4">Property Details</h2>
+    <div className="md:w-[70%] w-full mx-auto p-4 md:p-14 shadow-lg  border rounded hover:shadow-xl">
+      {session && (
+        <h2 className="text-purple-700 text-center font-semibold mb-4">
+          Hi, {session.user?.name}
+        </h2>
+      )}
+      <h1 className="text-4xl  my-10 font-bold mb-4 text-slate-400">Create New Apartment</h1>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleSubmit}>
-        {/* Property Name */}
-        <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="name">Property Name</label>
+        <div className="mb-4">
+        <label className="block mb-1 focus-within:text-blue-600 " htmlFor="Name">Apartment Name</label>
+
           <input
             type="text"
-            id="name"
             name="name"
-            value={formValues.name}
+            placeholder="Property Name"
+            value={formData.name}
             onChange={handleChange}
             required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+            className="w-full p-2 border rounded"
           />
         </div>
 
-        {/* Price Inputs */}
-        <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="minPrice">Minimum Price ($)</label>
-          <input
-            type="number"
-            id="minPrice"
-            name="minPrice"
-            value={formValues.minPrice}
-            onChange={handleChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="maxPrice">Maximum Price ($)</label>
-          <input
-            type="number"
-            id="maxPrice"
-            name="maxPrice"
-            value={formValues.maxPrice}
-            onChange={handleChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
+        {/* Price Selection */}
+        <div className="mb-4 flex gap-4">
+          <div className="flex-1">
+            <label className="block mb-1 focus-within:text-blue-600" htmlFor="minPrice">Min Price</label>
+            <select
+              id="minPrice"
+              name="minPrice"
+              value={formData.minPrice}
+              onChange={handleChange}
+              required
+              className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+            >
+              {Array.from({ length: 11 }, (_, index) => (500 + index * 50)).map((price) => (
+                <option key={price} value={price}>{price}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1">
+            <label className="block mb-1 focus-within:text-blue-600" htmlFor="maxPrice">Max Price</label>
+            <select
+              id="maxPrice"
+              name="maxPrice"
+              value={formData.maxPrice}
+              onChange={handleChange}
+              required
+              className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+            >
+              {Array.from({ length: 11 }, (_, index) => (1000 + index * 50)).map((price) => (
+                <option key={price} value={price}>{price}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Rental Type Dropdown */}
-        <div className="mb-6">
+        <div className="mb-4">
           <label className="block mb-1 focus-within:text-blue-600" htmlFor="rentalType">Rental Type</label>
           <select
             id="rentalType"
             name="rentalType"
-            value={formValues.rentalType}
+            value={formData.rentalType}
             onChange={handleChange}
             required
             className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
@@ -201,12 +176,12 @@ const PropertyForm: React.FC = () => {
         </div>
 
         {/* Star Rating Dropdown */}
-        <div className="mb-6">
+        <div className="mb-4">
           <label className="block mb-1 focus-within:text-blue-600" htmlFor="starRating">Star Rating</label>
           <select
             id="starRating"
             name="starRating"
-            value={formValues.starRating}
+            value={formData.starRating}
             onChange={handleChange}
             required
             className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
@@ -219,12 +194,12 @@ const PropertyForm: React.FC = () => {
         </div>
 
         {/* Property Type Dropdown */}
-        <div className="mb-6">
+        <div className="mb-4">
           <label className="block mb-1 focus-within:text-blue-600" htmlFor="propertyType">Property Type</label>
           <select
             id="propertyType"
             name="propertyType"
-            value={formValues.propertyType}
+            value={formData.propertyType}
             onChange={handleChange}
             required
             className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
@@ -236,82 +211,90 @@ const PropertyForm: React.FC = () => {
           </select>
         </div>
 
-        {/* Contact Information */}
-        <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="phoneNumber">Phone Number</label>
-          <input
-            type="tel"
-            id="phoneNumber"
-            name="phoneNumber"
-            value={formValues.phoneNumber}
-            onChange={handleChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formValues.email}
-            onChange={handleChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-1 focus-within:text-blue-600" htmlFor="address">Address</label>
+        <div className="mb-4">
           <input
             type="text"
-            id="address"
-            name="address"
-            value={formValues.address}
+            name="phoneNumber"
+            placeholder="Phone Number"
+            value={formData.phoneNumber}
             onChange={handleChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
+            className="w-full p-2 border rounded"
           />
         </div>
 
-        {/* Image URLs */}
-        {['kitchenImage', 'livingRoomImage', 'bedroomImage', 'apartmentImage'].map((imageKey) => (
-          <div className="mb-6" key={imageKey}>
-            <label className="block mb-1 focus-within:text-blue-600" htmlFor={imageKey}>
-              {imageKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Image URL
-            </label>
-            <input
-              type="text"
-              id={imageKey}
-              name={imageKey}
-              value={formValues[imageKey as keyof PropertyFormValues] || ''}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded outline-none shadow-sm focus:ring-2 focus:ring-blue-500 transition duration-200"
-            />
-          </div>
-        ))}
+        <div className="mb-4">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email} // Autofill from session
+            onChange={handleChange}
+            required
+            className="w-full p-2 border rounded"
+          />
+        </div>
 
-        {/* Feedback Message */}
-        {feedbackMessage && (
-          <div className={`mb-4 ${feedbackMessage.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
-            {feedbackMessage}
-          </div>
-        )}
+        <div className="mb-4">
+          <input
+            type="text"
+            name="address"
+            placeholder="Address"
+            value={formData.address}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+        </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full p-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200"
-        >
-          {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Property'}
-        </button>
-      </form>
+        <div className="mb-4">
+          <input
+            type="url"
+            name="kitchenImage"
+            placeholder="Kitchen Image URL"
+            value={formData.kitchenImage}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+        </div>
 
-      {/* Modal for Login/Register */}
-      {isModalOpen && <Modal onClose={() => setIsModalOpen(false)} />}
+        <div className="mb-4">
+          <input
+            type="url"
+            name="livingRoomImage"
+            placeholder="Living Room Image URL"
+            value={formData.livingRoomImage}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+        </div>
+
+        <div className="mb-4">
+          <input
+            type="url"
+            name="bedroomImage"
+            placeholder="Bedroom Image URL"
+            value={formData.bedroomImage}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+        </div>
+
+        <div className="mb-4">
+          <input
+            type="url"
+            name="apartmentImage"
+            placeholder="Apartment Image URL"
+            value={formData.apartmentImage}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+          />
+        </div>
+
+        <div className='flex gap-6'>
+        <button type="submit" className="w-full p-2 rounded-md hover:rounded-full bg-blue-600 text-white hover:outline-green-300  hover:bg-blue-700">Submit</button>
+        <button className="w-full p-2 rounded-md hover:rounded-full bg-slate-600 text-white hover:outline-green-300  hover:bg-slate-700">cancel</button>
+
+          </div> 
+       </form>
     </div>
   );
 };

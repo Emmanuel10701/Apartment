@@ -13,7 +13,6 @@ import { FaArrowUp } from "react-icons/fa6";
 import { IoFilterSharp } from "react-icons/io5";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Autocomplete } from '@react-google-maps/api';
 
 interface SearchNavbarProps {
   onSearch: (filters: SearchFilters) => void;
@@ -40,16 +39,10 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
   const [starRating, setStarRating] = useState<number>(0);  
   const [propertyType, setPropertyType] = useState<string>('');  
   const [showModal, setShowModal] = useState<boolean>(false);  
-  const [savedSearches, setSavedSearches] = useState<string[]>([]);  
 
   const modalRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const searches = localStorage.getItem('savedSearches');
-    if (searches) {
-      setSavedSearches(JSON.parse(searches));
-    }
-  }, []);
+ 
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

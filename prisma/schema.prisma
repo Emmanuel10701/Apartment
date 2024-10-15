@@ -1,5 +1,3 @@
-// schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -22,11 +20,11 @@ model User {
   role                 Role                    @default(USER)
   createdAt            DateTime                @default(now())
   updatedAt            DateTime                @updatedAt
-  apartments           Apartment[]             @relation("UserApartments")
+  apartments           Apartment[]             @relation("UserApartments") // No fields or references here
   accounts             Account[]               // Relation to NextAuth Accounts
   sessions             Session[]               // Relation to NextAuth Sessions
-  verificationTokens    VerificationToken[]    // Relation for password reset tokens
-  passwordReset    passwordReset[]    // Relation for password reset tokens
+  verificationTokens    VerificationToken[]     // Relation for password reset tokens
+  passwordReset        passwordReset[]         // Relation for password reset tokens
 }
 
 model Apartment {
@@ -42,12 +40,13 @@ model Apartment {
   bedroomImage         String?   // Separate image for bedroom
   apartmentImage       String?   // General apartment image
   phoneNumber          String
-  email                String
+  email                String    // Link to the user's email
   address              String
-  userId               String    @db.ObjectId
-  user                 User      @relation("UserApartments", fields: [userId], references: [id])
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
+
+  // Specify fields and references here
+  user                 User      @relation("UserApartments", fields: [email], references: [email])
 }
 
 model Subscription {

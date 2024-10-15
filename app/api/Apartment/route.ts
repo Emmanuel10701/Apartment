@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '../../../libs/prisma';
 
+// POST method to create a new apartment
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -14,17 +15,18 @@ export async function POST(request: Request) {
       phoneNumber,
       email,
       address,
-      userId,
       kitchenImage,
       livingRoomImage,
       bedroomImage,
       apartmentImage,
     } = body;
 
+    // Check for required fields
     if (!name || !minPrice || !maxPrice || !rentalType || !propertyType || !email) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Validate image URLs
     const isValidURL = (url: string) => {
       const pattern = /^(http|https):\/\/[^\s]+/;
       return pattern.test(url);
@@ -37,6 +39,16 @@ export async function POST(request: Request) {
       }
     }
 
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Create the new apartment
     const newApartment = await prisma.apartment.create({
       data: {
         name,
@@ -48,7 +60,9 @@ export async function POST(request: Request) {
         phoneNumber,
         email,
         address,
-        userId,
+        user: {
+          connect: { id: user.id }, // Connect the apartment to the user
+        },
         kitchenImage,
         livingRoomImage,
         bedroomImage,
@@ -63,17 +77,18 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
-  try {
-    const apartments = await prisma.apartment.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-
-    return NextResponse.json(apartments);
-  } catch (dbError: any) {
-    console.error('Database operation error:', dbError.message);
-    return NextResponse.json({ error: 'Database operation failed' }, { status: 500 });
+// GET method to retrieve apartmentsexport async function GET() {
+  export async function GET() {
+    try {
+      const apartments = await prisma.apartment.findMany({
+        orderBy: {
+          createdAt: 'desc', // Sort by the createdAt field in descending order
+        },
+      });
+      return NextResponse.json(apartments, { status: 200 });
+    } catch (error: any) {
+      console.error('Error fetching apartments:', error.message);
+      return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
   }
-}
+  
