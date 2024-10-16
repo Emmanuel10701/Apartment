@@ -137,8 +137,8 @@ const ApartmentList = () => {
         <div>
             <ToastContainer />
             {apartments.length === 0 ? (
-                <div className="text-center mt-20">
-                    <h2 className="text-white text-center test-3xl bg-gradient-to-r from-purple-500 via-orange-500 to-indigo-500 p-4 rounded-lg shadow-md">
+                <div className="text-center mt-[29%]">
+                    <h2 className=" text-center test-3xl bg-gradient-to-r from-purple-500 via-orange-500 to-indigo-500 ">
                         You Have No Apartments
                     </h2>
                     <p className="text-gray-500 mt-2">Start adding apartments to your dashboard!</p>
@@ -208,7 +208,9 @@ const ApartmentList = () => {
                                             </button>
                                         </div>
                                     </div>
-                                ) : (
+                                ) : 
+                                
+                                (
                                     <div className="w-full mx-auto">
                                         <h5 className="text-xl font-bold text-slate-600">{apartment.name}</h5>
                                         <div className="flex items-center mt-2 mb-2">

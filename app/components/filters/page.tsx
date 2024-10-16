@@ -11,8 +11,6 @@ interface SearchNavbarProps {
 }
 
 interface SearchFilters {
-  search: string;
-  location: string;  
   minRent?: number;
   maxRent?: number;
   rentalType?: string;
@@ -20,8 +18,6 @@ interface SearchFilters {
 }
 
 const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
-  const [search, setSearch] = useState<string>('');
-  const [location, setLocation] = useState<string>('');
   const [minRent, setMinRent] = useState<number | ''>('');
   const [maxRent, setMaxRent] = useState<number | ''>('');
   const [rentalType, setRentalType] = useState<string>('');
@@ -50,8 +46,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
     }
 
     const filters: SearchFilters = {
-      search: search.trim(),
-      location: location.trim(),
       minRent: minRent !== '' ? Number(minRent) : undefined,
       maxRent: maxRent !== '' ? Number(maxRent) : undefined,
       rentalType,
@@ -66,8 +60,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
   };
 
   const clearFilters = () => {
-    setSearch('');
-    setLocation('');
     setMinRent('');
     setMaxRent('');
     setRentalType('');
@@ -75,8 +67,6 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
 
     if (onSearch) {
       onSearch({
-        search: '',
-        location: '',
         minRent: undefined,
         maxRent: undefined,
         rentalType: '',
