@@ -70,7 +70,7 @@ const Contact: React.FC = () => {
         initial="hidden"
         animate="visible"
       >
-        Let's Connect
+        Let&apos;s Connect
       </motion.h1>
 
       <div className="flex flex-col md:flex-row px-8 gap-8">
@@ -84,7 +84,7 @@ const Contact: React.FC = () => {
             Reach Out to Us
           </h1>
           <p className="text-sm text-slate-500 mb-5">
-            We're excited to assist you with any inquiries regarding our apartments. Whether you're interested in availability, pricing, or have any other questions, feel free to get in touch. Your comfort and satisfaction are our top priorities.
+            We&apos;re excited to assist you with any inquiries regarding our apartments. Whether you&apos;re interested in availability, pricing, or have any other questions, feel free to get in touch. Your comfort and satisfaction are our top priorities.
           </p>
           <div className="flex items-start mt-6">
             <MdMarkEmailRead className="text-green-500 text-xl" />

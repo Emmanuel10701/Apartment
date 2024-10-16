@@ -76,7 +76,7 @@ const MainComponent: React.FC = () => {
 
         setFilteredApartments(filtered);
         setCurrentPage(0);
-        setIsLoading(false);
+        setTimeout(() => setIsLoading(false), 100); // Delay for loading state
     };
 
     const handleSearchSubmit = () => {
@@ -105,6 +105,7 @@ const MainComponent: React.FC = () => {
                     onFocus={(e) => e.target.classList.add("shadow-md")}
                     onBlur={(e) => e.target.classList.remove("shadow-md")}
                     className="w-full sm:w-1/2 p-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-300"
+                    aria-label="Search apartments"
                 />
                 <input
                     type="text"
@@ -114,6 +115,7 @@ const MainComponent: React.FC = () => {
                     onFocus={(e) => e.target.classList.add("shadow-md")}
                     onBlur={(e) => e.target.classList.remove("shadow-md")}
                     className="w-full sm:w-1/2 p-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2 sm:mt-0 sm:ml-2 transition-shadow duration-300"
+                    aria-label="Search location"
                 />
                 <button
                     onClick={() => {
@@ -127,7 +129,6 @@ const MainComponent: React.FC = () => {
                 </button>
             </div>
 
-            {/* Pass necessary props to SearchNavbar */}
             <SearchNavbar onSearch={handleSearch} />
 
             <div className="flex items-center flex-col">
@@ -146,7 +147,7 @@ const MainComponent: React.FC = () => {
                 ) : (
                     <div className="flex flex-wrap justify-between space-y-4">
                         {displayedApartments.length === 0 ? (
-                            <p className="text-center text-slate-700 text-lg my-10 ">No apartments found matching your search criteria.</p>
+                            <p className="text-center text-slate-700 text-lg my-10">No apartments found matching your search criteria.</p>
                         ) : (
                             displayedApartments.map((apartment) => (
                                 <div className="w-full sm:w-1/2 lg:w-1/3 p-2" key={apartment.id}>

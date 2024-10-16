@@ -66,12 +66,12 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.SECRET!,
   session: {
     strategy: 'jwt',
-    maxAge: 60*60*2, // Session expires in 2 hrs
+    maxAge: 60 * 60 * 2, // Session expires in 2 hrs
   },
   pages: {
-    signIn: '/login',     // Custom login page
-    newUser: '/register', // Custom registration page
-    error: '/auth/error', // Error page
+    signIn: '/login',
+    newUser: '/register',
+    error: '/auth/error',
   },
   callbacks: {
     async signIn({ user, account }) {
@@ -109,7 +109,6 @@ export const authOptions: NextAuthOptions = {
             where: { email: session.user.email },
             select: { role: true },
           });
-         console.log(session.user)
 
           if (user) {
             (session.user as any).role = user.role; // Add role to the session
