@@ -24,8 +24,8 @@ interface Apartment {
 }
 
 interface SearchFilters {
-    search: string;
-    location: string;  
+    search?: string;
+    location?: string;  
     minRent?: number;
     maxRent?: number;
     rentalType?: string;
@@ -41,7 +41,7 @@ const MainComponent: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleSearch = (filters: SearchFilters) => {
-        setIsLoading(true); // Set loading state
+        setIsLoading(true);
         let filtered = apartmentsData;
 
         // Apply search filters
@@ -75,8 +75,8 @@ const MainComponent: React.FC = () => {
         }
 
         setFilteredApartments(filtered);
-        setCurrentPage(0); 
-        setIsLoading(false); // Reset loading state
+        setCurrentPage(0);
+        setIsLoading(false);
     };
 
     const handleSearchSubmit = () => {
@@ -84,7 +84,6 @@ const MainComponent: React.FC = () => {
     };
 
     const totalPages = Math.ceil(filteredApartments.length / itemsPerPage);
-
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
@@ -97,43 +96,45 @@ const MainComponent: React.FC = () => {
     return (
         <div className="flex flex-col p-4">
             <Carousel />
-            <div className="flex flex-col sm:flex-row items-center justify-evenly mt-20  mx-20 mb-4">
-    <input
-        type="text"
-        placeholder="Search apartments..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        onFocus={(e) => e.target.classList.add("shadow-md")}
-        onBlur={(e) => e.target.classList.remove("shadow-md")}
-        className="w-full sm:w-1/2 p-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-300"
-    />
-    <input
-        type="text"
-        placeholder="Location..."
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        onFocus={(e) => e.target.classList.add("shadow-md")}
-        onBlur={(e) => e.target.classList.remove("shadow-md")}
-        className="w-full sm:w-1/2 p-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2 sm:mt-0 sm:ml-2 transition-shadow duration-300"
-    />
-    <button
-        onClick={() => {
-            handleSearchSubmit();
-            setSearchTerm(''); // Clear the search input
-            setLocation(''); // Clear the location input
-        }}
-        className="mt-2 sm:mt-0 bg-transparent border border-blue-600 text-blue-600 px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    >
-        Search
-    </button>
-</div>
+            <div className="flex flex-col sm:flex-row items-center justify-evenly mt-20 mx-20 mb-4">
+                <input
+                    type="text"
+                    placeholder="Search apartments..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onFocus={(e) => e.target.classList.add("shadow-md")}
+                    onBlur={(e) => e.target.classList.remove("shadow-md")}
+                    className="w-full sm:w-1/2 p-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-300"
+                />
+                <input
+                    type="text"
+                    placeholder="Location..."
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    onFocus={(e) => e.target.classList.add("shadow-md")}
+                    onBlur={(e) => e.target.classList.remove("shadow-md")}
+                    className="w-full sm:w-1/2 p-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2 sm:mt-0 sm:ml-2 transition-shadow duration-300"
+                />
+                <button
+                    onClick={() => {
+                        handleSearchSubmit();
+                        setSearchTerm('');
+                        setLocation('');
+                    }}
+                    className="mt-2 sm:mt-0 bg-transparent border border-blue-600 text-blue-600 px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                    Search
+                </button>
+            </div>
 
+            {/* Pass necessary props to SearchNavbar */}
             <SearchNavbar onSearch={handleSearch} />
+
             <div className="flex items-center flex-col">
-            <h1 className="text-6xl font-bold mt-[5%] text-center bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent">
+                <h1 className="text-6xl font-bold mt-[5%] text-center bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent">
                     Available Apartments
                 </h1>
-                  <p className="text-center mt-6 mb-20 w-[70%] text-slate-500 text-md">
+                <p className="text-center mt-6 mb-20 w-[70%] text-slate-500 text-md">
                     Browse our collection of apartments and find your ideal home. 
                     Whether you're looking for a cozy studio or a spacious multi-bedroom, 
                     we offer a variety of options to suit every lifestyle and budget.
@@ -155,34 +156,33 @@ const MainComponent: React.FC = () => {
                         )}
                     </div>
                 )}
-             {totalPages > 1 && (
-    <div className="flex justify-center mb-20 mt-4 space-x-2">
-        <button
-            onClick={() => handlePageChange(currentPage > 0 ? currentPage - 1 : 0)}
-            disabled={currentPage === 0}
-            className={`px-4 py-2 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition duration-300 ${currentPage === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-            Previous
-        </button>
-        {Array.from({ length: totalPages }, (_, index) => (
-            <button
-                key={index}
-                onClick={() => handlePageChange(index)}
-                className={`px-4 py-2 rounded-full border border-gray-300 transition duration-300 ${currentPage === index ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}
-            >
-                {index + 1}
-            </button>
-        ))}
-        <button
-            onClick={() => handlePageChange(currentPage < totalPages - 1 ? currentPage + 1 : totalPages - 1)}
-            disabled={currentPage >= totalPages - 1}
-            className={`px-4 py-2 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition duration-300 ${currentPage >= totalPages - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-            Next
-        </button>
-    </div>
-)}
-
+                {totalPages > 1 && (
+                    <div className="flex justify-center mb-20 mt-4 space-x-2">
+                        <button
+                            onClick={() => handlePageChange(currentPage > 0 ? currentPage - 1 : 0)}
+                            disabled={currentPage === 0}
+                            className={`px-4 py-2 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition duration-300 ${currentPage === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            Previous
+                        </button>
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handlePageChange(index)}
+                                className={`px-4 py-2 rounded-full border border-gray-300 transition duration-300 ${currentPage === index ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}
+                            >
+                                {index + 1}
+                            </button>
+                        ))}
+                        <button
+                            onClick={() => handlePageChange(currentPage < totalPages - 1 ? currentPage + 1 : totalPages - 1)}
+                            disabled={currentPage >= totalPages - 1}
+                            className={`px-4 py-2 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition duration-300 ${currentPage >= totalPages - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
             </div>
             <Footer />
         </div>
