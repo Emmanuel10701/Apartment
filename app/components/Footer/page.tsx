@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
       }
 
       const data = await response.json();
-      toast.success(`Email submitted: ${data.email}`);
+      toast.success("Email submitted sucessifully!");
       setEmail('');
     } catch (error) {
       toast.error('Error submitting email. Please try again.');
