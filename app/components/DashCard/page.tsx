@@ -3,29 +3,37 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { FaStar, FaMapMarkerAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaStar, FaMapMarkerAlt, FaChevronRight } from "react-icons/fa";
 import CircularProgress from "@mui/material/CircularProgress";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 interface Apartment {
-    id: number;
-    title: string;
-    images: string[];
-    rating: number;
-    location: string;
-    availableRooms: number;
-    rentalType: string;
-    description: string;
-    price: number;
+    id: string;
+    name: string;
     minPrice: number;
+    maxPrice: number;
+    rentalType: string;
+    availableRooms: string | null;
+    starRating: number;
+    description: string | null;
+    propertyType: string;
+    kitchenImage: string;
+    livingRoomImage: string;
+    bedroomImage: string;
+    apartmentImage: string;
+    phoneNumber: string;
+    email: string;
+    address: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 const ApartmentList = () => {
     const { data: session } = useSession();
     const [apartments, setApartments] = useState<Apartment[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 1; // Set this to your desired number of items per page
+    const itemsPerPage = 1;
     const [loading, setLoading] = useState(true);
     const [editingApartment, setEditingApartment] = useState<Apartment | null>(null);
     const [formData, setFormData] = useState<Apartment | null>(null);
@@ -34,7 +42,7 @@ const ApartmentList = () => {
     useEffect(() => {
         const fetchApartments = async () => {
             if (session?.user?.email) {
-                const response = await fetch(`/api/Apartment?email=${session.user.email}`);
+                const response = await fetch(`/api/Apartment/${session.user.email}`);
                 const data = await response.json();
                 setApartments(data);
             }
@@ -52,7 +60,9 @@ const ApartmentList = () => {
         }
     };
 
-    const displayedApartments = apartments.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+    const displayedApartments = Array.isArray(apartments) 
+        ? apartments.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage) 
+        : [];
 
     const handleEditClick = (apartment: Apartment) => {
         setEditingApartment(apartment);
@@ -68,12 +78,15 @@ const ApartmentList = () => {
 
     const handleUpdateApartment = async () => {
         if (formData) {
+            // Create a new object without image fields
+            const { kitchenImage, livingRoomImage, bedroomImage, apartmentImage, ...updatedData } = formData;
+
             const response = await fetch(`/api/Apartment/${formData.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(updatedData), // Send only updated data
             });
 
             if (response.ok) {
@@ -88,7 +101,7 @@ const ApartmentList = () => {
         }
     };
 
-    const handleDeleteApartment = async (apartmentId: number) => {
+    const handleDeleteApartment = async (apartmentId: string) => {
         const response = await fetch(`/api/Apartment/${apartmentId}`, {
             method: 'DELETE',
         });
@@ -101,12 +114,8 @@ const ApartmentList = () => {
         }
     };
 
-    const goToPreviousImage = () => {
-        setCurrentIndex((prevIndex) => (prevIndex === 0 ? displayedApartments[0].images.length - 1 : prevIndex - 1));
-    };
-
     const goToNextImage = () => {
-        setCurrentIndex((prevIndex) => (prevIndex === displayedApartments[0].images.length - 1 ? 0 : prevIndex + 1));
+        setCurrentIndex((prevIndex) => (prevIndex === 3 ? 0 : prevIndex + 1)); // Adjust based on actual number of images
     };
 
     if (loading) {
@@ -124,21 +133,15 @@ const ApartmentList = () => {
             ) : (
                 <div className="grid grid-cols-1 gap-4">
                     {displayedApartments.map((apartment) => (
-                        <div key={apartment.id} className="w-full max-w-xs bg-white border rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 mb-4">
+                        <div key={apartment.id} className="w-full max-w-xs -400 border rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 mb-4">
                             <div className="relative cursor-pointer h-44">
                                 <Image
                                     className="w-full h-full object-cover"
-                                    src={apartment.images[currentIndex]}
-                                    alt={`Image of ${apartment.title}`}
+                                    src={apartment.apartmentImage}
+                                    alt={`Image of ${apartment.name}`}
                                     width={240}
                                     height={160}
                                 />
-                                <button
-                                    onClick={goToPreviousImage}
-                                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-lg"
-                                >
-                                    <FaChevronLeft className="text-gray-700" />
-                                </button>
                                 <button
                                     onClick={goToNextImage}
                                     className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-lg"
@@ -151,18 +154,35 @@ const ApartmentList = () => {
                                     <div>
                                         <input
                                             type="text"
-                                            name="title"
-                                            value={formData?.title}
+                                            name="name"
+                                            value={formData?.name || ''}
                                             onChange={handleInputChange}
                                             className="border p-2 rounded w-full mb-2"
-                                            placeholder="Apartment Title"
+                                            placeholder="Apartment Name"
                                         />
-                                        <textarea
-                                            name="description"
-                                            value={formData?.description}
+                                        <input
+                                            type="text"
+                                            name="address"
+                                            value={formData?.address || ''}
                                             onChange={handleInputChange}
                                             className="border p-2 rounded w-full mb-2"
-                                            placeholder="Description"
+                                            placeholder="Address"
+                                        />
+                                        <input
+                                            type="number"
+                                            name="minPrice"
+                                            value={formData?.minPrice || ''}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded w-full mb-2"
+                                            placeholder="Minimum Price"
+                                        />
+                                        <input
+                                            type="number"
+                                            name="maxPrice"
+                                            value={formData?.maxPrice || ''}
+                                            onChange={handleInputChange}
+                                            className="border p-2 rounded w-full mb-2"
+                                            placeholder="Maximum Price"
                                         />
                                         <button onClick={handleUpdateApartment} className="bg-green-600 text-white rounded px-4 py-2">
                                             Update
@@ -173,21 +193,20 @@ const ApartmentList = () => {
                                     </div>
                                 ) : (
                                     <div>
-                                        <h5 className="text-xl font-bold text-slate-600">{apartment.title}</h5>
+                                        <h5 className="text-xl font-bold text-slate-600">{apartment.name}</h5>
                                         <div className="flex items-center mt-2 mb-2">
                                             <div className="flex items-center">
                                                 {[...Array(5)].map((_, index) => (
-                                                    <FaStar key={index} className={`w-4 h-4 ${index < apartment.rating ? 'text-yellow-300' : 'text-gray-200'}`} />
+                                                    <FaStar key={index} className={`w-4 h-4 ${index < apartment.starRating ? 'text-yellow-300' : 'text-gray-200'}`} />
                                                 ))}
                                             </div>
-                                            <span className="ml-2 text-sm text-slate-600">{apartment.rating}</span>
+                                            <span className="ml-2 text-sm text-slate-600">{apartment.starRating}</span>
                                         </div>
                                         <div className="flex items-center text-slate-600 mb-2">
                                             <FaMapMarkerAlt className="text-red-500 mr-1" />
-                                            <span>{apartment.location}</span>
+                                            <span>{apartment.address}</span>
                                         </div>
                                         <p className="text-slate-600">Rooms: {apartment.availableRooms} | Type: {apartment.rentalType}</p>
-                                        <p className="mt-2 text-slate-600">{apartment.description}</p>
                                         <button onClick={() => handleEditClick(apartment)} className="bg-indigo-600 text-white rounded px-4 py-2 mt-2">
                                             Edit
                                         </button>
