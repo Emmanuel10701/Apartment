@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 import CircularProgress from '@mui/material/CircularProgress';
 import EmailModal from "../../components/emailModal/page";
-import apartmentsData from '../../../../apartment/public/data.json';
 
 // Define the Apartment interface
 interface Apartment {
@@ -32,22 +31,31 @@ const ApartmentDetail = () => {
     const [mainImage, setMainImage] = useState<string>('');
     const [imageIndex, setImageIndex] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [apartmentsData, setApartmentsData] = useState<Apartment[]>([]);
+
+    const fetchApartmentData = async () => {
+        const response = await fetch('/data.json');
+        const data = await response.json();
+        return data;
+    };
 
     useEffect(() => {
-        const fetchApartment = () => {
+        const getApartment = async () => {
+            const data = await fetchApartmentData();
+            setApartmentsData(data); // Store all apartments data
             if (id) {
-                const apartmentFound = (apartmentsData as Apartment[]).find((apt) => apt.id.toString() === id);
+                const apartmentFound = data.find((apt: Apartment) => apt.id.toString() === id);
                 if (apartmentFound) {
                     setApartment(apartmentFound);
                     setMainImage(apartmentFound.images[0] || '');
                 } else {
                     console.error('Apartment not found');
                 }
-                setLoading(false);
             }
+            setLoading(false);
         };
 
-        fetchApartment();
+        getApartment();
     }, [id]);
 
     const handleImageClick = (index: number) => {
@@ -135,9 +143,9 @@ const ApartmentDetail = () => {
                     <p>
                         <span className=" text-blue-800 text-md font-semibold px-2.5 py-0.5 ml-3">{apartment.description}</span>
                         <p>
-                            <p>Modern Accommodation for Students and Young Professionals
-                            </p>
-                            Welcome to your new home—a vibrant and stylish accommodation designed to meet the needs of students and young professionals alike. Our space offers a unique blend of comfort and community, providing an ideal environment for study, work, and socializing.</p>
+                            <p>Modern Accommodation for Students and Young Professionals</p>
+                            Welcome to your new home—a vibrant and stylish accommodation designed to meet the needs of students and young professionals alike. Our space offers a unique blend of comfort and community, providing an ideal environment for study, work, and socializing.
+                        </p>
                     </p>
 
                     <div className="flex items-center justify-between mt-4">
@@ -148,7 +156,7 @@ const ApartmentDetail = () => {
                     <div className="flex justify-center mt-4">
                         <button
                             className="bg-transparent border border-blue-600 text-blue-600 font-semibold py-2 px-4 rounded-full hover:bg-blue-600 hover:text-white transition duration-300"
-                            onClick={() => window.open(`tel:${apartment.phoneNumber}`)} // Ensure phoneNumber is defined in Apartment interface
+                            onClick={() => window.open(`tel:${apartment.phoneNumber}`)}
                         >
                             Call
                         </button>
@@ -170,14 +178,14 @@ const ApartmentDetail = () => {
                 Related Apartments
             </h2>
             <div className="flex w-full md:w-2/3 flex-row gap-6 mx-auto overflow-x-auto">
-                {(apartmentsData as Apartment[]).slice(0, 4).map((relatedApartment) => {
+                {apartmentsData.slice(0, 4).map((relatedApartment) => {
                     if (relatedApartment.id === apartment.id) return null;
 
                     return (
                         <Link href={`/homepage/${relatedApartment.id}`} key={relatedApartment.id}>
                             <div className="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between h-72 cursor-pointer hover:shadow-lg transition-shadow duration-300">
                                 <Image
-                                    src={relatedApartment.images[0] || ''} // Fallback in case of no images
+                                    src={relatedApartment.images[0] || ''}
                                     alt={relatedApartment.title}
                                     width={400}
                                     height={300}
