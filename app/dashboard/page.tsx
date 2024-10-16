@@ -335,17 +335,18 @@ const Dashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {subscribers.map((subscriber) => (
-                    <tr key={subscriber.id}>
-                      <td className="py-4">{subscriber.email}</td>
-                      <td className="py-4">{moment(subscriber.createdAt).fromNow()}</td>
-                      <td className="py-4">
-                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-200 text-green-800">
-                          Completed
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                {subscribers.map((subscriber, index) => (
+                  <tr key={subscriber.id} className={`${index % 2 === 0 ? 'bg-indigo-50' : 'bg-green-50'} hover:bg-indigo-100 transition duration-200`}>
+                    <td className="py-4">{subscriber.email}</td>
+                    <td className="py-4">{moment(subscriber.createdAt).fromNow()}</td>
+                    <td className="py-4">
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-200 text-green-800">
+                        Completed
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+
                 </tbody>
               </table>
             </div>

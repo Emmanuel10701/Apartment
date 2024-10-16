@@ -1,7 +1,7 @@
 "use client"; // Ensure client-side rendering in Next.js
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FaBed, FaHome, FaBuilding, FaCar, FaTimes } from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
 import { IoFilterSharp } from 'react-icons/io5';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -27,7 +27,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
   const [rentalType, setRentalType] = useState<string>('');
   const [propertyType, setPropertyType] = useState<string>('');
   const [showModal, setShowModal] = useState<boolean>(false);
-
+  
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -58,7 +58,9 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
       propertyType,
     };
 
-    onSearch(filters);
+    if (onSearch) {
+      onSearch(filters);
+    }
     setShowModal(false);
     toast.success("Filters applied successfully!");
   };
@@ -71,25 +73,27 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
     setRentalType('');
     setPropertyType('');
 
-    onSearch({
-      search: '',
-      location: '',
-      minRent: undefined,
-      maxRent: undefined,
-      rentalType: '',
-      propertyType: '',
-    });
+    if (onSearch) {
+      onSearch({
+        search: '',
+        location: '',
+        minRent: undefined,
+        maxRent: undefined,
+        rentalType: '',
+        propertyType: '',
+      });
+    }
 
     toast.success("Filters cleared!");
   };
 
   return (
-    <div className="bg-white shadow-lg py-4 px-4 my-4 w-full z-50 rounded-lg">
+    <div className="bg-slate-100 shadow-lg py-4 px-4 my-4 w-full z-50 rounded-lg">
       <ToastContainer />
       <div className="flex flex-col sm:flex-row items-center justify-evenly gap-4">
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center justify-center w-full sm:w-48 px-4 py-3 transition duration-300 ease-in-out transform hover:scale-105 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-md hover:from-blue-600 hover:to-blue-700 focus:outline-none"
+          className="flex items-center justify-center w-full sm:w-48 px-4 py-3 transition duration-300 ease-in-out transform hover:scale-105 bg-white text-blue-600 rounded-full shadow-md  focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <IoFilterSharp className="mr-2" />
           Filters
@@ -97,7 +101,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
 
         <button
           onClick={clearFilters}
-          className="w-full sm:w-48 px-4 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300 ease-in-out focus:outline-none"
+          className="w-full sm:w-48 px-4 py-3 bg-white text-blue-600 rounded-full transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           Clear Filters
         </button>
@@ -175,7 +179,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
                 <div className="mt-4">
                   <button
                     onClick={clearFilters}
-                    className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300 ease-in-out focus:outline-none"
+                    className="w-full px-4 py-2 bg-transparent text-blue-600 rounded-full hover:bg-blue-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     Clear Filters
                   </button>
@@ -184,7 +188,7 @@ const SearchNavbar: React.FC<SearchNavbarProps> = ({ onSearch }) => {
                 <div className="mt-4">
                   <button
                     onClick={handleFiltersSubmit}
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none"
+                    className="w-full px-4 py-2 bg-transparent text-blue-600 rounded-full hover:bg-blue-100 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     Apply Filters
                   </button>

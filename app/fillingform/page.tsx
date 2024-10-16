@@ -8,6 +8,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 const PropertyForm: React.FC = () => {
   const { data: session, status } = useSession();
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     minPrice: '500',
@@ -102,6 +104,37 @@ const PropertyForm: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-screen">
         <CircularProgress />
+      </div>
+    );
+  }
+
+
+  if (!session) {
+    return (
+      <div className='flex items-center justify-center'>
+        <div className="flex flex-col items-center justify-center mt-20 w-full max-w-md p-6 border border-gray-300 rounded-xl shadow-lg bg-white mx-auto my-4">
+          <h2 className="text-2xl font-bold">Please Log In</h2>
+          <p className="mt-2 text-gray-600">You need to log in to access this page. Security is needed</p>
+          <button
+            className={`mt-4 w-full py-2 rounded-full transition-all duration-300 ${loading ? 'border border-blue-600 bg-blue-600 text-white' : 'border border-blue-600 text-blue-600 bg-white hover:bg-blue-600 hover:text-white'} `}
+            onClick={() => {
+              setLoading(true);
+              setTimeout(() => {
+                window.location.href = '/login';
+              }, 2000);
+            }}
+            disabled={loading}
+          >
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <CircularProgress size={24} color="inherit" className="mr-2" />
+                <span>Processing...</span>
+              </div>
+            ) : (
+              'Go to Login'
+            )}
+          </button>
+        </div>
       </div>
     );
   }

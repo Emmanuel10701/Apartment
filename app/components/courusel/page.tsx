@@ -8,6 +8,13 @@ const images = [
     "/images/kit2.webp"
 ];
 
+const captions = [
+    "Apartments for rental for students near Universities",
+    "Modern bedroom with cozy decor",
+    "Stylish living room setup",
+    "Well-equipped kitchen for all your cooking needs"
+];
+
 const Carousel: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -28,7 +35,7 @@ const Carousel: React.FC = () => {
     };
 
     return (
-        <div className="relative w-full max-w-lg mx-auto overflow-hidden rounded-lg shadow-lg">
+        <div className="relative w-full md:w-4/5 mx-auto overflow-hidden rounded-lg shadow-lg">
             <div className="relative cursor-pointer">
                 <div className="flex justify-center">
                     <Image
@@ -54,6 +61,11 @@ const Carousel: React.FC = () => {
                         onClick={() => setCurrentIndex(index)}
                     />
                 ))}
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center items-center h-12">
+                <p className={`text-center text-2xl font-semibold bg-gradient-to-r from-purple-500 to-orange-500 bg-clip-text text-transparent`}>
+                    {captions[currentIndex]}
+                </p>
             </div>
         </div>
     );

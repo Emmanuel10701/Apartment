@@ -97,7 +97,7 @@ const MainComponent: React.FC = () => {
     return (
         <div className="flex flex-col p-4">
             <Carousel />
-            <div className="flex flex-col sm:flex-row items-center justify-evenly mt-20 mb-4">
+            <div className="flex flex-col sm:flex-row items-center justify-evenly mt-20  mx-20 mb-4">
     <input
         type="text"
         placeholder="Search apartments..."
