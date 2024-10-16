@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Footer from "../components/Footer/page"; 
 import SearchNavbar from "../components/filters/page"; 
 import ApartmentCard from "../components/card/page"; 
 import Carousel from "../components/courusel/page"; 
-import apartmentsData from '../../../apartment/public/data.json'; 
 import CircularProgress from '@mui/material/CircularProgress';
 
 interface Apartment {
@@ -33,12 +32,24 @@ interface SearchFilters {
 }
 
 const MainComponent: React.FC = () => {
-    const [filteredApartments, setFilteredApartments] = useState<Apartment[]>(apartmentsData);
+    const [apartmentsData, setApartmentsData] = useState<Apartment[]>([]);
+    const [filteredApartments, setFilteredApartments] = useState<Apartment[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 6; 
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [location, setLocation] = useState<string>('');
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const fetchApartmentsData = async () => {
+            const response = await fetch('/data.json');
+            const data = await response.json();
+            setApartmentsData(data);
+            setFilteredApartments(data); // Initialize with full data
+            setIsLoading(false);
+        };
+        fetchApartmentsData();
+    }, []);
 
     const handleSearch = (filters: SearchFilters) => {
         setIsLoading(true);
