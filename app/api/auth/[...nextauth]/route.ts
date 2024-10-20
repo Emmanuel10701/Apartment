@@ -9,24 +9,6 @@ import bcrypt from 'bcryptjs';
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!,
-      profile: (profile) => ({
-        id: profile.id,
-        name: profile.name,
-        email: profile.email,
-      }),
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_ID!,
-      clientSecret: process.env.GOOGLE_SECRET!,
-      profile: (profile) => ({
-        id: profile.sub,
-        name: profile.name,
-        email: profile.email,
-      }),
-    }),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -57,10 +39,26 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           email: user.email,
           role: user.role,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
         };
       },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID!,
+      clientSecret: process.env.GOOGLE_SECRET!,
+      profile: (profile) => ({
+        id: profile.sub,
+        name: profile.name,
+        email: profile.email,
+      }),
+    }),
+    GithubProvider({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+      profile: (profile) => ({
+        id: profile.id,
+        name: profile.name,
+        email: profile.email,
+      }),
     }),
   ],
   secret: process.env.SECRET!,
@@ -80,41 +78,32 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Email is required for sign-in');
         }
 
-        try {
-          const existingUser = await prisma.user.findUnique({
-            where: { email: user.email },
-          });
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
 
-          if (!existingUser) {
-            await prisma.user.create({
-              data: {
-                name: user.name || '',
-                email: user.email,
-                hashedPassword: '', // No password for OAuth users
-                role: 'USER', // Default role for new users
-              },
-            });
-          }
-        } catch (error) {
-          console.error('Error during OAuth user creation:', error);
-          throw new Error('An error occurred while processing sign-in');
+        if (!existingUser) {
+          await prisma.user.create({
+            data: {
+              name: user.name || '',
+              email: user.email,
+              hashedPassword: '', // No password for OAuth users
+              role: 'USER', // Default role for new users
+            },
+          });
         }
       }
       return true;
     },
     async session({ session, token }) {
       if (session.user?.email) {
-        try {
-          const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
-            select: { role: true },
-          });
+        const user = await prisma.user.findUnique({
+          where: { email: session.user.email },
+          select: { role: true },
+        });
 
-          if (user) {
-            (session.user as any).role = user.role; // Add role to the session
-          }
-        } catch (error) {
-          console.error('Error fetching user role:', error);
+        if (user) {
+          (session.user as any).role = user.role; // Add role to the session
         }
       }
       return session;

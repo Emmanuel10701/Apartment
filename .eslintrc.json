@@ -1,6 +1,6 @@
 {
   "extends": "next/core-web-vitals",
   "rules": {
-    "react/no-unescaped-entities": "warn" // or "error" if you want to enforce it
+    "react/no-unescaped-entities": "off" // This disables the rule
   }
 }
