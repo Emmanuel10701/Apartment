@@ -1,10 +1,24 @@
-import NextAuth, { NextAuthOptions } from 'next-auth';
+import NextAuth, { NextAuthOptions, DefaultSession } from 'next-auth';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import prisma from '../../../../libs/prisma';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from 'next-auth/providers/github';
 import bcrypt from 'bcryptjs';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+// Extend the session type to include role
+declare module 'next-auth' {
+  interface Session {
+    user: User & DefaultSession['user'];
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
