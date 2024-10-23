@@ -23,16 +23,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+    }
+
     // Create a transporter object using SMTP transport
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // Replace with your email service
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // true for 465, false for other ports
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      logger: true, // Enable logger
+      debug: true,  // Enable debug output
     });
+    
 
-    // Email to site owner
     const mailOptionsToOwner = {
       from: process.env.EMAIL_USER,
       to: 'emmanuelmakau90@gmail.com', // Replace with your email address
@@ -61,15 +71,14 @@ export async function POST(request: Request) {
     // Send email to owner
     await transporter.sendMail(mailOptionsToOwner);
 
-    // Send-back email to user
     const mailOptionsToUser = {
       from: process.env.EMAIL_USER,
-      to: email, // Send back to the user's email
+      to: email,
       subject: `Thank you for contacting us about ${filters.houseType}`,
       html: `
         <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; border-radius: 5px;">
           <h2 style="color: #333;">Thank you for your message, ${name}!</h2>
-          <p style="color: #555;">We have received your message and will respond to you within a short time.</p>
+          <p style="color: #555;">We have received your message and will respond to you shortly.</p>
           <div style="background-color: #fff; padding: 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
             <p><strong>Message:</strong></p>
             <p>${message}</p>
