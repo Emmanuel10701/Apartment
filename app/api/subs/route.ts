@@ -35,7 +35,6 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    // Fetch all subscriptions ordered from the latest to the oldest
     const subscriptions = await prisma.subscription.findMany({
       orderBy: {
         createdAt: 'desc', // Assuming you have a `createdAt` field for timestamps
