@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { Button, CircularProgress } from '@mui/material';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
 
 interface ModalProps {
   onClose: () => void;
@@ -9,18 +9,15 @@ interface ModalProps {
 
 const Modal: React.FC<ModalProps> = ({ onClose }) => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
 
   const handleLogin = () => {
     setIsProcessing(true);
-    // Simulate login process
     setTimeout(() => {
-      console.log('User logged in'); // Add your login logic here
+      console.log('User logged in');
       setIsProcessing(false);
       onClose(); // Close modal after processing
-
-      // Redirect to the desired route after login
-      router.push('/login'); // Change '/desired-route' to the route you want to navigate to
+      router.push('/login'); // Redirect after login
     }, 2000);
   };
 
@@ -55,4 +52,28 @@ const Modal: React.FC<ModalProps> = ({ onClose }) => {
   );
 };
 
-export default Modal;
+// New Page Component
+const Page: React.FC = () => {
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl mb-4">Welcome to the Page</h1>
+      <Button variant="contained" onClick={handleOpenModal}>
+        Open Modal
+      </Button>
+
+      {isModalOpen && <Modal onClose={handleCloseModal} />} // Conditional rendering of Modal
+    </div>
+  );
+};
+
+export default Page;

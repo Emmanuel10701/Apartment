@@ -1,6 +1,6 @@
 import NextAuth, { NextAuthOptions, DefaultSession } from 'next-auth';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import prisma from '../../../../libs/prisma';
+import prisma from '../../../libs/prisma';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from 'next-auth/providers/github';

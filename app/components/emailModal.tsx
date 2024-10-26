@@ -11,7 +11,7 @@ interface Apartment {
 interface EmailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  apartment: Apartment;
+  apartment: Apartment; // or whatever type you're using for apartment
 }
 
 const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, apartment }) => {

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 import CircularProgress from '@mui/material/CircularProgress';
-import EmailModal from "../../components/emailModal/page";
+import EmailModal from "../../components/emailModal";
 
 // Define the Apartment interface
 interface Apartment {

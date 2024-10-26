@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Footer from "../components/Footer/page"; 
-import SearchNavbar from "../components/filters/page"; 
-import ApartmentCard from "../components/card/page"; 
+import SearchNavbar from "../components/filters"; 
+import ApartmentCard from "../components/card"; 
 import Carousel from "../components/courusel/page"; 
 import CircularProgress from '@mui/material/CircularProgress';
 

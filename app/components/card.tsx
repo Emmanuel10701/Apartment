@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import EmailModal from "../emailModal/page";
+import EmailModal from "./emailModal";
 import Image from 'next/image';
 import { FaStar, FaMapMarkerAlt, FaPhone, FaEnvelope, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import Link from 'next/link';
@@ -46,7 +46,7 @@ const ApartmentCard: React.FC<ApartmentCardProps> = ({ apartment }) => {
     };
 
     return (
-        <div className="w-full max-w-xs h- bg-white border rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 mb-4">
+        <div className="w-full max-w-xs h-full bg-white border rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 mb-4">
             <div className="relative cursor-pointer h-44">
                 <Image
                     className="w-full h-full object-cover"
